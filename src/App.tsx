@@ -102,7 +102,8 @@ export default function App() {
       .replace(/Ş/g, 'S').replace(/ş/g, 's')
       .replace(/İ/g, 'I').replace(/ı/g, 'i')
       .replace(/Ö/g, 'O').replace(/ö/g, 'o')
-      .replace(/Ç/g, 'C').replace(/ç/g, 'c');
+      .replace(/Ç/g, 'C').replace(/ç/g, 'c')
+      .replace(/[^\x00-\x7F]/g, ''); // Remove any remaining non-ASCII characters to prevent PDFLib crashes
   };
 
   const generatePDF = async () => {
@@ -114,14 +115,19 @@ export default function App() {
       const pdfDoc = await PDFDocument.create();
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      const pageImages = ['/sayfa_1.jpg', '/sayfa_2.jpg', '/sayfa_3.jpg'];
+      const getImageUrl = (name: string) => {
+        const url = new URL(name, window.location.href);
+        return url.href;
+      };
+      const pageImages = [getImageUrl('sayfa_1.jpg'), getImageUrl('sayfa_2.jpg'), getImageUrl('sayfa_3.jpg')];
       let pagesAdded = 0;
+      let lastError = '';
       
       for (let i = 0; i < pageImages.length; i++) {
         const imgUrl = pageImages[i];
         try {
           const response = await fetch(imgUrl);
-          if (!response.ok) throw new Error(`${imgUrl} fetch failed`);
+          if (!response.ok) throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
           const imgBytes = await response.arrayBuffer();
           
           const image = await pdfDoc.embedJpg(imgBytes);
@@ -154,13 +160,14 @@ export default function App() {
               });
             }
           });
-        } catch (err) {
+        } catch (err: any) {
           console.error(`Page ${i+1} error:`, err);
+          lastError = err.message;
         }
       }
 
       if (pagesAdded === 0) {
-        throw new Error('Hiçbir sayfa oluşturulamadı. Görsel dosyaları eksik olabilir.');
+        throw new Error(`Hiçbir sayfa oluşturulamadı. Görsel dosyaları eksik olabilir veya yüklenemedi. Son hata: ${lastError}`);
       }
 
       const pdfBytes = await pdfDoc.save();
@@ -204,7 +211,7 @@ export default function App() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-lg font-black text-gray-800 uppercase tracking-wide leading-tight">SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU</p>
+                  <p className="text-lg font-black text-gray-800 uppercase tracking-wide leading-tight">KIZILAY GÖNÜLLÜ</p>
                 </div>
               </div>
 
@@ -268,7 +275,7 @@ export default function App() {
           <div className="flex items-center gap-4 text-right">
             <div className="flex flex-col justify-center">
               <p className="text-base md:text-xl font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
-                SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU
+                KIZILAY GÖNÜLLÜ
               </p>
             </div>
             <div className="w-14 h-14 flex items-center justify-center">
@@ -441,7 +448,7 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.3</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.4</p>
           </div>
         </div>
       </main>
