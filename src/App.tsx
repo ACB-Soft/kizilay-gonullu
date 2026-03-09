@@ -235,7 +235,7 @@ export default function App() {
 
       {/* Header */}
       <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center">
-        <div className="w-full max-w-2xl px-6 py-4 flex items-center justify-between">
+        <div className="w-full max-w-[480px] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center">
             {view !== 'home' && (
               <button 
@@ -272,25 +272,21 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto px-4 py-8 scroll-smooth flex flex-col items-center">
-        <div className="w-full max-w-2xl flex flex-col min-h-full justify-center">
+      <main className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth flex flex-col items-center bg-gray-50/30">
+        <div className="w-full max-w-[480px] flex flex-col min-h-full relative">
           
           {/* HELP VIEW */}
           {view === 'help' && (
-            <div className="space-y-8 py-4">
+            <div className="space-y-8 py-4 flex-1">
               <div className="space-y-4">
                 <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
                   <Info className="text-red-600" /> Hakkında
                 </h2>
-                <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-6 shadow-sm border border-gray-100">
+                <div className="bg-white p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-6 shadow-sm border border-gray-100">
                   <div className="space-y-4">
                     <p>Uygulama, Türk Kızılay'ın insani yardım faaliyetlerini kolaylaştırma vizyonu doğrultusunda, saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir. <strong>Türk Kızılay'ın resmi uygulaması değildir.</strong></p>
                     <p>Uygulamaya girilen veriler anlık olarak işlenerek resmi "FRM.005" ve "FRM.006" formatlarına uygun PDF belgeleri üretilir. Veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra silinir.</p>
                     <p>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</p>
-                  </div>
-                  
-                  <div className="pt-4 border-t border-gray-200">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Versiyon Bilgisi: 1.3.0</p>
                   </div>
                 </div>
               </div>
@@ -299,7 +295,17 @@ export default function App() {
 
           {/* HOME VIEW */}
           {view === 'home' && (
-            <div className="space-y-4 py-8">
+            <div className="space-y-6 py-4 flex-1">
+              <div className="flex justify-end">
+                <button 
+                  onClick={() => setView('help')}
+                  className="w-1/2 p-4 bg-white border border-gray-200 text-gray-800 rounded-2xl shadow-sm active:scale-95 transition-all flex items-center justify-center gap-3 group"
+                >
+                  <HelpCircle size={20} className="text-red-600" />
+                  <span className="text-sm font-black uppercase tracking-wide">Hakkında</span>
+                </button>
+              </div>
+
               <button 
                 onClick={() => {
                   setFormData({});
@@ -312,16 +318,6 @@ export default function App() {
                   <Plus size={28} />
                 </div>
                 <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Yeni Kayıt Oluştur</h2>
-              </button>
-
-              <button 
-                onClick={() => setView('help')}
-                className="w-full p-6 bg-white border border-gray-200 text-gray-800 rounded-3xl shadow-sm active:scale-95 transition-all flex items-center gap-5 group"
-              >
-                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                  <HelpCircle size={28} className="text-red-600" />
-                </div>
-                <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Hakkında</h2>
               </button>
             </div>
           )}
@@ -438,6 +434,10 @@ export default function App() {
               </div>
             </>
           )}
+          {/* Version Info Footer - Visible on all pages */}
+          <div className="mt-auto pt-8 pb-6 text-center">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.0</p>
+          </div>
         </div>
       </main>
     </div>
