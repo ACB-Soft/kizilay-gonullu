@@ -94,25 +94,40 @@ export default function App() {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
+  const trToEn = (str: string) => {
+    if (!str) return '';
+    return String(str)
+      .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
+      .replace(/Ü/g, 'U').replace(/ü/g, 'u')
+      .replace(/Ş/g, 'S').replace(/ş/g, 's')
+      .replace(/İ/g, 'I').replace(/ı/g, 'i')
+      .replace(/Ö/g, 'O').replace(/ö/g, 'o')
+      .replace(/Ç/g, 'C').replace(/ç/g, 'c');
+  };
+
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
       const { PDFDocument, rgb, StandardFonts } = (window as any).PDFLib;
+      if (!PDFDocument) throw new Error('PDFLib not loaded');
+      
       const pdfDoc = await PDFDocument.create();
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      const pageImages = ['sayfa_1.jpg', 'sayfa_2.jpg', 'sayfa_3.jpg'];
+      const pageImages = ['/sayfa_1.jpg', '/sayfa_2.jpg', '/sayfa_3.jpg'];
+      let pagesAdded = 0;
       
       for (let i = 0; i < pageImages.length; i++) {
         const imgUrl = pageImages[i];
         try {
-          const imgBytes = await fetch(imgUrl).then(res => {
-            if (!res.ok) throw new Error(`${imgUrl} not found`);
-            return res.arrayBuffer();
-          });
+          const response = await fetch(imgUrl);
+          if (!response.ok) throw new Error(`${imgUrl} fetch failed`);
+          const imgBytes = await response.arrayBuffer();
+          
           const image = await pdfDoc.embedJpg(imgBytes);
           const page = pdfDoc.addPage([image.width, image.height]);
           page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+          pagesAdded++;
 
           const fieldsOnThisPage = FORM_CONFIG.filter(f => f.page === i + 1);
           fieldsOnThisPage.forEach(field => {
@@ -122,7 +137,7 @@ export default function App() {
             const pdfY = image.height - field.y;
 
             if (field.type === 'text') {
-              page.drawText(String(value), {
+              page.drawText(trToEn(String(value)), {
                 x: field.x,
                 y: pdfY,
                 size: 10,
@@ -140,8 +155,12 @@ export default function App() {
             }
           });
         } catch (err) {
-          console.warn(`Page ${i+1} could not be loaded:`, err);
+          console.error(`Page ${i+1} error:`, err);
         }
+      }
+
+      if (pagesAdded === 0) {
+        throw new Error('Hiçbir sayfa oluşturulamadı. Görsel dosyaları eksik olabilir.');
       }
 
       const pdfBytes = await pdfDoc.save();
@@ -151,9 +170,9 @@ export default function App() {
       link.download = `Kizilay_Formu_${formData.is_tc_no || 'Yeni'}.pdf`;
       link.click();
       setView('result');
-    } catch (error) {
+    } catch (error: any) {
       console.error('PDF Error:', error);
-      alert('PDF oluşturulurken hata oluştu. Lütfen görsellerin doğru yüklendiğinden emin olun.');
+      alert(`Hata: ${error.message || 'PDF oluşturulamadı.'}`);
     } finally {
       setIsGenerating(false);
     }
@@ -360,12 +379,6 @@ export default function App() {
                     transition={{ duration: 0.2 }}
                   >
                     <div className="space-y-6">
-                      <div className="bg-red-50 p-6 rounded-3xl border border-red-100 mb-6">
-                        <h2 className="text-xl font-black text-red-700 mb-2 flex items-center gap-2 uppercase">
-                          {currentSection}
-                        </h2>
-                      </div>
-                      
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {fieldsInCurrentSection.map(field => (
                           <div key={field.id}>
@@ -428,7 +441,7 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.2</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.3</p>
           </div>
         </div>
       </main>
