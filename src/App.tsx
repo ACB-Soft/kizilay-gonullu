@@ -117,19 +117,10 @@ export default function App() {
 
       const getImageUrl = (name: string) => {
         const base = (import.meta as any).env.BASE_URL || '/';
-        // If base is relative (starts with .), use window.location.href as base
-        // If base is absolute (starts with /), use window.location.origin as base
-        const absoluteBase = base.startsWith('.') 
-          ? new URL(base, window.location.href).href 
-          : new URL(base, window.location.origin).href;
-          
-        // Ensure it ends with a slash for directory-style bases to avoid path jumping
-        const searchBase = absoluteBase.split('?')[0].split('#')[0];
-        const finalBase = (searchBase.endsWith('/') || searchBase.split('/').pop()?.includes('.'))
-          ? searchBase
-          : searchBase + '/';
-          
-        return new URL(name, finalBase).href;
+        // Ensure base ends with slash and name doesn't start with one
+        const cleanBase = base.endsWith('/') ? base : `${base}/`;
+        const cleanName = name.startsWith('/') ? name.slice(1) : name;
+        return new URL(cleanName, window.location.origin + cleanBase).href;
       };
 
       const pageImages = [getImageUrl('sayfa_1.jpg'), getImageUrl('sayfa_2.jpg'), getImageUrl('sayfa_3.jpg')];
@@ -140,15 +131,19 @@ export default function App() {
         const imgUrl = pageImages[i];
         try {
           const response = await fetch(imgUrl, { cache: 'no-cache' });
-          if (!response.ok) throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error(`${imgUrl} dosyası sunucuda bulunamadı (404).`);
+            }
+            throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
+          }
           
           const contentType = response.headers.get('Content-Type');
           if (contentType && !contentType.startsWith('image/') && !contentType.includes('application/octet-stream')) {
-            throw new Error(`${imgUrl} bir görsel değil (Content-Type: ${contentType})`);
+            throw new Error(`${imgUrl} bir görsel değil, sunucu ${contentType} döndürdü. Dosya bozulmuş olabilir.`);
           }
 
           const imgBytes = await response.arrayBuffer();
-          
           const uint8 = new Uint8Array(imgBytes);
           let image;
           
@@ -162,9 +157,8 @@ export default function App() {
           } 
           else {
             const hex = Array.from(uint8.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join(' ');
-            const text = new TextDecoder().decode(uint8.slice(0, 100));
-            if (text.toLowerCase().includes('<!doctype html>') || text.toLowerCase().includes('<html')) {
-              throw new Error(`${imgUrl} bulunamadı veya sunucu HTML döndürdü.`);
+            if (hex.startsWith('ef bf bd')) {
+              throw new Error(`${imgUrl} dosyası ikili (binary) yerine metin olarak kaydedilmiş ve bozulmuş. (UTF-8 Replacement Character hatası)`);
             }
             throw new Error(`${imgUrl} geçerli bir JPEG veya PNG değil. (İlk 8 bayt: ${hex})`);
           }

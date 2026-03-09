@@ -1,0 +1,16 @@
+# Ensure binary files are treated as binary and not modified
+*.jpg binary
+*.png binary
+*.gif binary
+*.pdf binary
+*.ico binary
+
+# Ensure text files use LF line endings
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.svg text eol=lf
+*.json text eol=lf
