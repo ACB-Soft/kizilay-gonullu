@@ -116,8 +116,8 @@ export default function App() {
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
       const getImageUrl = (name: string) => {
-        const url = new URL(name, window.location.href);
-        return url.href;
+        // Use origin to ensure we're fetching from the root where public assets are
+        return new URL(name, window.location.origin).href;
       };
       const pageImages = [getImageUrl('sayfa_1.jpg'), getImageUrl('sayfa_2.jpg'), getImageUrl('sayfa_3.jpg')];
       let pagesAdded = 0;
@@ -130,7 +130,25 @@ export default function App() {
           if (!response.ok) throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
           const imgBytes = await response.arrayBuffer();
           
-          const image = await pdfDoc.embedJpg(imgBytes);
+          const uint8 = new Uint8Array(imgBytes);
+          let image;
+          
+          // JPEG magic bytes: FF D8 FF
+          if (uint8[0] === 0xFF && uint8[1] === 0xD8 && uint8[2] === 0xFF) {
+            image = await pdfDoc.embedJpg(imgBytes);
+          } 
+          // PNG magic bytes: 89 50 4E 47
+          else if (uint8[0] === 0x89 && uint8[1] === 0x50 && uint8[2] === 0x4E && uint8[3] === 0x47) {
+            image = await pdfDoc.embedPng(imgBytes);
+          } 
+          else {
+            const text = new TextDecoder().decode(uint8.slice(0, 100));
+            if (text.toLowerCase().includes('<!doctype html>') || text.toLowerCase().includes('<html')) {
+              throw new Error(`${imgUrl} bulunamadı veya sunucu HTML döndürdü.`);
+            }
+            throw new Error(`${imgUrl} geçerli bir JPEG veya PNG değil (Magic bytes: ${uint8[0].toString(16)} ${uint8[1].toString(16)})`);
+          }
+
           const page = pdfDoc.addPage([image.width, image.height]);
           page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
           pagesAdded++;
@@ -211,7 +229,7 @@ export default function App() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-lg font-black text-gray-800 uppercase tracking-wide leading-tight">KIZILAY GÖNÜLLÜ</p>
+                  <p className="text-lg font-black text-gray-800 uppercase tracking-wide leading-tight">SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU</p>
                 </div>
               </div>
 
@@ -275,7 +293,7 @@ export default function App() {
           <div className="flex items-center gap-4 text-right">
             <div className="flex flex-col justify-center">
               <p className="text-base md:text-xl font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
-                KIZILAY GÖNÜLLÜ
+                SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU
               </p>
             </div>
             <div className="w-14 h-14 flex items-center justify-center">
