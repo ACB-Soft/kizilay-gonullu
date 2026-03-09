@@ -109,7 +109,7 @@ export default function App() {
       const pdfDoc = await PDFDocument.create();
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      const pageImages = ['/sayfa_1.jpg', '/sayfa_2.jpg', '/sayfa_3.jpg'];
+      const pageImages = ['sayfa_1.jpg', 'sayfa_2.jpg', 'sayfa_3.jpg'];
       
       for (let i = 0; i < pageImages.length; i++) {
         const imgUrl = pageImages[i];
@@ -187,7 +187,7 @@ export default function App() {
               <div className="flex flex-col items-center gap-4">
                 <div className="w-40 h-40 flex items-center justify-center">
                   <img 
-                    src="/kizilay_logo.svg" 
+                    src="kizilay_logo.svg" 
                     alt="Türk Kızılay Logo" 
                     className="w-full h-full object-contain"
                   />
@@ -241,7 +241,7 @@ export default function App() {
         <div className="flex items-center gap-3">
           <div className="w-14 h-14 flex items-center justify-center">
             <img 
-              src="/kizilay_logo.svg" 
+              src="kizilay_logo.svg" 
               alt="Türk Kızılay Logo" 
               className="w-full h-full object-contain"
             />
