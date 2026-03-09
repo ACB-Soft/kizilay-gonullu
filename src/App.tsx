@@ -182,10 +182,10 @@ export default function App() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="max-w-sm w-full space-y-6"
+              className="max-w-sm w-full space-y-4"
             >
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-40 h-40 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-32 h-32 flex items-center justify-center">
                   <img 
                     src="kizilay_logo.svg" 
                     alt="Türk Kızılay Logo" 
@@ -193,43 +193,40 @@ export default function App() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xl font-black text-gray-800 uppercase tracking-wide leading-tight">SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU</p>
+                  <p className="text-lg font-black text-gray-800 uppercase tracking-wide leading-tight">SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU</p>
                 </div>
               </div>
 
-              <div className="space-y-4 py-4">
-                <div className="grid grid-cols-1 gap-4 text-left">
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl">
+              <div className="space-y-2 py-2">
+                <div className="grid grid-cols-1 gap-2 text-left">
+                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-2xl">
                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
                       <FileText className="text-red-600" size={20} />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-gray-900">Kolay Başvuru</h3>
-                      <p className="text-sm text-gray-500">Adım adım soruları yanıtlayarak başvurunuzu tamamlayın.</p>
+                      <h3 className="text-sm font-bold text-gray-900">Kolay Başvuru</h3>
+                      <p className="text-xs text-gray-500">Adım adım soruları yanıtlayarak başvurunuzu tamamlayın.</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl">
+                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-2xl">
                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
                       <CheckCircle2 className="text-red-600" size={20} />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-gray-900">Hızlı Sonuç</h3>
-                      <p className="text-sm text-gray-500">Sistem sizin için resmi PDF formlarını otomatik olarak hazırlar.</p>
+                      <h3 className="text-sm font-bold text-gray-900">Hızlı Sonuç</h3>
+                      <p className="text-xs text-gray-500">Sistem sizin için resmi PDF formlarını otomatik olarak hazırlar.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 space-y-4">
+              <div className="pt-2 space-y-3">
                 <button 
                   onClick={() => setShowOnboarding(false)}
-                  className="w-full py-5 bg-red-600 text-white rounded-2xl font-black text-xl shadow-xl shadow-red-100 active:scale-95 transition-all"
+                  className="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-100 active:scale-95 transition-all"
                 >
                   BAŞLAYALIM
                 </button>
-                <p className="text-sm font-bold text-gray-500">
-                  MMG Bursa Şubesinin Katkılarıyla Hazırlanmıştır.
-                </p>
               </div>
             </motion.div>
           </motion.div>
@@ -237,43 +234,52 @@ export default function App() {
       </AnimatePresence>
 
       {/* Header */}
-      <header className="flex-none bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between shadow-sm z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-14 h-14 flex items-center justify-center">
-            <img 
-              src="kizilay_logo.svg" 
-              alt="Türk Kızılay Logo" 
-              className="w-full h-full object-contain"
-            />
+      <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center">
+        <div className="w-full max-w-2xl px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            {view !== 'home' && (
+              <button 
+                onClick={() => {
+                  if (view === 'form') {
+                    if (currentSectionIndex > 0) {
+                      setCurrentSectionIndex(prev => prev - 1);
+                    } else {
+                      if (window.confirm('Formu kapatmak istediğinize emin misiniz?')) {
+                        setView('home');
+                      }
+                    }
+                  } else {
+                    setView('home');
+                  }
+                }}
+                className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 flex items-center gap-1"
+              >
+                <ChevronLeft size={32} />
+                <span className="text-sm font-bold uppercase hidden sm:inline">Geri</span>
+              </button>
+            )}
           </div>
-          <div>
-            <p className="text-sm md:text-base font-black text-gray-800 uppercase tracking-wide leading-tight mt-0.5">SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU</p>
+
+          <div className="flex items-center gap-4 text-right">
+            <div className="flex flex-col justify-center">
+              <p className="text-sm md:text-base font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
+                SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU
+              </p>
+            </div>
+            <div className="w-14 h-14 flex items-center justify-center">
+              <img 
+                src="kizilay_logo.svg" 
+                alt="Türk Kızılay Logo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
         </div>
-        {view === 'form' ? (
-          <button 
-            onClick={() => {
-              if (window.confirm('Formu kapatmak istediğinize emin misiniz?')) {
-                setView('home');
-              }
-            }}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-red-600"
-          >
-            <X size={28} />
-          </button>
-        ) : (
-          <button 
-            onClick={() => setView('help')}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <HelpCircle size={28} className="text-gray-600" />
-          </button>
-        )}
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto px-4 pt-6 pb-24 scroll-smooth">
-        <div className="max-w-2xl mx-auto h-full">
+      <main className="flex-1 overflow-y-auto px-4 py-8 scroll-smooth flex flex-col items-center">
+        <div className="w-full max-w-2xl flex flex-col min-h-full justify-center">
           
           {/* HELP VIEW */}
           {view === 'help' && (
@@ -283,11 +289,17 @@ export default function App() {
                   <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
                     <Info className="text-red-600" /> Hakkında
                   </h2>
-                  <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-4">
-                    <p><strong>Türk Kızılay Sosyal İnceleme Sistemi</strong></p>
-                    <p>Bu uygulama, Türk Kızılay personeli ve gönüllülerinin saha çalışmalarında sosyal inceleme formlarını dijital ortamda hızlı ve hatasız bir şekilde doldurabilmeleri için geliştirilmiştir.</p>
-                    <p>Sistem, girilen verileri otomatik olarak standart FRM.005 formatına dönüştürür ve PDF olarak çıktısını verir.</p>
-                    <p className="text-xs text-gray-400">Versiyon 1.0.0</p>
+                  <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-4 shadow-sm border border-gray-100">
+                    <p className="text-base font-bold text-red-600">Türk Kızılay Dijital Saha Yönetim Sistemi</p>
+                    <p>Bu platform, Türk Kızılay'ın insani yardım faaliyetlerini dijitalleştirme vizyonu doğrultusunda, saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir.</p>
+                    <p><strong>Temel Amaç:</strong> İhtiyaç sahiplerine ulaşma süresini kısaltmak, veri doğruluğunu artırmak ve kağıt israfını önleyerek çevre dostu bir operasyon yürütmektir.</p>
+                    <p>Sistem, girilen verileri anlık olarak işleyerek resmi <strong>FRM.005 Sosyal İnceleme Formu</strong> formatına uygun PDF belgeleri üretir.</p>
+                    <div className="pt-2 border-t border-gray-200">
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.
+                      </p>
+                      <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">Versiyon 1.2.0 | 2024</p>
+                    </div>
                   </div>
                 </div>
 
@@ -295,62 +307,44 @@ export default function App() {
                   <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
                     <HelpCircle className="text-red-600" /> Yardım
                   </h2>
-                  <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-4">
-                    <h3 className="font-bold text-gray-900">Nasıl Kullanılır?</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Tüm adımları sırasıyla doldurunuz.</li>
-                      <li>Zorunlu alanları boş bırakmayınız.</li>
-                      <li>En son adımda "PDF Olarak İndir" butonuna basarak formu cihazınıza kaydediniz.</li>
+                  <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-4 shadow-sm border border-gray-100">
+                    <h3 className="font-bold text-gray-900">Sıkça Sorulan Sorular</h3>
+                    <ul className="list-disc pl-5 space-y-3">
+                      <li><strong>Verilerim Kaydediliyor mu?</strong> Girilen veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra silinir.</li>
+                      <li><strong>Zorunlu Alanlar:</strong> Kırmızı yıldız olmasa da, sağlıklı bir inceleme için tüm alanların doldurulması önerilir.</li>
+                      <li><strong>PDF İndirme:</strong> Form bittiğinde "Tamamla ve İndir" butonuna basarak dosyayı cihazınıza alabilirsiniz.</li>
                     </ul>
                   </div>
                 </div>
-              </div>
-
-              <div className="py-8 text-center space-y-4">
-                <p className="text-sm font-bold text-gray-500">
-                  MMG Bursa Şubesinin Katkılarıyla Hazırlanmıştır.
-                </p>
-                <button 
-                  onClick={() => setView('home')}
-                  className="w-full py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all"
-                >
-                  Geri Dön
-                </button>
               </div>
             </div>
           )}
 
           {/* HOME VIEW */}
           {view === 'home' && (
-            <div className="h-full flex flex-col items-center justify-center gap-6">
+            <div className="space-y-4 py-8">
               <button 
                 onClick={() => {
                   setFormData({});
                   setCurrentSectionIndex(0);
                   setView('form');
                 }}
-                className="w-full p-8 bg-red-600 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex flex-col items-center gap-4 group"
+                className="w-full p-6 bg-red-600 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex items-center gap-5 group"
               >
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Plus size={32} />
+                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                  <Plus size={28} />
                 </div>
-                <div className="text-center">
-                  <h2 className="text-2xl font-black">Yeni Kayıt Oluştur</h2>
-                  <p className="text-white/80 text-sm mt-1">Yeni bir sosyal inceleme formu başlat</p>
-                </div>
+                <h2 className="text-2xl font-black uppercase tracking-wide">Yeni Kayıt Oluştur</h2>
               </button>
 
               <button 
-                onClick={() => alert('Bu özellik yapım aşamasındadır.')}
-                className="w-full p-8 bg-white border border-gray-100 text-gray-800 rounded-3xl shadow-lg active:scale-95 transition-all flex flex-col items-center gap-4 group"
+                onClick={() => setView('help')}
+                className="w-full p-6 bg-white border border-gray-200 text-gray-800 rounded-3xl shadow-sm active:scale-95 transition-all flex items-center gap-5 group"
               >
-                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <FileText size={32} className="text-gray-400" />
+                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                  <HelpCircle size={28} className="text-red-600" />
                 </div>
-                <div className="text-center">
-                  <h2 className="text-2xl font-black">Eski Kayıtları İncele</h2>
-                  <p className="text-gray-400 text-sm mt-1">Geçmiş başvuruları görüntüle</p>
-                </div>
+                <h2 className="text-2xl font-black uppercase tracking-wide">Yardım & Hakkında</h2>
               </button>
             </div>
           )}
@@ -435,11 +429,16 @@ export default function App() {
                 {/* Navigation */}
                 <div className="mt-12 flex justify-between gap-4">
                   <button
-                    onClick={() => setCurrentSectionIndex(prev => Math.max(0, prev - 1))}
-                    className={`flex-1 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 ${
-                      currentSectionIndex === 0 ? 'bg-gray-50 text-gray-300 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                    disabled={currentSectionIndex === 0}
+                    onClick={() => {
+                      if (currentSectionIndex === 0) {
+                        if (window.confirm('Formdan çıkmak istediğinize emin misiniz? Verileriniz kaybolabilir.')) {
+                          setView('home');
+                        }
+                      } else {
+                        setCurrentSectionIndex(prev => Math.max(0, prev - 1));
+                      }
+                    }}
+                    className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
                   >
                     <ChevronLeft size={20} /> Geri
                   </button>
