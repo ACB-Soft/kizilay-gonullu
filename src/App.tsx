@@ -256,7 +256,7 @@ export default function App() {
 
           <div className="flex items-center gap-4 text-right">
             <div className="flex flex-col justify-center">
-              <p className="text-sm md:text-lg font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
+              <p className="text-base md:text-xl font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
                 SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU
               </p>
             </div>
@@ -436,7 +436,7 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.0</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.1</p>
           </div>
         </div>
       </main>
