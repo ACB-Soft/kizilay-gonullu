@@ -38,27 +38,19 @@ const initialData: FormData = {};
 const StepIndicator = ({ currentStep, steps }: { currentStep: number; steps: string[] }) => {
   return (
     <div className="w-full mb-8">
-      <div className="flex justify-between items-center relative">
-        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0" />
-        <div 
-          className="absolute top-1/2 left-0 h-0.5 bg-red-600 -translate-y-1/2 z-0 transition-all duration-500" 
-          style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-        />
-        {steps.map((_, idx) => (
-          <div 
-            key={idx}
-            className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-              idx <= currentStep ? 'bg-red-600 text-white shadow-lg scale-110' : 'bg-white text-gray-400 border-2 border-gray-200'
-            }`}
-          >
-            {idx + 1}
-          </div>
-        ))}
-      </div>
-      <div className="mt-2 text-center">
-        <span className="text-sm font-semibold text-red-600 uppercase tracking-wider">
+      <div className="flex justify-between items-end mb-2">
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+          ADIM {currentStep + 1} / {steps.length}
+        </span>
+        <span className="text-xs font-bold text-red-600 uppercase tracking-wider text-right max-w-[60%] truncate">
           {steps[currentStep]}
         </span>
+      </div>
+      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-red-600 transition-all duration-500 rounded-full" 
+          style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+        />
       </div>
     </div>
   );
@@ -436,7 +428,7 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.1</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.2</p>
           </div>
         </div>
       </main>
