@@ -115,19 +115,16 @@ export default function App() {
       const pdfDoc = await PDFDocument.create();
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      const getImageUrl = (name: string) => {
-        // Use origin to ensure we're fetching from the root where public assets are
-        return new URL(name, window.location.origin).href;
-      };
-      const pageImages = [getImageUrl('sayfa_1.jpg'), getImageUrl('sayfa_2.jpg'), getImageUrl('sayfa_3.jpg')];
+      const pageImages = ['sayfa_1.jpg', 'sayfa_2.jpg', 'sayfa_3.jpg'];
       let pagesAdded = 0;
       let lastError = '';
       
       for (let i = 0; i < pageImages.length; i++) {
-        const imgUrl = pageImages[i];
+        const imgName = pageImages[i];
         try {
-          const response = await fetch(imgUrl);
-          if (!response.ok) throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
+          // Use relative path to handle subfolders (like GitHub Pages)
+          const response = await fetch(imgName);
+          if (!response.ok) throw new Error(`${response.url} yüklenemedi (HTTP ${response.status})`);
           const imgBytes = await response.arrayBuffer();
           
           const uint8 = new Uint8Array(imgBytes);
@@ -144,9 +141,9 @@ export default function App() {
           else {
             const text = new TextDecoder().decode(uint8.slice(0, 100));
             if (text.toLowerCase().includes('<!doctype html>') || text.toLowerCase().includes('<html')) {
-              throw new Error(`${imgUrl} bulunamadı veya sunucu HTML döndürdü.`);
+              throw new Error(`${response.url} bulunamadı veya sunucu HTML döndürdü.`);
             }
-            throw new Error(`${imgUrl} geçerli bir JPEG veya PNG değil (Magic bytes: ${uint8[0].toString(16)} ${uint8[1].toString(16)})`);
+            throw new Error(`${response.url} geçerli bir JPEG veya PNG değil (Magic bytes: ${uint8[0].toString(16)} ${uint8[1].toString(16)})`);
           }
 
           const page = pdfDoc.addPage([image.width, image.height]);
@@ -466,7 +463,7 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.4</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.5</p>
           </div>
         </div>
       </main>
