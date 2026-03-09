@@ -240,14 +240,8 @@ export default function App() {
             {view !== 'home' && (
               <button 
                 onClick={() => {
-                  if (view === 'form') {
-                    if (currentSectionIndex > 0) {
-                      setCurrentSectionIndex(prev => prev - 1);
-                    } else {
-                      if (window.confirm('Formu kapatmak istediğinize emin misiniz?')) {
-                        setView('home');
-                      }
-                    }
+                  if (view === 'form' && currentSectionIndex > 0) {
+                    setCurrentSectionIndex(prev => prev - 1);
                   } else {
                     setView('home');
                   }
@@ -262,7 +256,7 @@ export default function App() {
 
           <div className="flex items-center gap-4 text-right">
             <div className="flex flex-col justify-center">
-              <p className="text-sm md:text-base font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
+              <p className="text-sm md:text-lg font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
                 SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU
               </p>
             </div>
@@ -283,37 +277,20 @@ export default function App() {
           
           {/* HELP VIEW */}
           {view === 'help' && (
-            <div className="h-full flex flex-col">
-              <div className="flex-1 space-y-8">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-                    <Info className="text-red-600" /> Hakkında
-                  </h2>
-                  <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-4 shadow-sm border border-gray-100">
-                    <p className="text-base font-bold text-red-600">Türk Kızılay Dijital Saha Yönetim Sistemi</p>
-                    <p>Bu platform, Türk Kızılay'ın insani yardım faaliyetlerini dijitalleştirme vizyonu doğrultusunda, saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir.</p>
-                    <p><strong>Temel Amaç:</strong> İhtiyaç sahiplerine ulaşma süresini kısaltmak, veri doğruluğunu artırmak ve kağıt israfını önleyerek çevre dostu bir operasyon yürütmektir.</p>
-                    <p>Sistem, girilen verileri anlık olarak işleyerek resmi <strong>FRM.005 Sosyal İnceleme Formu</strong> formatına uygun PDF belgeleri üretir.</p>
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-xs text-gray-500 leading-relaxed">
-                        Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.
-                      </p>
-                      <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">Versiyon 1.2.0 | 2024</p>
-                    </div>
+            <div className="space-y-8 py-4">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+                  <Info className="text-red-600" /> Hakkında
+                </h2>
+                <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-6 shadow-sm border border-gray-100">
+                  <div className="space-y-4">
+                    <p>Uygulama, Türk Kızılay'ın insani yardım faaliyetlerini kolaylaştırma vizyonu doğrultusunda, saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir. <strong>Türk Kızılay'ın resmi uygulaması değildir.</strong></p>
+                    <p>Uygulamaya girilen veriler anlık olarak işlenerek resmi "FRM.005" ve "FRM.006" formatlarına uygun PDF belgeleri üretilir. Veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra silinir.</p>
+                    <p>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</p>
                   </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-                    <HelpCircle className="text-red-600" /> Yardım
-                  </h2>
-                  <div className="bg-gray-50 p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-4 shadow-sm border border-gray-100">
-                    <h3 className="font-bold text-gray-900">Sıkça Sorulan Sorular</h3>
-                    <ul className="list-disc pl-5 space-y-3">
-                      <li><strong>Verilerim Kaydediliyor mu?</strong> Girilen veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra silinir.</li>
-                      <li><strong>Zorunlu Alanlar:</strong> Kırmızı yıldız olmasa da, sağlıklı bir inceleme için tüm alanların doldurulması önerilir.</li>
-                      <li><strong>PDF İndirme:</strong> Form bittiğinde "Tamamla ve İndir" butonuna basarak dosyayı cihazınıza alabilirsiniz.</li>
-                    </ul>
+                  
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Versiyon Bilgisi: 1.3.0</p>
                   </div>
                 </div>
               </div>
@@ -334,7 +311,7 @@ export default function App() {
                 <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                   <Plus size={28} />
                 </div>
-                <h2 className="text-2xl font-black uppercase tracking-wide">Yeni Kayıt Oluştur</h2>
+                <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Yeni Kayıt Oluştur</h2>
               </button>
 
               <button 
@@ -344,7 +321,7 @@ export default function App() {
                 <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                   <HelpCircle size={28} className="text-red-600" />
                 </div>
-                <h2 className="text-2xl font-black uppercase tracking-wide">Yardım & Hakkında</h2>
+                <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Hakkında</h2>
               </button>
             </div>
           )}
@@ -431,9 +408,7 @@ export default function App() {
                   <button
                     onClick={() => {
                       if (currentSectionIndex === 0) {
-                        if (window.confirm('Formdan çıkmak istediğinize emin misiniz? Verileriniz kaybolabilir.')) {
-                          setView('home');
-                        }
+                        setView('home');
                       } else {
                         setCurrentSectionIndex(prev => Math.max(0, prev - 1));
                       }
@@ -452,12 +427,11 @@ export default function App() {
                     </button>
                   ) : (
                     <button
-                      onClick={generatePDF}
-                      disabled={isGenerating}
-                      className="flex-1 py-4 bg-black text-white rounded-2xl font-bold hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 shadow-lg"
+                      onClick={() => setView('result')}
+                      className="flex-1 py-4 bg-green-600 text-white rounded-2xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-lg"
                     >
-                      {isGenerating ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" /> : <Save size={20} />}
-                      Tamamla ve İndir
+                      <Check size={20} />
+                      Tamamla
                     </button>
                   )}
                 </div>
