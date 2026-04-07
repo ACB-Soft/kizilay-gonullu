@@ -64,7 +64,7 @@ const Input = ({ label, value, onChange, type = "text", placeholder = "" }: any)
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm"
+      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm uppercase"
     />
   </div>
 );
@@ -91,7 +91,8 @@ export default function App() {
   const fieldsInCurrentSection = FORM_CONFIG.filter(f => f.section === currentSection);
 
   const updateField = (id: string, value: any) => {
-    setFormData(prev => ({ ...prev, [id]: value }));
+    const processedValue = typeof value === 'string' ? value.toLocaleUpperCase('tr-TR') : value;
+    setFormData(prev => ({ ...prev, [id]: processedValue }));
   };
 
   const trToEn = (str: string) => {
@@ -117,23 +118,12 @@ export default function App() {
 
       const getImageUrl = (name: string) => {
         const base = (import.meta as any).env.BASE_URL || '/';
-        let basePath = base;
-        
-        // If base is relative (like './'), derive the actual path from window.location
-        if (base.startsWith('.')) {
-          const parts = window.location.pathname.split('/');
-          // If the last part looks like a file (contains a dot), remove it
-          if (parts[parts.length - 1].includes('.')) {
-            parts.pop();
-          }
-          basePath = parts.join('/');
-        }
-        
-        // Ensure basePath starts and ends with a slash for consistent URL construction
-        const cleanBase = basePath.startsWith('/') ? basePath : `/${basePath}`;
-        const finalBase = cleanBase.endsWith('/') ? cleanBase : `${cleanBase}/`;
-        
-        return new URL(name, window.location.origin + finalBase).href;
+        // Resolve the base URL relative to the current page URL
+        // This handles both absolute (/repo/) and relative (./) base paths correctly
+        const resolvedBase = new URL(base, window.location.href).href;
+        // Ensure the resolved base ends with a slash if it's a directory
+        const finalBase = resolvedBase.endsWith('/') ? resolvedBase : `${resolvedBase}/`;
+        return new URL(name, finalBase).href;
       };
 
       const pageImages = [getImageUrl('sayfa_1.jpg'), getImageUrl('sayfa_2.jpg'), getImageUrl('sayfa_3.jpg')];
@@ -493,7 +483,7 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.6</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.3.7</p>
           </div>
         </div>
       </main>
