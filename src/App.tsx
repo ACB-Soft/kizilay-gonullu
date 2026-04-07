@@ -116,27 +116,7 @@ export default function App() {
       const pdfDoc = await PDFDocument.create();
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      const getImageUrl = (name: string) => {
-        const base = (import.meta as any).env.BASE_URL || './';
-        const normalizedBase = base.endsWith('/') ? base : `${base}/`;
-        
-        // Get the current directory path
-        let currentDir = window.location.pathname;
-        if (!currentDir.endsWith('/')) {
-          const lastSegment = currentDir.split('/').pop() || '';
-          if (!lastSegment.includes('.')) {
-            currentDir += '/';
-          } else {
-            currentDir = currentDir.substring(0, currentDir.lastIndexOf('/') + 1);
-          }
-        }
-        
-        const origin = window.location.origin;
-        const absoluteBase = new URL(normalizedBase, origin + currentDir).href;
-        return new URL(name, absoluteBase).href;
-      };
-
-      const pageImages = [getImageUrl('sayfa_1.png'), getImageUrl('sayfa_2.png')];
+      const pageImages = ['sayfa_1.png', 'sayfa_2.png'];
       let pagesAdded = 0;
       let lastError = '';
       
@@ -493,7 +473,7 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.4.1</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.4.2</p>
           </div>
         </div>
       </main>
