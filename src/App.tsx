@@ -126,7 +126,7 @@ export default function App() {
         return new URL(name, finalBase).href;
       };
 
-      const pageImages = [getImageUrl('sayfa_1.jpg'), getImageUrl('sayfa_2.jpg'), getImageUrl('sayfa_3.jpg')];
+      const pageImages = [getImageUrl('sayfa_1.png'), getImageUrl('sayfa_2.png'), getImageUrl('sayfa_3.png')];
       let pagesAdded = 0;
       let lastError = '';
       
