@@ -153,37 +153,4 @@ export const FORM_CONFIG: FieldConfig[] = [
   { id: 'yardim_kurum1_adi', label: '1. Kurum Adı', type: 'text', x: 115, y: 415, page: 2, section: '10. DİĞER KURUM YARDIMLARI' },
   { id: 'yardim_kurum1_turu', label: '1. Yardım Türü', type: 'text', x: 315, y: 415, page: 2, section: '10. DİĞER KURUM YARDIMLARI' },
   { id: 'yardim_kurum1_miktari', label: '1. Yardım Miktarı', type: 'text', x: 515, y: 415, page: 2, section: '10. DİĞER KURUM YARDIMLARI' },
-
-  // --- SAYFA 3 ---
-  // 11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME
-  { id: 'gorusme_adi_soyadi', label: 'Görüşme Yapan Adı Soyadı', type: 'text', x: 215, y: 55, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'gorusme_gorevi', label: 'Görevi', type: 'text', x: 215, y: 75, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'gorusme_gorev_yeri', label: 'Görev Yeri', type: 'text', x: 215, y: 95, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'gorusme_tarih', label: 'Tarih', type: 'text', x: 625, y: 55, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'gorusme_yeri', label: 'Görüşme Yeri', type: 'text', x: 625, y: 75, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-
-  { id: 'belge_dilekce', label: 'Dilekçe/Başvuru Formu', type: 'checkbox', x: 125, y: 135, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'belge_kimlik', label: 'Kimlik Belgesi', type: 'checkbox', x: 225, y: 135, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'belge_riza', label: 'Açık Rıza Formu', type: 'checkbox', x: 325, y: 135, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'belge_saglik', label: 'Sağlık Raporu', type: 'checkbox', x: 425, y: 135, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-  { id: 'belge_gelir', label: 'Gelir Belgesi', type: 'checkbox', x: 525, y: 135, page: 3, section: '11. GÖRÜŞME BİLGİLERİ VE BELGELENDİRME' },
-
-  // 12. YARDIM KARARI VE GEREKÇESİ
-  { id: 'karar_sahibidir', label: 'İhtiyaç Sahibidir', type: 'checkbox', x: 155, y: 185, page: 3, section: '12. YARDIM KARARI VE GEREKÇESİ' },
-  { id: 'karar_sahibi_degildir', label: 'İhtiyaç Sahibi Değildir', type: 'checkbox', x: 255, y: 185, page: 3, section: '12. YARDIM KARARI VE GEREKÇESİ' },
-  { id: 'karar_aciklama', label: 'Görüş ve Öneriler', type: 'text', x: 115, y: 215, page: 3, section: '12. YARDIM KARARI VE GEREKÇESİ' },
-
-  // 13. YÖNLENDİRİLEN KURUM/KURULUŞ
-  { id: 'yonlendirme_belediye', label: 'Belediye', type: 'checkbox', x: 125, y: 315, page: 3, section: '13. YÖNLENDİRİLEN KURUM/KURULUŞ' },
-  { id: 'yonlendirme_sosyal_hizmet', label: 'Sosyal Hizmet Merkezi', type: 'checkbox', x: 225, y: 315, page: 3, section: '13. YÖNLENDİRİLEN KURUM/KURULUŞ' },
-  { id: 'yonlendirme_sydv', label: 'Sos. Yard. ve Dayanışma Vakfı', type: 'checkbox', x: 325, y: 315, page: 3, section: '13. YÖNLENDİRİLEN KURUM/KURULUŞ' },
-  { id: 'yonlendirme_kizilay', label: 'Türk Kızılay Toplum Merkezi', type: 'checkbox', x: 425, y: 315, page: 3, section: '13. YÖNLENDİRİLEN KURUM/KURULUŞ' },
-
-  // AÇIK RIZA FORMU
-  { id: 'riza_onay1', label: 'Aydınlatma Metnini okudum anladım', type: 'checkbox', x: 125, y: 415, page: 3, section: 'AÇIK RIZA FORMU' },
-  { id: 'riza_onay2', label: 'Özel nitelikli kişisel verilerin işlenmesine onay', type: 'checkbox', x: 125, y: 435, page: 3, section: 'AÇIK RIZA FORMU' },
-  { id: 'riza_onay3', label: 'İletişim kanalları vasıtasıyla ileti gönderilmesine onay', type: 'checkbox', x: 125, y: 455, page: 3, section: 'AÇIK RIZA FORMU' },
-  { id: 'riza_tc_no', label: 'T.C. Kimlik No (Rıza)', type: 'text', x: 175, y: 475, page: 3, section: 'AÇIK RIZA FORMU' },
-  { id: 'riza_adi_soyadi', label: 'Ad Soyad (Rıza)', type: 'text', x: 335, y: 475, page: 3, section: 'AÇIK RIZA FORMU' },
-  { id: 'riza_tarih', label: 'Tarih (Rıza)', type: 'text', x: 650, y: 475, page: 3, section: 'AÇIK RIZA FORMU' },
 ];
