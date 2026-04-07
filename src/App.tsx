@@ -117,10 +117,23 @@ export default function App() {
 
       const getImageUrl = (name: string) => {
         const base = (import.meta as any).env.BASE_URL || '/';
-        // Ensure base ends with slash and name doesn't start with one
-        const cleanBase = base.endsWith('/') ? base : `${base}/`;
-        const cleanName = name.startsWith('/') ? name.slice(1) : name;
-        return new URL(cleanName, window.location.origin + cleanBase).href;
+        let basePath = base;
+        
+        // If base is relative (like './'), derive the actual path from window.location
+        if (base.startsWith('.')) {
+          const parts = window.location.pathname.split('/');
+          // If the last part looks like a file (contains a dot), remove it
+          if (parts[parts.length - 1].includes('.')) {
+            parts.pop();
+          }
+          basePath = parts.join('/');
+        }
+        
+        // Ensure basePath starts and ends with a slash for consistent URL construction
+        const cleanBase = basePath.startsWith('/') ? basePath : `/${basePath}`;
+        const finalBase = cleanBase.endsWith('/') ? cleanBase : `${cleanBase}/`;
+        
+        return new URL(name, window.location.origin + finalBase).href;
       };
 
       const pageImages = [getImageUrl('sayfa_1.jpg'), getImageUrl('sayfa_2.jpg'), getImageUrl('sayfa_3.jpg')];
