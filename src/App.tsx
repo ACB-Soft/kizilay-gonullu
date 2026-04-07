@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { format } from 'date-fns';
 import { 
   Heart, 
@@ -22,10 +22,12 @@ import {
   Plus,
   Trash2,
   FileDown,
-  Save
+  Save,
+  Copy,
+  RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { FORM_CONFIG } from './constants/formConfig';
+import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // --- Types ---
 interface FormData {
@@ -80,15 +82,21 @@ const Checkbox = ({ label, checked, onChange }: any) => (
 );
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'form' | 'result' | 'help'>('home');
+  const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug'>('home');
   const [formData, setFormData] = useState<FormData>(initialData);
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
+  const [debugPage, setDebugPage] = useState(1);
+  const [clickedCoord, setClickedCoord] = useState<{x: number, y: number} | null>(null);
+  const [debugFields, setDebugFields] = useState<FieldConfig[]>(FORM_CONFIG);
+  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
+  const debugImageRef = useRef<HTMLImageElement>(null);
 
-  const sections = Array.from(new Set(FORM_CONFIG.map(f => f.section)));
+  const sections = Array.from(new Set(debugFields.map(f => f.section)));
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const currentSection = sections[currentSectionIndex];
-  const fieldsInCurrentSection = FORM_CONFIG.filter(f => f.section === currentSection);
+  const fieldsInCurrentSection = debugFields.filter(f => f.section === currentSection);
 
   const updateField = (id: string, value: any) => {
     const processedValue = typeof value === 'string' ? value.toLocaleUpperCase('tr-TR') : value;
@@ -156,30 +164,43 @@ export default function App() {
             throw new Error(`${imgUrl} geçerli bir JPEG veya PNG değil. (İlk 8 bayt: ${hex})`);
           }
 
-          const page = pdfDoc.addPage([image.width, image.height]);
-          page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+          const page = pdfDoc.addPage([595, 842]);
+          page.drawImage(image, { x: 0, y: 0, width: 595, height: 842 });
           pagesAdded++;
 
-          const fieldsOnThisPage = FORM_CONFIG.filter(f => f.page === i + 1);
+          const fieldsOnThisPage = debugFields.filter(f => f.page === i + 1);
           fieldsOnThisPage.forEach(field => {
             const value = formData[field.id];
             if (value === undefined || value === '') return;
 
-            const pdfY = image.height - field.y;
+            const pdfY = field.y;
+            const fontSize = 9;
+            const checkboxSize = 10;
+
+            if (debugMode) {
+              page.drawRectangle({
+                x: field.x,
+                y: field.y,
+                width: field.width,
+                height: field.height,
+                borderColor: rgb(1, 0, 0),
+                borderWidth: 0.5,
+              });
+            }
 
             if (field.type === 'text') {
               page.drawText(trToEn(String(value)), {
                 x: field.x,
                 y: pdfY,
-                size: 10,
+                size: fontSize,
                 font: font,
                 color: rgb(0, 0, 0),
               });
             } else if (field.type === 'checkbox' && value === true) {
               page.drawText('X', {
-                x: field.x - 4,
-                y: pdfY - 4,
-                size: 12,
+                x: field.x + 2,
+                y: pdfY + 2,
+                size: checkboxSize,
                 font: font,
                 color: rgb(0, 0, 0),
               });
@@ -336,6 +357,157 @@ export default function App() {
             </div>
           )}
 
+          {/* DEBUG VIEW */}
+          {view === 'debug' && (
+            <div className="space-y-6 py-4 flex-1">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col">
+                  <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Gelişmiş Koordinatör</h2>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase">Kutuları sürükleyerek konumlandırın</p>
+                </div>
+                <button 
+                  onClick={() => setView('home')}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-4 flex items-start gap-3">
+                <Info className="text-blue-600 mt-0.5 shrink-0" size={18} />
+                <div className="text-xs text-blue-800 leading-relaxed">
+                  <p className="font-bold mb-1">NASIL KULLANILIR?</p>
+                  <p>Kutuları sürükleyerek doğru yerlerine yerleştirin. İşlem bittiğinde <b>JSON Kopyala</b> butonuyla yeni koordinatları alıp <code>formConfig.ts</code> dosyasına yapıştırabilirsiniz.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2 mb-4">
+                <button 
+                  onClick={() => setDebugPage(1)}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all uppercase tracking-wider ${debugPage === 1 ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-white border border-gray-200 text-gray-600'}`}
+                >
+                  Sayfa 1
+                </button>
+                <button 
+                  onClick={() => setDebugPage(2)}
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all uppercase tracking-wider ${debugPage === 2 ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-white border border-gray-200 text-gray-600'}`}
+                >
+                  Sayfa 2
+                </button>
+              </div>
+
+              <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none">
+                <img 
+                  ref={debugImageRef}
+                  src={debugPage === 1 ? 'sayfa_1.png' : 'sayfa_2.png'} 
+                  alt="Debug" 
+                  className="w-full h-auto block pointer-events-none"
+                  onLoad={() => {
+                    // Force re-render to position boxes correctly after image loads
+                    setClickedCoord(prev => prev ? {...prev} : null);
+                  }}
+                />
+                
+                {/* Draggable Boxes Overlay */}
+                <div className="absolute inset-0 overflow-hidden">
+                  {debugFields.filter(f => f.page === debugPage).map(field => {
+                    const isSelected = selectedFieldId === field.id;
+                    return (
+                      <motion.div
+                        key={field.id}
+                        drag
+                        dragMomentum={false}
+                        onDragStart={() => setSelectedFieldId(field.id)}
+                        onDragEnd={(e, info) => {
+                          if (!debugImageRef.current) return;
+                          const rect = debugImageRef.current.getBoundingClientRect();
+                          
+                          // Calculate new PDF coordinates based on total offset
+                          const deltaX = (info.offset.x / rect.width) * 595;
+                          const deltaY = (info.offset.y / rect.height) * 842;
+                          
+                          const newPdfX = Math.round(field.x + deltaX);
+                          const newPdfY = Math.round(field.y - deltaY); // PDF Y is bottom-up
+                          
+                          setDebugFields(prev => prev.map(f => 
+                            f.id === field.id ? { ...f, x: newPdfX, y: newPdfY } : f
+                          ));
+                        }}
+                        style={{
+                          position: 'absolute',
+                          left: `${(field.x / 595) * 100}%`,
+                          bottom: `${(field.y / 842) * 100}%`,
+                          width: `${(field.width / 595) * 100}%`,
+                          height: `${(field.height / 842) * 100}%`,
+                          border: isSelected ? '2px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.6)',
+                          backgroundColor: isSelected ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)',
+                          cursor: 'move',
+                          zIndex: isSelected ? 50 : 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {isSelected && (
+                          <span className="text-[8px] font-bold text-white bg-red-600 px-1 rounded pointer-events-none whitespace-nowrap">
+                            {field.id}
+                          </span>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {selectedFieldId && (
+                  <div className="absolute bottom-4 left-4 right-4 bg-black/80 text-white p-3 rounded-xl font-mono text-[10px] backdrop-blur-sm shadow-2xl border border-white/20 flex justify-between items-center">
+                    <div>
+                      <p className="text-red-400 font-bold mb-1 uppercase">{debugFields.find(f => f.id === selectedFieldId)?.label}</p>
+                      <p>X: {debugFields.find(f => f.id === selectedFieldId)?.x} | Y: {debugFields.find(f => f.id === selectedFieldId)?.y}</p>
+                    </div>
+                    <button 
+                      onClick={() => setSelectedFieldId(null)}
+                      className="p-1 hover:bg-white/20 rounded"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={() => {
+                      const json = JSON.stringify(debugFields, null, 2);
+                      navigator.clipboard.writeText(json);
+                      alert('Tüm koordinatlar JSON olarak panoya kopyalandı! formConfig.ts dosyasına yapıştırabilirsiniz.');
+                    }}
+                    className="flex items-center justify-center gap-2 py-4 bg-white border border-gray-200 text-gray-800 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm uppercase tracking-widest text-[10px]"
+                  >
+                    <Copy size={16} /> JSON Kopyala
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (confirm('Tüm değişiklikler sıfırlanacak. Emin misiniz?')) {
+                        setDebugFields(FORM_CONFIG);
+                      }
+                    }}
+                    className="flex items-center justify-center gap-2 py-4 bg-white border border-gray-200 text-gray-400 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm uppercase tracking-widest text-[10px]"
+                  >
+                    <RefreshCw size={16} /> Sıfırla
+                  </button>
+                </div>
+
+                <button 
+                  onClick={() => setView('form')}
+                  className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition-all shadow-lg uppercase tracking-widest text-xs"
+                >
+                  Forma Dön
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* HOME VIEW */}
           {view === 'home' && (
             <div className="space-y-6 py-4 flex-1">
@@ -473,7 +645,13 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 1.4.2</p>
+            <button 
+              onClick={() => setView('debug')}
+              className="mt-4 text-[10px] font-bold text-gray-300 hover:text-red-400 uppercase tracking-[0.2em] transition-colors"
+            >
+              Geliştirici Modu (Koordinat Bulucu)
+            </button>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Versiyon 1.7.0</p>
           </div>
         </div>
       </main>
