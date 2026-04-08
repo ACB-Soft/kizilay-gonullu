@@ -24,7 +24,10 @@ import {
   FileDown,
   Save,
   Copy,
-  RefreshCw
+  RefreshCw,
+  ExternalLink,
+  Grid,
+  Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
@@ -83,9 +86,44 @@ const Checkbox = ({ label, checked, onChange }: any) => (
 
 export default function App() {
   const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug'>('home');
+  
+  // Handle URL parameters for direct view access (e.g., for opening in new tab)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam === 'debug') {
+      setView('debug');
+    }
+  }, []);
+
   const [formData, setFormData] = useState<FormData>(initialData);
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [fontData, setFontData] = useState<ArrayBuffer | null>(null);
+  const [showGrid, setShowGrid] = useState(true);
+  const [snapToGrid, setSnapToGrid] = useState(false);
+
+  const GRID_SIZE = 14.173; // 0.5cm in points (72 / 2.54 * 0.5)
+  const PT_TO_MM = 0.352778;
+  const MM_TO_PT = 2.83465;
+
+  // Load Turkish compatible font
+  useEffect(() => {
+    const loadFont = async () => {
+      try {
+        // Using Roboto Regular from Google Fonts CDN
+        const response = await fetch('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.ttf');
+        const data = await response.arrayBuffer();
+        setFontData(data);
+      } catch (error) {
+        console.error('Font loading error:', error);
+      }
+    };
+    loadFont();
+  }, []);
+
   const [debugMode, setDebugMode] = useState(false);
   const [debugPage, setDebugPage] = useState(1);
   const [clickedCoord, setClickedCoord] = useState<{x: number, y: number} | null>(null);
@@ -93,7 +131,40 @@ export default function App() {
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const debugImageRef = useRef<HTMLImageElement>(null);
 
-  const sections = Array.from(new Set(debugFields.map(f => f.section)));
+  // Keyboard navigation for debug fields
+  useEffect(() => {
+    if (view !== 'debug' || !selectedFieldId) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const step = e.altKey ? 0.1 : (e.shiftKey ? 10 : 1);
+      
+      setDebugFields(prev => prev.map(f => {
+        if (f.id !== selectedFieldId) return f;
+        
+        switch (e.key) {
+          case 'ArrowUp':
+            return { ...f, y: Number((f.y + step).toFixed(2)) };
+          case 'ArrowDown':
+            return { ...f, y: Number((f.y - step).toFixed(2)) };
+          case 'ArrowLeft':
+            return { ...f, x: Number((f.x - step).toFixed(2)) };
+          case 'ArrowRight':
+            return { ...f, x: Number((f.x + step).toFixed(2)) };
+          default:
+            return f;
+        }
+      }));
+
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [view, selectedFieldId]);
+
+  const sections: string[] = Array.from(new Set(debugFields.map(f => f.section)));
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const currentSection = sections[currentSectionIndex];
   const fieldsInCurrentSection = debugFields.filter(f => f.section === currentSection);
@@ -105,6 +176,7 @@ export default function App() {
 
   const trToEn = (str: string) => {
     if (!str) return '';
+    if (fontData) return String(str); // Don't convert if we have the custom font
     return String(str)
       .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
       .replace(/Ü/g, 'U').replace(/ü/g, 'u')
@@ -115,108 +187,114 @@ export default function App() {
       .replace(/[^\x00-\x7F]/g, ''); // Remove any remaining non-ASCII characters to prevent PDFLib crashes
   };
 
+  const getPDFBytes = async () => {
+    const { PDFDocument, rgb, StandardFonts } = (window as any).PDFLib;
+    if (!PDFDocument) throw new Error('PDFLib not loaded');
+    
+    const pdfDoc = await PDFDocument.create();
+    
+    // Use custom font if loaded, otherwise fallback to Helvetica
+    let font;
+    if (fontData) {
+      font = await pdfDoc.embedFont(fontData);
+    } else {
+      font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    }
+
+    const pageImages = ['sayfa_1.png', 'sayfa_2.png'];
+    let pagesAdded = 0;
+    let lastError = '';
+    
+    for (let i = 0; i < pageImages.length; i++) {
+      const imgUrl = pageImages[i];
+      try {
+        const response = await fetch(imgUrl, { cache: 'no-cache' });
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error(`${imgUrl} dosyası sunucuda bulunamadı (404).`);
+          }
+          throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
+        }
+        
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && !contentType.startsWith('image/') && !contentType.includes('application/octet-stream')) {
+          throw new Error(`${imgUrl} bir görsel değil, sunucu ${contentType} döndürdü. Dosya bozulmuş olabilir.`);
+        }
+
+        const imgBytes = await response.arrayBuffer();
+        const uint8 = new Uint8Array(imgBytes);
+        let image;
+        
+        if (uint8[0] === 0xFF && uint8[1] === 0xD8 && uint8[2] === 0xFF) {
+          image = await pdfDoc.embedJpg(imgBytes);
+        } else if (uint8[0] === 0x89 && uint8[1] === 0x50 && uint8[2] === 0x4E && uint8[3] === 0x47) {
+          image = await pdfDoc.embedPng(imgBytes);
+        } else {
+          throw new Error(`${imgUrl} geçerli bir JPEG veya PNG değil.`);
+        }
+
+        const page = pdfDoc.addPage([595, 842]);
+        page.drawImage(image, { x: 0, y: 0, width: 595, height: 842 });
+        pagesAdded++;
+
+        const fieldsOnThisPage = debugFields.filter(f => f.page === i + 1);
+        fieldsOnThisPage.forEach(field => {
+          const value = formData[field.id];
+          if (value === undefined || value === '') return;
+
+          const fontSize = 9;
+          const checkboxSize = 10;
+          
+          // Vertical offset to center text in the box (PDF Y is baseline)
+          const vOffset = (field.height - fontSize) / 2 + 1;
+          const pdfY = field.y + vOffset;
+
+          if (debugMode) {
+            page.drawRectangle({
+              x: field.x,
+              y: field.y,
+              width: field.width,
+              height: field.height,
+              borderColor: rgb(1, 0, 0),
+              borderWidth: 0.5,
+            });
+          }
+
+          if (field.type === 'text') {
+            page.drawText(trToEn(String(value)), {
+              x: field.x,
+              y: pdfY,
+              size: fontSize,
+              font: font,
+              color: rgb(0, 0, 0),
+            });
+          } else if (field.type === 'checkbox' && value === true) {
+            page.drawText('X', {
+              x: field.x + 2,
+              y: pdfY + 2,
+              size: checkboxSize,
+              font: font,
+              color: rgb(0, 0, 0),
+            });
+          }
+        });
+      } catch (err: any) {
+        console.error(`Page ${i+1} error:`, err);
+        lastError = err.message;
+      }
+    }
+
+    if (pagesAdded === 0) {
+      throw new Error(`Hiçbir sayfa oluşturulamadı. Son hata: ${lastError}`);
+    }
+
+    return await pdfDoc.save();
+  };
+
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
-      const { PDFDocument, rgb, StandardFonts } = (window as any).PDFLib;
-      if (!PDFDocument) throw new Error('PDFLib not loaded');
-      
-      const pdfDoc = await PDFDocument.create();
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-      const pageImages = ['sayfa_1.png', 'sayfa_2.png'];
-      let pagesAdded = 0;
-      let lastError = '';
-      
-      for (let i = 0; i < pageImages.length; i++) {
-        const imgUrl = pageImages[i];
-        try {
-          const response = await fetch(imgUrl, { cache: 'no-cache' });
-          if (!response.ok) {
-            if (response.status === 404) {
-              throw new Error(`${imgUrl} dosyası sunucuda bulunamadı (404).`);
-            }
-            throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
-          }
-          
-          const contentType = response.headers.get('Content-Type');
-          if (contentType && !contentType.startsWith('image/') && !contentType.includes('application/octet-stream')) {
-            throw new Error(`${imgUrl} bir görsel değil, sunucu ${contentType} döndürdü. Dosya bozulmuş olabilir.`);
-          }
-
-          const imgBytes = await response.arrayBuffer();
-          const uint8 = new Uint8Array(imgBytes);
-          let image;
-          
-          // JPEG magic bytes: FF D8 FF
-          if (uint8[0] === 0xFF && uint8[1] === 0xD8 && uint8[2] === 0xFF) {
-            image = await pdfDoc.embedJpg(imgBytes);
-          } 
-          // PNG magic bytes: 89 50 4E 47
-          else if (uint8[0] === 0x89 && uint8[1] === 0x50 && uint8[2] === 0x4E && uint8[3] === 0x47) {
-            image = await pdfDoc.embedPng(imgBytes);
-          } 
-          else {
-            const hex = Array.from(uint8.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join(' ');
-            if (hex.startsWith('ef bf bd')) {
-              throw new Error(`${imgUrl} dosyası ikili (binary) yerine metin olarak kaydedilmiş ve bozulmuş. (UTF-8 Replacement Character hatası)`);
-            }
-            throw new Error(`${imgUrl} geçerli bir JPEG veya PNG değil. (İlk 8 bayt: ${hex})`);
-          }
-
-          const page = pdfDoc.addPage([595, 842]);
-          page.drawImage(image, { x: 0, y: 0, width: 595, height: 842 });
-          pagesAdded++;
-
-          const fieldsOnThisPage = debugFields.filter(f => f.page === i + 1);
-          fieldsOnThisPage.forEach(field => {
-            const value = formData[field.id];
-            if (value === undefined || value === '') return;
-
-            const pdfY = field.y;
-            const fontSize = 9;
-            const checkboxSize = 10;
-
-            if (debugMode) {
-              page.drawRectangle({
-                x: field.x,
-                y: field.y,
-                width: field.width,
-                height: field.height,
-                borderColor: rgb(1, 0, 0),
-                borderWidth: 0.5,
-              });
-            }
-
-            if (field.type === 'text') {
-              page.drawText(trToEn(String(value)), {
-                x: field.x,
-                y: pdfY,
-                size: fontSize,
-                font: font,
-                color: rgb(0, 0, 0),
-              });
-            } else if (field.type === 'checkbox' && value === true) {
-              page.drawText('X', {
-                x: field.x + 2,
-                y: pdfY + 2,
-                size: checkboxSize,
-                font: font,
-                color: rgb(0, 0, 0),
-              });
-            }
-          });
-        } catch (err: any) {
-          console.error(`Page ${i+1} error:`, err);
-          lastError = err.message;
-        }
-      }
-
-      if (pagesAdded === 0) {
-        throw new Error(`Hiçbir sayfa oluşturulamadı. Görsel dosyaları eksik olabilir veya yüklenemedi. Son hata: ${lastError}`);
-      }
-
-      const pdfBytes = await pdfDoc.save();
+      const pdfBytes = await getPDFBytes();
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -228,6 +306,45 @@ export default function App() {
       alert(`Hata: ${error.message || 'PDF oluşturulamadı.'}`);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const uploadToDrive = async () => {
+    setIsUploading(true);
+    setUploadStatus('idle');
+    try {
+      const pdfBytes = await getPDFBytes();
+      
+      // Convert to base64
+      const base64 = btoa(
+        new Uint8Array(pdfBytes)
+          .reduce((data, byte) => data + String.fromCharCode(byte), '')
+      );
+
+      const fileName = `Kizilay_Formu_${formData.is_tc_no || 'Yeni'}_${format(new Date(), 'yyyyMMdd_HHmm')}.pdf`;
+
+      const response = await fetch('/api/upload-to-drive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName,
+          pdfBase64: base64
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Yükleme başarısız oldu.');
+      }
+
+      setUploadStatus('success');
+      alert('Form başarıyla Kızılay Drive klasörüne gönderildi!');
+    } catch (error: any) {
+      console.error('Upload Error:', error);
+      setUploadStatus('error');
+      alert(`Gönderim Hatası: ${error.message}`);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -365,20 +482,56 @@ export default function App() {
                   <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Gelişmiş Koordinatör</h2>
                   <p className="text-[10px] font-bold text-gray-400 uppercase">Kutuları sürükleyerek konumlandırın</p>
                 </div>
-                <button 
-                  onClick={() => setView('home')}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X size={24} />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      const url = new URL(window.location.href);
+                      url.searchParams.set('view', 'debug');
+                      window.open(url.toString(), '_blank');
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-[10px] font-bold uppercase transition-all"
+                    title="Yeni sekmede açarak yakınlaştırma yapabilirsiniz"
+                  >
+                    <ExternalLink size={14} />
+                    Yeni Sekme
+                  </button>
+                  <button 
+                    onClick={() => setView('home')}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-4 flex items-start gap-3">
-                <Info className="text-blue-600 mt-0.5 shrink-0" size={18} />
-                <div className="text-xs text-blue-800 leading-relaxed">
-                  <p className="font-bold mb-1">NASIL KULLANILIR?</p>
-                  <p>Kutuları sürükleyerek doğru yerlerine yerleştirin. İşlem bittiğinde <b>JSON Kopyala</b> butonuyla yeni koordinatları alıp <code>formConfig.ts</code> dosyasına yapıştırabilirsiniz.</p>
-                </div>
+                  <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-4 flex items-start gap-3">
+                    <Info className="text-blue-600 mt-0.5 shrink-0" size={18} />
+                    <div className="text-xs text-blue-800 leading-relaxed">
+                      <p className="font-bold mb-1 uppercase tracking-wider">Koordinat Sistemi Notu</p>
+                      <p>PDF standartlarına göre <b>(0,0) noktası sol alt köşedir.</b></p>
+                      <ul className="list-disc ml-4 mt-1 space-y-0.5">
+                        <li>X arttıkça sağa gider.</li>
+                        <li>Y arttıkça <b>yukarı</b> gider.</li>
+                        <li>A4 Boyutu: 595 x 842 birimdir.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+              <div className="flex gap-2 mb-4">
+                <button 
+                  onClick={() => setShowGrid(!showGrid)}
+                  className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${showGrid ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                >
+                  <Grid size={14} />
+                  Izgara {showGrid ? 'Kapat' : 'Aç'}
+                </button>
+                <button 
+                  onClick={() => setSnapToGrid(!snapToGrid)}
+                  className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${snapToGrid ? 'bg-emerald-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                >
+                  <Zap size={14} />
+                  Mıknatıs {snapToGrid ? 'Açık' : 'Kapalı'}
+                </button>
               </div>
 
               <div className="flex gap-2 mb-4">
@@ -396,17 +549,39 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none">
+              <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none aspect-[595/842]">
                 <img 
                   ref={debugImageRef}
                   src={debugPage === 1 ? 'sayfa_1.png' : 'sayfa_2.png'} 
                   alt="Debug" 
-                  className="w-full h-auto block pointer-events-none"
+                  className="w-full h-full object-fill block pointer-events-none opacity-60"
                   onLoad={() => {
                     // Force re-render to position boxes correctly after image loads
                     setClickedCoord(prev => prev ? {...prev} : null);
                   }}
                 />
+                
+                {/* Grid Overlay */}
+                {showGrid && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Vertical Lines */}
+                    {Array.from({ length: Math.ceil(595 / GRID_SIZE) }).map((_, i) => (
+                      <div 
+                        key={`v-${i}`}
+                        className="absolute top-0 bottom-0 border-l border-gray-300/20"
+                        style={{ left: `${(i * GRID_SIZE / 595) * 100}%` }}
+                      />
+                    ))}
+                    {/* Horizontal Lines */}
+                    {Array.from({ length: Math.ceil(842 / GRID_SIZE) }).map((_, i) => (
+                      <div 
+                        key={`h-${i}`}
+                        className="absolute left-0 right-0 border-t border-gray-300/20"
+                        style={{ bottom: `${(i * GRID_SIZE / 842) * 100}%` }}
+                      />
+                    ))}
+                  </div>
+                )}
                 
                 {/* Draggable Boxes Overlay */}
                 <div className="absolute inset-0 overflow-hidden">
@@ -422,13 +597,22 @@ export default function App() {
                           if (!debugImageRef.current) return;
                           const rect = debugImageRef.current.getBoundingClientRect();
                           
-                          // Calculate new PDF coordinates based on total offset
+                          // Calculate deltas in PDF points
                           const deltaX = (info.offset.x / rect.width) * 595;
                           const deltaY = (info.offset.y / rect.height) * 842;
                           
-                          const newPdfX = Math.round(field.x + deltaX);
-                          const newPdfY = Math.round(field.y - deltaY); // PDF Y is bottom-up
+                          let newPdfX = Number((field.x + deltaX).toFixed(2));
+                          let newPdfY = Number((field.y - deltaY).toFixed(2));
+
+                          if (snapToGrid) {
+                            newPdfX = Math.round(newPdfX / GRID_SIZE) * GRID_SIZE;
+                            newPdfY = Math.round(newPdfY / GRID_SIZE) * GRID_SIZE;
+                          }
                           
+                          // Bounds check
+                          newPdfX = Math.max(0, Math.min(595 - field.width, newPdfX));
+                          newPdfY = Math.max(0, Math.min(842 - field.height, newPdfY));
+
                           setDebugFields(prev => prev.map(f => 
                             f.id === field.id ? { ...f, x: newPdfX, y: newPdfY } : f
                           ));
@@ -439,19 +623,49 @@ export default function App() {
                           bottom: `${(field.y / 842) * 100}%`,
                           width: `${(field.width / 595) * 100}%`,
                           height: `${(field.height / 842) * 100}%`,
-                          border: isSelected ? '2px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.6)',
-                          backgroundColor: isSelected ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)',
+                          border: isSelected ? '2px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.4)',
+                          backgroundColor: isSelected ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
                           cursor: 'move',
                           zIndex: isSelected ? 50 : 10,
                           display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          alignItems: 'flex-start',
+                          justifyContent: 'flex-start',
                         }}
                       >
                         {isSelected && (
-                          <span className="text-[8px] font-bold text-white bg-red-600 px-1 rounded pointer-events-none whitespace-nowrap">
-                            {field.id}
-                          </span>
+                          <>
+                            {/* Resize Handle Right (Width) */}
+                            <motion.div
+                              drag="x"
+                              dragMomentum={false}
+                              onDrag={(e, info) => {
+                                e.stopPropagation();
+                                if (!debugImageRef.current) return;
+                                const rect = debugImageRef.current.getBoundingClientRect();
+                                const deltaW = (info.delta.x / rect.width) * 595;
+                                setDebugFields(prev => prev.map(f => 
+                                  f.id === field.id ? { ...f, width: Math.max(0.1, Number((f.width + deltaW).toFixed(2))) } : f
+                                ));
+                              }}
+                              className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize bg-red-500/50 hover:bg-red-500 transition-colors"
+                            />
+                            {/* Resize Handle Top (Height) */}
+                            <motion.div
+                              drag="y"
+                              dragMomentum={false}
+                              onDrag={(e, info) => {
+                                e.stopPropagation();
+                                if (!debugImageRef.current) return;
+                                const rect = debugImageRef.current.getBoundingClientRect();
+                                // PDF Y is bottom-up, so dragging UP (negative delta.y) increases height
+                                const deltaH = (-info.delta.y / rect.height) * 842;
+                                setDebugFields(prev => prev.map(f => 
+                                  f.id === field.id ? { ...f, height: Math.max(0.1, Number((f.height + deltaH).toFixed(2))) } : f
+                                ));
+                              }}
+                              className="absolute top-0 left-0 right-0 h-2 cursor-ns-resize bg-red-500/50 hover:bg-red-500 transition-colors"
+                            />
+                          </>
                         )}
                       </motion.div>
                     );
@@ -459,17 +673,102 @@ export default function App() {
                 </div>
 
                 {selectedFieldId && (
-                  <div className="absolute bottom-4 left-4 right-4 bg-black/80 text-white p-3 rounded-xl font-mono text-[10px] backdrop-blur-sm shadow-2xl border border-white/20 flex justify-between items-center">
-                    <div>
-                      <p className="text-red-400 font-bold mb-1 uppercase">{debugFields.find(f => f.id === selectedFieldId)?.label}</p>
-                      <p>X: {debugFields.find(f => f.id === selectedFieldId)?.x} | Y: {debugFields.find(f => f.id === selectedFieldId)?.y}</p>
+                  <div className="absolute bottom-4 left-4 right-4 bg-black/90 text-white p-4 rounded-2xl font-mono text-[11px] backdrop-blur-md shadow-2xl border border-white/20">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex flex-col">
+                        <span className="text-red-400 font-black uppercase tracking-wider text-[10px]">Düzenlenen Alan</span>
+                        <span className="text-white font-bold text-sm">{debugFields.find(f => f.id === selectedFieldId)?.label}</span>
+                      </div>
+                      <button 
+                        onClick={() => setSelectedFieldId(null)}
+                        className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+                      >
+                        <X size={18} />
+                      </button>
                     </div>
-                    <button 
-                      onClick={() => setSelectedFieldId(null)}
-                      className="p-1 hover:bg-white/20 rounded"
-                    >
-                      <X size={14} />
-                    </button>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest">X (Sol Kenardan)</label>
+                          <span className="text-[9px] text-red-400 font-bold">{((debugFields.find(f => f.id === selectedFieldId)?.x || 0) * PT_TO_MM).toFixed(1)} mm</span>
+                        </div>
+                        <input 
+                          type="number" 
+                          step="0.1"
+                          value={debugFields.find(f => f.id === selectedFieldId)?.x || 0}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, x: val } : f));
+                          }}
+                          className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest">Y (Alt Kenardan)</label>
+                          <span className="text-[9px] text-red-400 font-bold">{((debugFields.find(f => f.id === selectedFieldId)?.y || 0) * PT_TO_MM).toFixed(1)} mm</span>
+                        </div>
+                        <input 
+                          type="number" 
+                          step="0.1"
+                          value={debugFields.find(f => f.id === selectedFieldId)?.y || 0}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: val } : f));
+                          }}
+                          className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest block">Y (Üst Kenardan)</label>
+                        <input 
+                          type="number" 
+                          step="0.1"
+                          value={Number((842 - (debugFields.find(f => f.id === selectedFieldId)?.y || 0) - (debugFields.find(f => f.id === selectedFieldId)?.height || 0)).toFixed(2))}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            const height = debugFields.find(f => f.id === selectedFieldId)?.height || 0;
+                            // newY = 842 - topDistance - height
+                            const newPdfY = Number((842 - val - height).toFixed(2));
+                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: newPdfY } : f));
+                          }}
+                          className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-blue-500 transition-all text-sm"
+                        />
+                        <p className="text-[8px] text-blue-400 mt-1 italic">Cetvelle üstten ölçtüğünüz değeri buraya girin.</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest block">Genişlik / Yükseklik</label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="number" 
+                            step="0.1"
+                            placeholder="G"
+                            value={debugFields.find(f => f.id === selectedFieldId)?.width || 0}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, width: val } : f));
+                            }}
+                            className="w-1/2 bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                          />
+                          <input 
+                            type="number" 
+                            step="0.1"
+                            placeholder="Y"
+                            value={debugFields.find(f => f.id === selectedFieldId)?.height || 0}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, height: val } : f));
+                            }}
+                            className="w-1/2 bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-[9px] text-gray-500 italic text-center">İpucu: Aynı satırdaki kutuların Y değerlerini eşitleyerek hizalayabilirsiniz.</p>
                   </div>
                 )}
               </div>
@@ -549,6 +848,15 @@ export default function App() {
               </div>
 
               <div className="w-full space-y-4">
+                <button 
+                  onClick={uploadToDrive}
+                  disabled={isUploading}
+                  className={`w-full py-5 rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all ${uploadStatus === 'success' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white shadow-blue-100'}`}
+                >
+                  {isUploading ? <RefreshCw className="animate-spin" size={24} /> : <FileDown size={24} />}
+                  {uploadStatus === 'success' ? 'GÖNDERİLDİ!' : "KIZILAY'A GÖNDER"}
+                </button>
+
                 <button 
                   onClick={generatePDF}
                   disabled={isGenerating}
@@ -651,7 +959,7 @@ export default function App() {
             >
               Geliştirici Modu (Koordinat Bulucu)
             </button>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Versiyon 1.7.0</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Versiyon 2.1.0</p>
           </div>
         </div>
       </main>

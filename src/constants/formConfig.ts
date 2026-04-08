@@ -13,23 +13,23 @@ export interface FieldConfig {
 export const FORM_CONFIG: FieldConfig[] = [
   // --- SAYFA 1 ---
   // 1. BAŞVURU KANALI
-  { id: 'kan_sosyal_medya', label: 'Sosyal Medya', type: 'checkbox', x: 42, y: 748, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
-  { id: 'kan_dilekce', label: 'Dilekçe/Başvuru Formu', type: 'checkbox', x: 155, y: 748, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
-  { id: 'kan_yonlendirme', label: 'Yönlendirme', type: 'checkbox', x: 320, y: 748, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
-  { id: 'kan_kamu', label: 'Kamu Kurum/Kuruluş', type: 'checkbox', x: 440, y: 748, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
-  { id: 'kan_cagri', label: 'Çağrı Merkezi', type: 'checkbox', x: 575, y: 748, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
-  { id: 'kan_diger', label: 'Diğer', type: 'text', x: 680, y: 748, width: 48, height: 12, page: 1, section: '1. BAŞVURU KANALI' },
+  { id: 'kan_sosyal_medya', label: 'Sosyal Medya', type: 'checkbox', x: 23, y: 755, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
+  { id: 'kan_dilekce', label: 'Dilekçe/Başvuru Formu', type: 'checkbox', x: 91, y: 755, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
+  { id: 'kan_yonlendirme', label: 'Yönlendirme', type: 'checkbox', x: 310, y: 755, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
+  { id: 'kan_kamu', label: 'Kamu Kurum/Kuruluş', type: 'checkbox', x: 203, y: 755, width: 10, height: 12, page: 1, section: '1. BAŞVURU KANALI' },
+  { id: 'kan_cagri', label: 'Çağrı Merkezi', type: 'checkbox', x: 366, y: 755, width: 10, height: 10, page: 1, section: '1. BAŞVURU KANALI' },
+  { id: 'kan_diger', label: 'Diğer', type: 'text', x: 680, y: 755, width: 48, height: 12, page: 1, section: '1. BAŞVURU KANALI' },
   
   // 2. İHTİYAÇ SAHİBİ BİLGİLERİ
-  { id: 'is_adi_soyadi', label: 'Adı Soyadı', type: 'text', x: 215, y: 710, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_tc_no', label: 'T.C. Kimlik No', type: 'text', x: 215, y: 690, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_baba_adi', label: 'Baba Adı', type: 'text', x: 215, y: 670, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_ana_adi', label: 'Ana Adı', type: 'text', x: 215, y: 650, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_dogum_yeri', label: 'Doğum Yeri', type: 'text', x: 215, y: 630, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_dogum_tarihi', label: 'Doğum Tarihi', type: 'text', x: 350, y: 630, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_medeni_durum', label: 'Medeni Durum', type: 'text', x: 215, y: 610, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_cinsiyet', label: 'Cinsiyet', type: 'text', x: 215, y: 590, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
-  { id: 'is_uyruk', label: 'Uyruk', type: 'text', x: 350, y: 590, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_adi_soyadi', label: 'Adı Soyadı', type: 'text', x: 115, y: 715, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_tc_no', label: 'T.C. Kimlik No', type: 'text', x: 95, y: 707, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_baba_adi', label: 'Baba Adı', type: 'text', x: 109, y: 690, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_ana_adi', label: 'Ana Adı', type: 'text', x: 117, y: 669, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_dogum_yeri', label: 'Doğum Yeri', type: 'text', x: 215, y: 640, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_dogum_tarihi', label: 'Doğum Tarihi', type: 'text', x: 317, y: 630, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_medeni_durum', label: 'Medeni Durum', type: 'text', x: 212, y: 595, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_cinsiyet', label: 'Cinsiyet', type: 'text', x: 212, y: 594, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
+  { id: 'is_uyruk', label: 'Uyruk', type: 'text', x: 318, y: 580, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
   
   { id: 'is_meslek', label: 'Meslek/İş', type: 'text', x: 625, y: 710, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
   { id: 'is_calisma_durumu', label: 'Çalışma Durumu', type: 'text', x: 625, y: 690, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
@@ -41,10 +41,10 @@ export const FORM_CONFIG: FieldConfig[] = [
   { id: 'is_ayakkabi', label: 'Ayakkabı', type: 'text', x: 775, y: 590, width: 48, height: 12, page: 1, section: '2. İHTİYAÇ SAHİBİ BİLGİLERİ' },
 
   // 2.1 İLETİŞİM - ADRES BİLGİLERİ
-  { id: 'adr_ev_tel', label: 'Ev Telefonu', type: 'text', x: 215, y: 567, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
-  { id: 'adr_cep', label: 'Cep Telefonu', type: 'text', x: 215, y: 547, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
-  { id: 'adr_eposta', label: 'E-Posta', type: 'text', x: 215, y: 527, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
-  { id: 'adr_ilce_il', label: 'İlçe/İl', type: 'text', x: 215, y: 507, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
+  { id: 'adr_ev_tel', label: 'Ev Telefonu', type: 'text', x: 118, y: 590, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
+  { id: 'adr_cep', label: 'Cep Telefonu', type: 'text', x: 211, y: 547, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
+  { id: 'adr_eposta', label: 'E-Posta', type: 'text', x: 178, y: 532, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
+  { id: 'adr_ilce_il', label: 'İlçe/İl', type: 'text', x: 160, y: 535, width: 48, height: 13, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
   { id: 'adr_mahalle', label: 'Mahalle', type: 'text', x: 625, y: 567, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
   { id: 'adr_acik', label: 'Açık Adres', type: 'text', x: 625, y: 547, width: 48, height: 12, page: 1, section: '2.1 İLETİŞİM - ADRES BİLGİLERİ' },
 
