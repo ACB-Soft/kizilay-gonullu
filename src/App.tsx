@@ -102,24 +102,37 @@ export default function App() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [fontData, setFontData] = useState<ArrayBuffer | null>(null);
-  const [showGrid, setShowGrid] = useState(true);
-  const [snapToGrid, setSnapToGrid] = useState(false);
 
-  const GRID_SIZE = 14.173; // 0.5cm in points (72 / 2.54 * 0.5)
   const PT_TO_MM = 0.352778;
   const MM_TO_PT = 2.83465;
 
   // Load Turkish compatible font
   useEffect(() => {
     const loadFont = async () => {
-      try {
-        // Using Roboto Regular from Google Fonts CDN
-        const response = await fetch('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.ttf');
-        const data = await response.arrayBuffer();
-        setFontData(data);
-      } catch (error) {
-        console.error('Font loading error:', error);
+      // Multiple CDN sources for Roboto Regular to ensure reliability and bypass CORS issues
+      const fontUrls = [
+        'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.ttf',
+        'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Regular.ttf',
+        'https://cdnjs.cloudflare.com/ajax/libs/roboto-fontface/0.10.0/fonts/roboto/Roboto-Regular.ttf'
+      ];
+
+      for (const url of fontUrls) {
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            const data = await response.arrayBuffer();
+            setFontData(data);
+            console.log(`Font successfully loaded from: ${url}`);
+            return;
+          }
+        } catch (error) {
+          // Silent fail for individual URLs, we try the next one
+        }
       }
+      
+      // If all attempts fail, we log a warning instead of a scary error
+      // The application will fallback to Helvetica and ASCII conversion automatically
+      console.warn('Custom font could not be loaded from any source. Turkish characters will be converted to ASCII for PDF compatibility.');
     };
     loadFont();
   }, []);
@@ -201,7 +214,7 @@ export default function App() {
       font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     }
 
-    const pageImages = ['sayfa_1.png', 'sayfa_2.png'];
+    const pageImages = ['/sayfa_1.png', '/sayfa_2.png'];
     let pagesAdded = 0;
     let lastError = '';
     
@@ -416,7 +429,7 @@ export default function App() {
 
       {/* Header */}
       <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center">
-        <div className="w-full max-w-[480px] px-6 py-4 flex items-center justify-between">
+        <div className="w-full max-w-7xl px-6 py-4 flex items-center justify-between">
           <div className="flex items-center">
             {view !== 'home' && (
               <button 
@@ -454,11 +467,11 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth flex flex-col items-center bg-gray-50/30">
-        <div className="w-full max-w-[480px] flex flex-col min-h-full relative">
+        <div className="w-full max-w-7xl flex flex-col min-h-full relative">
           
           {/* HELP VIEW */}
           {view === 'help' && (
-            <div className="space-y-8 py-4 flex-1">
+            <div className="space-y-8 py-4 flex-1 max-w-xl mx-auto w-full">
               <div className="space-y-4">
                 <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
                   <Info className="text-red-600" /> Hakkında
@@ -519,18 +532,26 @@ export default function App() {
 
               <div className="flex gap-2 mb-4">
                 <button 
-                  onClick={() => setShowGrid(!showGrid)}
-                  className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${showGrid ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
+                  onClick={() => {
+                    const newId = `yeni_alan_${Date.now()}`;
+                    const newField: FieldConfig = {
+                      id: newId,
+                      label: 'Yeni Alan',
+                      type: 'text',
+                      x: 100,
+                      y: 400,
+                      width: 100,
+                      height: 20,
+                      page: debugPage,
+                      section: 'YENİ'
+                    };
+                    setDebugFields(prev => [...prev, newField]);
+                    setSelectedFieldId(newId);
+                  }}
+                  className="w-full py-4 bg-green-600 text-white rounded-2xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-green-100 active:scale-95"
                 >
-                  <Grid size={14} />
-                  Izgara {showGrid ? 'Kapat' : 'Aç'}
-                </button>
-                <button 
-                  onClick={() => setSnapToGrid(!snapToGrid)}
-                  className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${snapToGrid ? 'bg-emerald-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}
-                >
-                  <Zap size={14} />
-                  Mıknatıs {snapToGrid ? 'Açık' : 'Kapalı'}
+                  <Plus size={20} />
+                  Yeni Alan Ekle
                 </button>
               </div>
 
@@ -552,7 +573,7 @@ export default function App() {
               <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none aspect-[595/842]">
                 <img 
                   ref={debugImageRef}
-                  src={debugPage === 1 ? 'sayfa_1.png' : 'sayfa_2.png'} 
+                  src={debugPage === 1 ? '/sayfa_1.png' : '/sayfa_2.png'} 
                   alt="Debug" 
                   className="w-full h-full object-fill block pointer-events-none opacity-60"
                   onLoad={() => {
@@ -560,28 +581,6 @@ export default function App() {
                     setClickedCoord(prev => prev ? {...prev} : null);
                   }}
                 />
-                
-                {/* Grid Overlay */}
-                {showGrid && (
-                  <div className="absolute inset-0 pointer-events-none">
-                    {/* Vertical Lines */}
-                    {Array.from({ length: Math.ceil(595 / GRID_SIZE) }).map((_, i) => (
-                      <div 
-                        key={`v-${i}`}
-                        className="absolute top-0 bottom-0 border-l border-gray-300/20"
-                        style={{ left: `${(i * GRID_SIZE / 595) * 100}%` }}
-                      />
-                    ))}
-                    {/* Horizontal Lines */}
-                    {Array.from({ length: Math.ceil(842 / GRID_SIZE) }).map((_, i) => (
-                      <div 
-                        key={`h-${i}`}
-                        className="absolute left-0 right-0 border-t border-gray-300/20"
-                        style={{ bottom: `${(i * GRID_SIZE / 842) * 100}%` }}
-                      />
-                    ))}
-                  </div>
-                )}
                 
                 {/* Draggable Boxes Overlay */}
                 <div className="absolute inset-0 overflow-hidden">
@@ -604,11 +603,6 @@ export default function App() {
                           let newPdfX = Number((field.x + deltaX).toFixed(2));
                           let newPdfY = Number((field.y - deltaY).toFixed(2));
 
-                          if (snapToGrid) {
-                            newPdfX = Math.round(newPdfX / GRID_SIZE) * GRID_SIZE;
-                            newPdfY = Math.round(newPdfY / GRID_SIZE) * GRID_SIZE;
-                          }
-                          
                           // Bounds check
                           newPdfX = Math.max(0, Math.min(595 - field.width, newPdfX));
                           newPdfY = Math.max(0, Math.min(842 - field.height, newPdfY));
@@ -671,110 +665,157 @@ export default function App() {
                     );
                   })}
                 </div>
+              </div>
 
-                {selectedFieldId && (
-                  <div className="absolute bottom-4 left-4 right-4 bg-black/90 text-white p-4 rounded-2xl font-mono text-[11px] backdrop-blur-md shadow-2xl border border-white/20">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex flex-col">
-                        <span className="text-red-400 font-black uppercase tracking-wider text-[10px]">Düzenlenen Alan</span>
-                        <span className="text-white font-bold text-sm">{debugFields.find(f => f.id === selectedFieldId)?.label}</span>
-                      </div>
+              {selectedFieldId && (
+                <div className="mt-6 bg-gray-900 text-white p-6 rounded-3xl font-mono text-[11px] shadow-2xl border border-gray-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                  <div className="flex justify-between items-start mb-5">
+                    <div className="flex flex-col flex-1 mr-4">
+                      <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Alan Kimliği (ID)</span>
+                      <input 
+                        type="text"
+                        value={debugFields.find(f => f.id === selectedFieldId)?.id || ''}
+                        onChange={(e) => {
+                          const newId = e.target.value;
+                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, id: newId } : f));
+                          setSelectedFieldId(newId);
+                        }}
+                        placeholder="Örn: 2.1-adisoyadi"
+                        className="bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all"
+                      />
+                    </div>
+                    <div className="flex flex-col mr-4">
+                      <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Tür</span>
+                      <select 
+                        value={debugFields.find(f => f.id === selectedFieldId)?.type || 'text'}
+                        onChange={(e) => {
+                          const val = e.target.value as 'text' | 'checkbox';
+                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, type: val } : f));
+                        }}
+                        className="bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="text" className="bg-gray-900">Metin</option>
+                        <option value="checkbox" className="bg-gray-900">Onay Kutusu</option>
+                      </select>
+                    </div>
+                    <div className="flex gap-2 pt-5">
+                      <button 
+                        onClick={() => {
+                          if (confirm('Bu alanı silmek istediğinize emin misiniz?')) {
+                            setDebugFields(prev => prev.filter(f => f.id !== selectedFieldId));
+                            setSelectedFieldId(null);
+                          }
+                        }}
+                        className="p-3 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white rounded-xl transition-all border border-red-600/20"
+                        title="Alanı Sil"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                       <button 
                         onClick={() => setSelectedFieldId(null)}
-                        className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
                       >
                         <X size={18} />
                       </button>
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest">X (Sol Kenardan)</label>
-                          <span className="text-[9px] text-red-400 font-bold">{((debugFields.find(f => f.id === selectedFieldId)?.x || 0) * PT_TO_MM).toFixed(1)} mm</span>
-                        </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest">X (Sol Kenardan)</label>
+                        <span className="text-[10px] text-red-500 font-bold">{((debugFields.find(f => f.id === selectedFieldId)?.x || 0) * PT_TO_MM).toFixed(1)} mm</span>
+                      </div>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={debugFields.find(f => f.id === selectedFieldId)?.x || 0}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, x: val } : f));
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest">Y (Alt Kenardan)</label>
+                        <span className="text-[10px] text-red-500 font-bold">{((debugFields.find(f => f.id === selectedFieldId)?.y || 0) * PT_TO_MM).toFixed(1)} mm</span>
+                      </div>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={debugFields.find(f => f.id === selectedFieldId)?.y || 0}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: val } : f));
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-4">
+                      <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest block">Y (Üst Kenardan)</label>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={Number((842 - (debugFields.find(f => f.id === selectedFieldId)?.y || 0) - (debugFields.find(f => f.id === selectedFieldId)?.height || 0)).toFixed(2))}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          const height = debugFields.find(f => f.id === selectedFieldId)?.height || 0;
+                          const newPdfY = Number((842 - val - height).toFixed(2));
+                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: newPdfY } : f));
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-blue-500 transition-all text-sm"
+                      />
+                      <p className="text-[9px] text-blue-400/60 mt-1 italic">Cetvelle üstten ölçtüğünüz değeri buraya girin.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest block">Genişlik / Yükseklik</label>
+                      <div className="flex gap-3">
                         <input 
                           type="number" 
                           step="0.1"
-                          value={debugFields.find(f => f.id === selectedFieldId)?.x || 0}
+                          placeholder="G"
+                          value={debugFields.find(f => f.id === selectedFieldId)?.width || 0}
                           onChange={(e) => {
                             const val = parseFloat(e.target.value);
-                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, x: val } : f));
+                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, width: val } : f));
                           }}
-                          className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                          className="w-1/2 bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
                         />
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest">Y (Alt Kenardan)</label>
-                          <span className="text-[9px] text-red-400 font-bold">{((debugFields.find(f => f.id === selectedFieldId)?.y || 0) * PT_TO_MM).toFixed(1)} mm</span>
-                        </div>
                         <input 
                           type="number" 
                           step="0.1"
-                          value={debugFields.find(f => f.id === selectedFieldId)?.y || 0}
+                          placeholder="Y"
+                          value={debugFields.find(f => f.id === selectedFieldId)?.height || 0}
                           onChange={(e) => {
                             const val = parseFloat(e.target.value);
-                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: val } : f));
+                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, height: val } : f));
                           }}
-                          className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
+                          className="w-1/2 bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
                         />
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest block">Y (Üst Kenardan)</label>
-                        <input 
-                          type="number" 
-                          step="0.1"
-                          value={Number((842 - (debugFields.find(f => f.id === selectedFieldId)?.y || 0) - (debugFields.find(f => f.id === selectedFieldId)?.height || 0)).toFixed(2))}
-                          onChange={(e) => {
-                            const val = parseFloat(e.target.value);
-                            const height = debugFields.find(f => f.id === selectedFieldId)?.height || 0;
-                            // newY = 842 - topDistance - height
-                            const newPdfY = Number((842 - val - height).toFixed(2));
-                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: newPdfY } : f));
-                          }}
-                          className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-blue-500 transition-all text-sm"
-                        />
-                        <p className="text-[8px] text-blue-400 mt-1 italic">Cetvelle üstten ölçtüğünüz değeri buraya girin.</p>
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest block">Genişlik / Yükseklik</label>
-                        <div className="flex gap-2">
-                          <input 
-                            type="number" 
-                            step="0.1"
-                            placeholder="G"
-                            value={debugFields.find(f => f.id === selectedFieldId)?.width || 0}
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value);
-                              setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, width: val } : f));
-                            }}
-                            className="w-1/2 bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
-                          />
-                          <input 
-                            type="number" 
-                            step="0.1"
-                            placeholder="Y"
-                            value={debugFields.find(f => f.id === selectedFieldId)?.height || 0}
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value);
-                              setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, height: val } : f));
-                            }}
-                            className="w-1/2 bg-white/10 border border-white/20 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
-                          />
-                        </div>
                       </div>
                     </div>
-                    <p className="mt-3 text-[9px] text-gray-500 italic text-center">İpucu: Aynı satırdaki kutuların Y değerlerini eşitleyerek hizalayabilirsiniz.</p>
+
+                    <div className="col-span-2 pt-4">
+                      <button 
+                        onClick={() => setSelectedFieldId(null)}
+                        className="w-full py-5 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-red-900/40 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                      >
+                        <Check size={22} />
+                        Değişiklikleri Onayla
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
+                  <p className="mt-5 text-[10px] text-gray-500 italic text-center border-t border-white/5 pt-4">İpucu: Aynı satırdaki kutuların Y değerlerini eşitleyerek mükemmel hizalama sağlayabilirsiniz.</p>
+                </div>
+              )}
 
               <div className="space-y-3 pt-2">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-2">
                   <button 
                     onClick={() => {
                       const json = JSON.stringify(debugFields, null, 2);
@@ -783,7 +824,18 @@ export default function App() {
                     }}
                     className="flex items-center justify-center gap-2 py-4 bg-white border border-gray-200 text-gray-800 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm uppercase tracking-widest text-[10px]"
                   >
-                    <Copy size={16} /> JSON Kopyala
+                    <Copy size={16} /> JSON
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (confirm('Tüm alanlar silinecek. Emin misiniz?')) {
+                        setDebugFields([]);
+                        setSelectedFieldId(null);
+                      }
+                    }}
+                    className="flex items-center justify-center gap-2 py-4 bg-white border border-gray-200 text-red-600 rounded-2xl font-bold hover:bg-red-50 transition-all shadow-sm uppercase tracking-widest text-[10px]"
+                  >
+                    <Trash2 size={16} /> Hepsini Sil
                   </button>
                   <button 
                     onClick={() => {
@@ -803,13 +855,42 @@ export default function App() {
                 >
                   Forma Dön
                 </button>
+
+                {/* Field List */}
+                <div className="mt-6 space-y-3">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Mevcut Alanlar ({debugFields.filter(f => f.page === debugPage).length})</h3>
+                  <div className="max-h-[300px] overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+                    {debugFields.filter(f => f.page === debugPage).map(field => (
+                      <div 
+                        key={field.id}
+                        className={`p-3 rounded-xl border transition-all flex items-center justify-between ${selectedFieldId === field.id ? 'bg-red-50 border-red-200 shadow-sm' : 'bg-white border-gray-100 hover:border-gray-200'}`}
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-[11px] font-bold text-gray-900">{field.id}</span>
+                          <span className="text-[9px] text-gray-400">{field.type === 'text' ? 'Metin' : 'Onay Kutusu'}</span>
+                        </div>
+                        <button 
+                          onClick={() => setSelectedFieldId(field.id)}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${selectedFieldId === field.id ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >
+                          Düzenle
+                        </button>
+                      </div>
+                    ))}
+                    {debugFields.filter(f => f.page === debugPage).length === 0 && (
+                      <div className="py-8 text-center border-2 border-dashed border-gray-100 rounded-2xl">
+                        <p className="text-[10px] text-gray-400 font-medium italic">Bu sayfada henüz alan yok.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
           {/* HOME VIEW */}
           {view === 'home' && (
-            <div className="space-y-6 py-4 flex-1">
+            <div className="space-y-6 py-4 flex-1 max-w-xl mx-auto w-full">
               <div className="flex justify-end">
                 <button 
                   onClick={() => setView('help')}
@@ -833,12 +914,25 @@ export default function App() {
                 </div>
                 <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Yeni Kayıt Oluştur</h2>
               </button>
+
+              <button 
+                onClick={() => setView('debug')}
+                className="w-full p-6 bg-white border-2 border-gray-100 text-gray-800 rounded-3xl shadow-sm active:scale-95 transition-all flex items-center gap-5 group"
+              >
+                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                  <FileText size={28} className="text-gray-400" />
+                </div>
+                <div className="text-left">
+                  <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Alan Düzenle</h2>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Geliştirici Modu</p>
+                </div>
+              </button>
             </div>
           )}
 
           {/* RESULT VIEW */}
           {view === 'result' && (
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-8">
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-8 max-w-xl mx-auto w-full">
               <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner animate-bounce">
                 <CheckCircle2 size={48} />
               </div>
@@ -878,7 +972,7 @@ export default function App() {
 
           {/* FORM VIEW */}
           {view === 'form' && (
-            <>
+            <div className="max-w-xl mx-auto w-full">
               <StepIndicator currentStep={currentSectionIndex} steps={sections} />
 
               <div className="mt-6 pb-8">
@@ -949,7 +1043,7 @@ export default function App() {
                   )}
                 </div>
               </div>
-            </>
+            </div>
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
