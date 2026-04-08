@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { 
   Heart, 
@@ -96,7 +96,15 @@ export default function App() {
     }
   }, []);
 
-  const [formData, setFormData] = useState<FormData>(initialData);
+  const [formData, setFormData] = useState<FormData>(() => {
+    const initial: FormData = {};
+    FORM_CONFIG.forEach(field => {
+      if (field.defaultValue !== undefined) {
+        initial[field.id] = field.defaultValue;
+      }
+    });
+    return initial;
+  });
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -105,6 +113,15 @@ export default function App() {
 
   const PT_TO_MM = 0.352778;
   const MM_TO_PT = 2.83465;
+
+  const calculateCorners = (x: number, y: number, width: number, height: number) => {
+    return {
+      bottomLeft: [Number(x.toFixed(2)), Number(y.toFixed(2))] as [number, number],
+      bottomRight: [Number((x + width).toFixed(2)), Number(y.toFixed(2))] as [number, number],
+      topRight: [Number((x + width).toFixed(2)), Number((y + height).toFixed(2))] as [number, number],
+      topLeft: [Number(x.toFixed(2)), Number((y + height).toFixed(2))] as [number, number]
+    };
+  };
 
   // Load Turkish compatible font
   useEffect(() => {
@@ -154,18 +171,30 @@ export default function App() {
       setDebugFields(prev => prev.map(f => {
         if (f.id !== selectedFieldId) return f;
         
+        let newX = f.x;
+        let newY = f.y;
+
         switch (e.key) {
           case 'ArrowUp':
-            return { ...f, y: Number((f.y + step).toFixed(2)) };
+            newY = Number((f.y + step).toFixed(2));
+            break;
           case 'ArrowDown':
-            return { ...f, y: Number((f.y - step).toFixed(2)) };
+            newY = Number((f.y - step).toFixed(2));
+            break;
           case 'ArrowLeft':
-            return { ...f, x: Number((f.x - step).toFixed(2)) };
+            newX = Number((f.x - step).toFixed(2));
+            break;
           case 'ArrowRight':
-            return { ...f, x: Number((f.x + step).toFixed(2)) };
-          default:
-            return f;
+            newX = Number((f.x + step).toFixed(2));
+            break;
         }
+
+        return { 
+          ...f, 
+          x: newX, 
+          y: newY, 
+          corners: calculateCorners(newX, newY, f.width, f.height) 
+        };
       }));
 
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
@@ -177,10 +206,35 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [view, selectedFieldId]);
 
-  const sections: string[] = Array.from(new Set(debugFields.map(f => f.section)));
+  const getPrefix = (id: string) => id.split('-')[0];
+  
+  // Group fields by their ID prefix (e.g., "2.0", "2.1")
+  const stepGroups = useMemo(() => {
+    const visibleFields = debugFields.filter(f => !f.hidden);
+    const groups: { id: string; label: string; fields: FieldConfig[] }[] = [];
+    
+    // Get unique prefixes in order of appearance
+    const prefixes: string[] = [];
+    visibleFields.forEach(f => {
+      const p = getPrefix(f.id);
+      if (!prefixes.includes(p)) prefixes.push(p);
+    });
+
+    prefixes.forEach(p => {
+      const fields = visibleFields.filter(f => getPrefix(f.id) === p);
+      groups.push({
+        id: p,
+        label: fields[0].section, // Use the section name of the first field in the group
+        fields
+      });
+    });
+    
+    return groups;
+  }, [debugFields]);
+
+  const sections = stepGroups.map(g => g.label);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
-  const currentSection = sections[currentSectionIndex];
-  const fieldsInCurrentSection = debugFields.filter(f => f.section === currentSection);
+  const fieldsInCurrentSection = stepGroups[currentSectionIndex]?.fields || [];
 
   const updateField = (id: string, value: any) => {
     const processedValue = typeof value === 'string' ? value.toLocaleUpperCase('tr-TR') : value;
@@ -255,13 +309,6 @@ export default function App() {
           const value = formData[field.id];
           if (value === undefined || value === '') return;
 
-          const fontSize = 9;
-          const checkboxSize = 10;
-          
-          // Vertical offset to center text in the box (PDF Y is baseline)
-          const vOffset = (field.height - fontSize) / 2 + 1;
-          const pdfY = field.y + vOffset;
-
           if (debugMode) {
             page.drawRectangle({
               x: field.x,
@@ -273,18 +320,42 @@ export default function App() {
             });
           }
 
-          if (field.type === 'text') {
-            page.drawText(trToEn(String(value)), {
-              x: field.x,
+          if (field.type === 'text' || field.type === 'number' || field.type === 'date') {
+            const text = trToEn(String(value));
+            let currentFontSize = 7; // Reduced from 8
+            const padding = 1.5;
+            const availableWidth = field.width - (padding * 2);
+            
+            let textWidth = font.widthOfTextAtSize(text, currentFontSize);
+            
+            // Auto-scale font size if text is wider than the field
+            if (textWidth > availableWidth) {
+              currentFontSize = (availableWidth / textWidth) * currentFontSize;
+              // Minimum readable font size
+              currentFontSize = Math.max(4, currentFontSize);
+            }
+
+            // Vertical offset to center text in the box (PDF Y is baseline)
+            const vOffset = (field.height - currentFontSize) / 2 + 0.5;
+            const pdfY = field.y + vOffset;
+
+            page.drawText(text, {
+              x: field.x + padding,
               y: pdfY,
-              size: fontSize,
+              size: currentFontSize,
               font: font,
               color: rgb(0, 0, 0),
             });
           } else if (field.type === 'checkbox' && value === true) {
+            // Checkbox size is 6x6 in config, so X should be smaller
+            const checkboxSize = 6; // Reduced from 10 to fit 6x6 boxes
+            // Center X perfectly in the box
+            const xOffset = (field.width - (font.widthOfTextAtSize('X', checkboxSize))) / 2;
+            const yOffset = (field.height - checkboxSize) / 2 + 1;
+            
             page.drawText('X', {
-              x: field.x + 2,
-              y: pdfY + 2,
+              x: field.x + xOffset,
+              y: field.y + yOffset,
               size: checkboxSize,
               font: font,
               color: rgb(0, 0, 0),
@@ -536,14 +607,15 @@ export default function App() {
                     const newId = `yeni_alan_${Date.now()}`;
                     const newField: FieldConfig = {
                       id: newId,
-                      label: 'Yeni Alan',
+                      label: 'Yeni Alan (Düzenle)',
                       type: 'text',
                       x: 100,
                       y: 400,
                       width: 100,
                       height: 20,
                       page: debugPage,
-                      section: 'YENİ'
+                      section: 'YENİ',
+                      corners: calculateCorners(100, 400, 100, 20)
                     };
                     setDebugFields(prev => [...prev, newField]);
                     setSelectedFieldId(newId);
@@ -608,7 +680,12 @@ export default function App() {
                           newPdfY = Math.max(0, Math.min(842 - field.height, newPdfY));
 
                           setDebugFields(prev => prev.map(f => 
-                            f.id === field.id ? { ...f, x: newPdfX, y: newPdfY } : f
+                            f.id === field.id ? { 
+                              ...f, 
+                              x: newPdfX, 
+                              y: newPdfY,
+                              corners: calculateCorners(newPdfX, newPdfY, f.width, f.height)
+                            } : f
                           ));
                         }}
                         style={{
@@ -637,9 +714,17 @@ export default function App() {
                                 if (!debugImageRef.current) return;
                                 const rect = debugImageRef.current.getBoundingClientRect();
                                 const deltaW = (info.delta.x / rect.width) * 595;
-                                setDebugFields(prev => prev.map(f => 
-                                  f.id === field.id ? { ...f, width: Math.max(0.1, Number((f.width + deltaW).toFixed(2))) } : f
-                                ));
+                                setDebugFields(prev => prev.map(f => {
+                                  if (f.id === field.id) {
+                                    const newWidth = Math.max(0.1, Number((f.width + deltaW).toFixed(2)));
+                                    return { 
+                                      ...f, 
+                                      width: newWidth,
+                                      corners: calculateCorners(f.x, f.y, newWidth, f.height)
+                                    };
+                                  }
+                                  return f;
+                                }));
                               }}
                               className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize bg-red-500/50 hover:bg-red-500 transition-colors"
                             />
@@ -653,9 +738,17 @@ export default function App() {
                                 const rect = debugImageRef.current.getBoundingClientRect();
                                 // PDF Y is bottom-up, so dragging UP (negative delta.y) increases height
                                 const deltaH = (-info.delta.y / rect.height) * 842;
-                                setDebugFields(prev => prev.map(f => 
-                                  f.id === field.id ? { ...f, height: Math.max(0.1, Number((f.height + deltaH).toFixed(2))) } : f
-                                ));
+                                setDebugFields(prev => prev.map(f => {
+                                  if (f.id === field.id) {
+                                    const newHeight = Math.max(0.1, Number((f.height + deltaH).toFixed(2)));
+                                    return { 
+                                      ...f, 
+                                      height: newHeight,
+                                      corners: calculateCorners(f.x, f.y, f.width, newHeight)
+                                    };
+                                  }
+                                  return f;
+                                }));
                               }}
                               className="absolute top-0 left-0 right-0 h-2 cursor-ns-resize bg-red-500/50 hover:bg-red-500 transition-colors"
                             />
@@ -684,21 +777,60 @@ export default function App() {
                         className="bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all"
                       />
                     </div>
+                    <div className="flex flex-col flex-1 mr-4">
+                      <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Alan Adı (Etiket)</span>
+                      <input 
+                        type="text"
+                        value={debugFields.find(f => f.id === selectedFieldId)?.label || ''}
+                        onChange={(e) => {
+                          const newLabel = e.target.value;
+                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, label: newLabel } : f));
+                        }}
+                        placeholder="Örn: Adı Soyadı"
+                        className="bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all"
+                      />
+                    </div>
                     <div className="flex flex-col mr-4">
                       <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Tür</span>
                       <select 
                         value={debugFields.find(f => f.id === selectedFieldId)?.type || 'text'}
                         onChange={(e) => {
-                          const val = e.target.value as 'text' | 'checkbox';
+                          const val = e.target.value as any;
                           setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, type: val } : f));
                         }}
                         className="bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all appearance-none cursor-pointer"
                       >
                         <option value="text" className="bg-gray-900">Metin</option>
+                        <option value="number" className="bg-gray-900">Sayı</option>
+                        <option value="date" className="bg-gray-900">Tarih</option>
                         <option value="checkbox" className="bg-gray-900">Onay Kutusu</option>
                       </select>
                     </div>
-                    <div className="flex gap-2 pt-5">
+                        <div className="flex flex-col mr-4">
+                          <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Gizli</span>
+                          <button 
+                            onClick={() => {
+                              const isHidden = debugFields.find(f => f.id === selectedFieldId)?.hidden;
+                              setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, hidden: !isHidden } : f));
+                            }}
+                            className={`p-3 rounded-xl border transition-all font-bold text-[10px] uppercase tracking-widest ${debugFields.find(f => f.id === selectedFieldId)?.hidden ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                          >
+                            {debugFields.find(f => f.id === selectedFieldId)?.hidden ? 'EVET' : 'HAYIR'}
+                          </button>
+                        </div>
+                        <div className="flex flex-col mr-4">
+                          <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Zorunlu</span>
+                          <button 
+                            onClick={() => {
+                              const isReq = debugFields.find(f => f.id === selectedFieldId)?.required;
+                              setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, required: !isReq } : f));
+                            }}
+                            className={`p-3 rounded-xl border transition-all font-bold text-[10px] uppercase tracking-widest ${debugFields.find(f => f.id === selectedFieldId)?.required ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                          >
+                            {debugFields.find(f => f.id === selectedFieldId)?.required ? 'EVET' : 'HAYIR'}
+                          </button>
+                        </div>
+                        <div className="flex gap-2 pt-5">
                       <button 
                         onClick={() => {
                           if (confirm('Bu alanı silmek istediğinize emin misiniz?')) {
@@ -732,7 +864,13 @@ export default function App() {
                         value={debugFields.find(f => f.id === selectedFieldId)?.x || 0}
                         onChange={(e) => {
                           const val = parseFloat(e.target.value);
-                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, x: val } : f));
+                          setDebugFields(prev => prev.map(f => 
+                            f.id === selectedFieldId ? { 
+                              ...f, 
+                              x: val,
+                              corners: calculateCorners(val, f.y, f.width, f.height)
+                            } : f
+                          ));
                         }}
                         className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
                       />
@@ -749,7 +887,13 @@ export default function App() {
                         value={debugFields.find(f => f.id === selectedFieldId)?.y || 0}
                         onChange={(e) => {
                           const val = parseFloat(e.target.value);
-                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: val } : f));
+                          setDebugFields(prev => prev.map(f => 
+                            f.id === selectedFieldId ? { 
+                              ...f, 
+                              y: val,
+                              corners: calculateCorners(f.x, val, f.width, f.height)
+                            } : f
+                          ));
                         }}
                         className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
                       />
@@ -765,7 +909,13 @@ export default function App() {
                           const val = parseFloat(e.target.value);
                           const height = debugFields.find(f => f.id === selectedFieldId)?.height || 0;
                           const newPdfY = Number((842 - val - height).toFixed(2));
-                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, y: newPdfY } : f));
+                          setDebugFields(prev => prev.map(f => 
+                            f.id === selectedFieldId ? { 
+                              ...f, 
+                              y: newPdfY,
+                              corners: calculateCorners(f.x, newPdfY, f.width, height)
+                            } : f
+                          ));
                         }}
                         className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-blue-500 transition-all text-sm"
                       />
@@ -782,7 +932,13 @@ export default function App() {
                           value={debugFields.find(f => f.id === selectedFieldId)?.width || 0}
                           onChange={(e) => {
                             const val = parseFloat(e.target.value);
-                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, width: val } : f));
+                            setDebugFields(prev => prev.map(f => 
+                              f.id === selectedFieldId ? { 
+                                ...f, 
+                                width: val,
+                                corners: calculateCorners(f.x, f.y, val, f.height)
+                              } : f
+                            ));
                           }}
                           className="w-1/2 bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
                         />
@@ -793,10 +949,38 @@ export default function App() {
                           value={debugFields.find(f => f.id === selectedFieldId)?.height || 0}
                           onChange={(e) => {
                             const val = parseFloat(e.target.value);
-                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, height: val } : f));
+                            setDebugFields(prev => prev.map(f => 
+                              f.id === selectedFieldId ? { 
+                                ...f, 
+                                height: val,
+                                corners: calculateCorners(f.x, f.y, f.width, val)
+                              } : f
+                            ));
                           }}
                           className="w-1/2 bg-white/5 border border-white/10 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-red-500 transition-all text-sm"
                         />
+                      </div>
+                    </div>
+
+                    <div className="col-span-2 space-y-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+                      <label className="text-[10px] text-red-500 uppercase font-black tracking-widest block mb-2">Köşe Koordinatları (PDF Puanı)</label>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                          <span className="text-[9px] text-gray-400 uppercase">Sol Alt:</span>
+                          <span className="text-[10px] text-white font-mono">[{debugFields.find(f => f.id === selectedFieldId)?.corners.bottomLeft.join(', ')}]</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                          <span className="text-[9px] text-gray-400 uppercase">Sağ Alt:</span>
+                          <span className="text-[10px] text-white font-mono">[{debugFields.find(f => f.id === selectedFieldId)?.corners.bottomRight.join(', ')}]</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                          <span className="text-[9px] text-gray-400 uppercase">Sağ Üst:</span>
+                          <span className="text-[10px] text-white font-mono">[{debugFields.find(f => f.id === selectedFieldId)?.corners.topRight.join(', ')}]</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-white/5 pb-1">
+                          <span className="text-[9px] text-gray-400 uppercase">Sol Üst:</span>
+                          <span className="text-[10px] text-white font-mono">[{debugFields.find(f => f.id === selectedFieldId)?.corners.topLeft.join(', ')}]</span>
+                        </div>
                       </div>
                     </div>
 
@@ -867,7 +1051,14 @@ export default function App() {
                       >
                         <div className="flex flex-col">
                           <span className="text-[11px] font-bold text-gray-900">{field.id}</span>
-                          <span className="text-[9px] text-gray-400">{field.type === 'text' ? 'Metin' : 'Onay Kutusu'}</span>
+                          <span className="text-[10px] text-gray-600 font-medium">{field.label}</span>
+                          <span className="text-[9px] text-gray-400">
+                            {field.type === 'text' ? 'Metin' : 
+                             field.type === 'number' ? 'Sayı' : 
+                             field.type === 'date' ? 'Tarih' : 'Onay Kutusu'}
+                            {field.hidden && <span className="ml-2 text-red-500 font-bold">(GİZLİ)</span>}
+                            {field.required && <span className="ml-2 text-blue-500 font-bold">(ZORUNLU)</span>}
+                          </span>
                         </div>
                         <button 
                           onClick={() => setSelectedFieldId(field.id)}
@@ -903,7 +1094,13 @@ export default function App() {
 
               <button 
                 onClick={() => {
-                  setFormData({});
+                  const initial: FormData = {};
+                  FORM_CONFIG.forEach(field => {
+                    if (field.defaultValue !== undefined) {
+                      initial[field.id] = field.defaultValue;
+                    }
+                  });
+                  setFormData(initial);
                   setCurrentSectionIndex(0);
                   setView('form');
                 }}
@@ -978,7 +1175,7 @@ export default function App() {
               <div className="mt-6 pb-8">
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={currentSection}
+                    key={stepGroups[currentSectionIndex]?.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -988,20 +1185,21 @@ export default function App() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {fieldsInCurrentSection.map(field => (
                           <div key={field.id}>
-                            {field.type === 'text' ? (
-                              <Input 
-                                label={field.label} 
-                                value={formData[field.id]} 
-                                onChange={(v: string) => updateField(field.id, v)} 
-                              />
-                            ) : (
+                            {field.type === 'checkbox' ? (
                               <div className="pt-6">
                                 <Checkbox 
-                                  label={field.label} 
+                                  label={field.label + (field.required ? ' *' : '')} 
                                   checked={formData[field.id]} 
                                   onChange={(v: boolean) => updateField(field.id, v)} 
                                 />
                               </div>
+                            ) : (
+                              <Input 
+                                label={field.label + (field.required ? ' *' : '')} 
+                                value={formData[field.id]} 
+                                type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
+                                onChange={(v: string) => updateField(field.id, v)} 
+                              />
                             )}
                           </div>
                         ))}
@@ -1027,14 +1225,32 @@ export default function App() {
                   
                   {currentSectionIndex < sections.length - 1 ? (
                     <button
-                      onClick={() => setCurrentSectionIndex(prev => prev + 1)}
+                      onClick={() => {
+                        // Validate current section
+                        const missingRequired = fieldsInCurrentSection.some(f => f.required && !formData[f.id]);
+                        if (missingRequired) {
+                          alert('Lütfen zorunlu alanları doldurunuz.');
+                          return;
+                        }
+                        setCurrentSectionIndex(prev => prev + 1);
+                      }}
                       className="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-100"
                     >
                       İleri <ChevronRight size={20} />
                     </button>
                   ) : (
                     <button
-                      onClick={() => setView('result')}
+                      onClick={() => {
+                        // Final validation
+                        const allRequiredFields = debugFields.filter(f => f.required && !f.hidden);
+                        const missingFields = allRequiredFields.filter(f => !formData[f.id]);
+                        
+                        if (missingFields.length > 0) {
+                          alert(`Lütfen zorunlu alanları doldurunuz: ${missingFields.map(f => f.label).join(', ')}`);
+                          return;
+                        }
+                        setView('result');
+                      }}
                       className="flex-1 py-4 bg-green-600 text-white rounded-2xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-lg"
                     >
                       <Check size={20} />
