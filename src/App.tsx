@@ -781,7 +781,7 @@ export default function App() {
               <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none aspect-[595/842]">
                 <img 
                   ref={debugImageRef}
-                  src={debugPage === 1 ? '/sayfa_1.png' : '/sayfa_2.png'} 
+                  src={debugPage === 1 ? sayfa1 : sayfa2} 
                   alt="Debug" 
                   className="w-full h-full object-fill block pointer-events-none opacity-60"
                   onLoad={() => {
