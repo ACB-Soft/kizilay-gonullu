@@ -34,8 +34,8 @@ import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // Import assets
 import kizilayLogo from './assets/kizilay_logo.svg';
-import sayfa1 from './assets/images/form_sayfa1.png';
-import sayfa2 from './assets/images/form_sayfa2.png';
+import sayfa1 from './assets/images/form_sayfa1.jpg';
+import sayfa2 from './assets/images/form_sayfa2.jpg';
 
 // Helper for robust asset paths (especially for GitHub Pages)
 const getAssetPath = (path: string) => {
@@ -322,7 +322,7 @@ export default function App() {
   const getPDFBytes = async () => {
     // PDF-Lib Ayarları ve Çalışma Mantığı:
     // 1. Kütüphane index.html içinde CDN üzerinden yüklenir ve window.PDFLib üzerinden erişilir.
-    // 2. Görseller (form_sayfa1.png, form_sayfa2.png) fetch() ile 'byte' dizisi olarak indirilir.
+    // 2. Görseller (form_sayfa1.jpg, form_sayfa2.jpg) fetch() ile 'byte' dizisi olarak indirilir.
     // 3. İndirilen bu veriler pdfDoc.embedPng() metodu ile PDF dökümanına gömülür.
     // 4. Sorun genellikle kütüphanede değil, fetch() işleminin GitHub Pages gibi ortamlarda 
     //    dosyayı yanlış konumda aramasından (404) kaynaklanır.
