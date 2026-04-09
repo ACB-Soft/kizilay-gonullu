@@ -33,9 +33,18 @@ import { motion, AnimatePresence } from 'motion/react';
 import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // Import assets
-import sayfa1 from './assets/sayfa_1.png';
-import sayfa2 from './assets/sayfa_2.png';
 import kizilayLogo from './assets/kizilay_logo.svg';
+
+// Helper for robust asset paths (especially for GitHub Pages)
+const getAssetPath = (path: string) => {
+  const base = import.meta.env.BASE_URL || '/';
+  const cleanBase = base.endsWith('/') ? base : `${base}/`;
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${cleanBase}${cleanPath}`;
+};
+
+const sayfa1 = getAssetPath('sayfa_1.png');
+const sayfa2 = getAssetPath('sayfa_2.png');
 
 // --- Types ---
 interface FormData {
@@ -309,6 +318,13 @@ export default function App() {
   };
 
   const getPDFBytes = async () => {
+    // PDF-Lib Ayarları ve Çalışma Mantığı:
+    // 1. Kütüphane index.html içinde CDN üzerinden yüklenir ve window.PDFLib üzerinden erişilir.
+    // 2. Görseller (sayfa_1.png, sayfa_2.png) fetch() ile 'byte' dizisi olarak indirilir.
+    // 3. İndirilen bu veriler pdfDoc.embedPng() metodu ile PDF dökümanına gömülür.
+    // 4. Sorun genellikle kütüphanede değil, fetch() işleminin GitHub Pages gibi ortamlarda 
+    //    dosyayı yanlış konumda aramasından (404) kaynaklanır.
+    
     const { PDFDocument, rgb, StandardFonts } = (window as any).PDFLib;
     if (!PDFDocument) throw new Error('PDFLib not loaded');
     
