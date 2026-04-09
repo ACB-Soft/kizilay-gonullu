@@ -5,7 +5,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function extract() {
   for (let i = 1; i <= 2; i++) {
-    const data = fs.readFileSync(`./public/sayfa_${i}.png`);
+    const data = fs.readFileSync(`./public/sayfa${i}.png`);
     const base64EncodeString = data.toString("base64");
     
     const response = await ai.models.generateContent({

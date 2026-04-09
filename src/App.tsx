@@ -43,8 +43,8 @@ const getAssetPath = (path: string) => {
   return `${cleanBase}${cleanPath}`;
 };
 
-const sayfa1 = getAssetPath('sayfa_1.png');
-const sayfa2 = getAssetPath('sayfa_2.png');
+const sayfa1 = getAssetPath('sayfa1.png');
+const sayfa2 = getAssetPath('sayfa2.png');
 
 // --- Types ---
 interface FormData {
@@ -320,7 +320,7 @@ export default function App() {
   const getPDFBytes = async () => {
     // PDF-Lib Ayarları ve Çalışma Mantığı:
     // 1. Kütüphane index.html içinde CDN üzerinden yüklenir ve window.PDFLib üzerinden erişilir.
-    // 2. Görseller (sayfa_1.png, sayfa_2.png) fetch() ile 'byte' dizisi olarak indirilir.
+    // 2. Görseller (sayfa1.png, sayfa2.png) fetch() ile 'byte' dizisi olarak indirilir.
     // 3. İndirilen bu veriler pdfDoc.embedPng() metodu ile PDF dökümanına gömülür.
     // 4. Sorun genellikle kütüphanede değil, fetch() işleminin GitHub Pages gibi ortamlarda 
     //    dosyayı yanlış konumda aramasından (404) kaynaklanır.
