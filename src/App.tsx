@@ -120,7 +120,7 @@ const Select = ({ label, value, onChange, options = [] }: any) => (
 );
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug'>('home');
+  const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug' | 'frm006'>('home');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
@@ -527,9 +527,6 @@ export default function App() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-lg font-black text-gray-800 uppercase tracking-wide leading-tight">SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU</p>
-                </div>
               </div>
 
               <div className="space-y-2 py-2">
@@ -672,11 +669,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4 text-right">
-            <div className="flex flex-col justify-center">
-              <p className="text-base md:text-xl font-black text-gray-800 uppercase tracking-tight leading-[1.1]">
-                SOSYAL İNCELEME VE<br/>İHTİYAÇ TESPİT FORMU
-              </p>
-            </div>
             <div className="w-14 h-14 flex items-center justify-center">
               <img 
                 src={kizilayLogo} 
@@ -1302,7 +1294,23 @@ export default function App() {
                 <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                   <Plus size={28} />
                 </div>
-                <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Yeni Kayıt Oluştur</h2>
+                <div className="flex flex-col items-start text-left">
+                  <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">FRM.005 Oluştur</h2>
+                  <p className="text-xs font-bold opacity-80 tracking-tight">Sosyal İnceleme ve İhtiyaç Tespit Formu</p>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => setView('frm006')}
+                className="w-full p-6 bg-red-500 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex items-center gap-5 group"
+              >
+                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                  <FileText size={28} />
+                </div>
+                <div className="flex flex-col items-start text-left">
+                  <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">FRM.006 Oluştur</h2>
+                  <p className="text-xs font-bold opacity-80 tracking-tight">Açık Rıza Formu</p>
+                </div>
               </button>
 
               <button 
@@ -1318,8 +1326,27 @@ export default function App() {
                 </div>
                 <div className="text-left">
                   <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Alan Düzenle</h2>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Geliştirici Modu</p>
+                  <p className="text-[10px] text-gray-400 font-bold tracking-widest">Geliştirici Modu</p>
                 </div>
+              </button>
+            </div>
+          )}
+
+          {/* FRM.006 PLACEHOLDER VIEW */}
+          {view === 'frm006' && (
+            <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 max-w-xl mx-auto w-full">
+              <div className="w-20 h-20 bg-gray-100 text-gray-400 rounded-3xl flex items-center justify-center mx-auto shadow-inner">
+                <RefreshCw size={40} className="animate-spin-slow" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">FRM.006 Hazırlanıyor</h2>
+                <p className="text-gray-500 text-sm">Açık Rıza Formu modülü çok yakında burada olacak.</p>
+              </div>
+              <button 
+                onClick={() => setView('home')}
+                className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-all"
+              >
+                ANA SAYFAYA DÖN
               </button>
             </div>
           )}

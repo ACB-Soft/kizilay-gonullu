@@ -239,7 +239,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "type": "text",
     "x": 372,
     "y": 679,
-    "width": 160,
+    "width": 150,
     "height": 28,
     "page": 1,
     "section": "YENİ",
@@ -249,16 +249,45 @@ export const FORM_CONFIG: FieldConfig[] = [
         679
       ],
       "bottomRight": [
-        532,
+        522,
         679
       ],
       "topRight": [
-        532,
+        522,
         707
       ],
       "topLeft": [
         372,
         707
+      ]
+    }
+  },
+  {
+    "id": "2.0-calisiyorsageliri",
+    "label": "Çalışıyorsa Aylık Geliri",
+    "type": "number",
+    "x": 372,
+    "y": 649,
+    "width": 150,
+    "height": 28,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        372,
+        649
+      ],
+      "bottomRight": [
+        522,
+        649
+      ],
+      "topRight": [
+        522,
+        677
+      ],
+      "topLeft": [
+        372,
+        677
       ]
     }
   },
@@ -535,35 +564,6 @@ export const FORM_CONFIG: FieldConfig[] = [
     }
   },
   {
-    "id": "2.0-calisiyorsageliri",
-    "label": "Çalışıyorsa Aylık Geliri",
-    "type": "number",
-    "x": 372,
-    "y": 649,
-    "width": 160,
-    "height": 28,
-    "page": 1,
-    "section": "YENİ",
-    "corners": {
-      "bottomLeft": [
-        372,
-        649
-      ],
-      "bottomRight": [
-        532,
-        649
-      ],
-      "topRight": [
-        532,
-        677
-      ],
-      "topLeft": [
-        372,
-        677
-      ]
-    }
-  },
-  {
     "id": "2.0-egitimdurumu",
     "label": "Eğitim Durumu",
     "type": "select",
@@ -596,6 +596,84 @@ export const FORM_CONFIG: FieldConfig[] = [
       "ORTAOKUL",
       "LİSE",
       "ÜNİVERSİTE"
+    ]
+  },
+  {
+    "id": "2.0-bedengiyim",
+    "label": "Beden Giyim",
+    "type": "select",
+    "x": 482,
+    "y": 635,
+    "width": 30,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        482,
+        635
+      ],
+      "bottomRight": [
+        512,
+        635
+      ],
+      "topRight": [
+        512,
+        648
+      ],
+      "topLeft": [
+        482,
+        648
+      ]
+    },
+    "options": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ]
+  },
+  {
+    "id": "2.0-bedenayakkabi",
+    "label": "Beden Ayakkabı",
+    "type": "select",
+    "x": 553,
+    "y": 635,
+    "width": 30,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        553,
+        635
+      ],
+      "bottomRight": [
+        583,
+        635
+      ],
+      "topRight": [
+        583,
+        648
+      ],
+      "topLeft": [
+        553,
+        648
+      ]
+    },
+    "options": [
+      "35",
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
     ]
   }
 ];
