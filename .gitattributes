@@ -1,6 +1,6 @@
 # Ensure binary files are treated as binary and not modified
 *.jpg binary
-*.png binary -text
+*.png binary
 *.gif binary
 *.pdf binary
 *.ico binary
