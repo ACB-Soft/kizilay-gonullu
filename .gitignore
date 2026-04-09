@@ -6,5 +6,3 @@ coverage/
 *.log
 .env*
 !.env.example
-public/sayfa_1.png
-public/sayfa_2.png
