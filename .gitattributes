@@ -1,6 +1,7 @@
 # Ensure binary files are treated as binary and not modified
 *.jpg binary
 *.png binary -text
+src/assets/images/*.png binary -text
 *.gif binary
 *.pdf binary
 *.ico binary

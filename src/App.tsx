@@ -34,6 +34,8 @@ import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // Import assets
 import kizilayLogo from './assets/kizilay_logo.svg';
+import sayfa1 from './assets/images/form_sayfa1.png';
+import sayfa2 from './assets/images/form_sayfa2.png';
 
 // Helper for robust asset paths (especially for GitHub Pages)
 const getAssetPath = (path: string) => {
@@ -43,8 +45,8 @@ const getAssetPath = (path: string) => {
   return `${cleanBase}${cleanPath}`;
 };
 
-const sayfa1 = getAssetPath('form_sayfa1.png');
-const sayfa2 = getAssetPath('form_sayfa2.png');
+const sayfa1Url = sayfa1;
+const sayfa2Url = sayfa2;
 
 // --- Types ---
 interface FormData {
@@ -338,7 +340,7 @@ export default function App() {
       font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     }
 
-    const pageImages = [sayfa1, sayfa2];
+    const pageImages = [sayfa1Url, sayfa2Url];
     let pagesAdded = 0;
     let lastError = '';
     
