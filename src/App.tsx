@@ -84,8 +84,32 @@ const Checkbox = ({ label, checked, onChange }: any) => (
   </label>
 );
 
+const Select = ({ label, value, onChange, options = [] }: any) => (
+  <div className="flex flex-col gap-1.5 w-full">
+    <label className="text-xs font-bold text-gray-600 uppercase tracking-tight">{label}</label>
+    <div className="relative">
+      <select 
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm uppercase appearance-none cursor-pointer"
+      >
+        <option value="">SEÇİNİZ</option>
+        {options.map((opt: string) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+        <ChevronRight size={16} className="rotate-90" />
+      </div>
+    </div>
+  </div>
+);
+
 export default function App() {
   const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug'>('home');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
   
   // Handle URL parameters for direct view access (e.g., for opening in new tab)
   useEffect(() => {
@@ -159,6 +183,22 @@ export default function App() {
   const [clickedCoord, setClickedCoord] = useState<{x: number, y: number} | null>(null);
   const [debugFields, setDebugFields] = useState<FieldConfig[]>(FORM_CONFIG);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
+
+  const moveField = (id: string, direction: 'up' | 'down') => {
+    setDebugFields(prev => {
+      const index = prev.findIndex(f => f.id === id);
+      if (index === -1) return prev;
+      
+      const newFields = [...prev];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      
+      if (targetIndex >= 0 && targetIndex < newFields.length) {
+        [newFields[index], newFields[targetIndex]] = [newFields[targetIndex], newFields[index]];
+      }
+      
+      return newFields;
+    });
+  };
   const debugImageRef = useRef<HTMLImageElement>(null);
 
   // Keyboard navigation for debug fields
@@ -222,9 +262,18 @@ export default function App() {
 
     prefixes.forEach(p => {
       const fields = visibleFields.filter(f => getPrefix(f.id) === p);
+      
+      // Map prefix to specific labels
+      let label = fields[0].section;
+      if (p === '1.0') label = "Başvuru Kanalı";
+      else if (p === '2.0') label = "İhtiyaç Sahibi Bilgileri";
+      else if (p === '2.1') label = "İletişim - Adres Bilgileri";
+      else if (p === '2.2') label = "Vasi/Veli/Kayyım Bilgileri";
+      else if (p === '2.3') label = "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri";
+
       groups.push({
         id: p,
-        label: fields[0].section, // Use the section name of the first field in the group
+        label: label,
         fields
       });
     });
@@ -322,7 +371,7 @@ export default function App() {
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date') {
             const text = trToEn(String(value));
-            let currentFontSize = 7; // Reduced from 8
+            let currentFontSize = 6; // Reduced from 7
             const padding = 1.5;
             const availableWidth = field.width - (padding * 2);
             
@@ -492,6 +541,88 @@ export default function App() {
                 >
                   BAŞLAYALIM
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Password Modal */}
+      <AnimatePresence>
+        {showPasswordModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl"
+            >
+              <div className="flex flex-col items-center text-center space-y-6">
+                <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center">
+                  <Zap className="text-red-600" size={32} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">GELİŞTİRİCİ GİRİŞİ</h3>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Devam etmek için şifreyi girin</p>
+                </div>
+                
+                <div className="w-full space-y-4">
+                  <div className="space-y-1.5">
+                    <input 
+                      type="password"
+                      value={passwordInput}
+                      onChange={(e) => {
+                        setPasswordInput(e.target.value);
+                        setPasswordError(false);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          if (passwordInput === "748123") {
+                            setView('debug');
+                            setShowPasswordModal(false);
+                          } else {
+                            setPasswordError(true);
+                          }
+                        }
+                      }}
+                      placeholder="••••••"
+                      autoFocus
+                      className={`w-full px-6 py-4 bg-gray-50 border-2 rounded-2xl text-center text-2xl tracking-[0.5em] font-black focus:outline-none transition-all ${passwordError ? 'border-red-500 bg-red-50 text-red-600 animate-shake' : 'border-gray-100 focus:border-red-500 text-gray-900'}`}
+                    />
+                    {passwordError && (
+                      <p className="text-[10px] font-black text-red-600 uppercase tracking-widest flex items-center justify-center gap-1">
+                        <AlertCircle size={12} /> Hatalı Şifre
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => setShowPasswordModal(false)}
+                      className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
+                    >
+                      İPTAL
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (passwordInput === "748123") {
+                          setView('debug');
+                          setShowPasswordModal(false);
+                        } else {
+                          setPasswordError(true);
+                        }
+                      }}
+                      className="flex-1 py-4 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100 hover:bg-red-700 transition-all"
+                    >
+                      GİRİŞ YAP
+                    </button>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -803,6 +934,7 @@ export default function App() {
                         <option value="text" className="bg-gray-900">Metin</option>
                         <option value="number" className="bg-gray-900">Sayı</option>
                         <option value="date" className="bg-gray-900">Tarih</option>
+                        <option value="select" className="bg-gray-900">Çoktan Seçmeli</option>
                         <option value="checkbox" className="bg-gray-900">Onay Kutusu</option>
                       </select>
                     </div>
@@ -851,6 +983,22 @@ export default function App() {
                       </button>
                     </div>
                   </div>
+
+                  {debugFields.find(f => f.id === selectedFieldId)?.type === 'select' && (
+                    <div className="mb-6 space-y-2">
+                      <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Seçenekler (Virgülle ayırın)</span>
+                      <input 
+                        type="text"
+                        value={debugFields.find(f => f.id === selectedFieldId)?.options?.join(', ') || ''}
+                        onChange={(e) => {
+                          const opts = e.target.value.split(',').map(s => s.trim()).filter(s => s !== '');
+                          setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, options: opts } : f));
+                        }}
+                        placeholder="Örn: SEÇENEK 1, SEÇENEK 2"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all"
+                      />
+                    </div>
+                  )}
                   
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-4">
@@ -1060,12 +1208,36 @@ export default function App() {
                             {field.required && <span className="ml-2 text-blue-500 font-bold">(ZORUNLU)</span>}
                           </span>
                         </div>
-                        <button 
-                          onClick={() => setSelectedFieldId(field.id)}
-                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${selectedFieldId === field.id ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                        >
-                          Düzenle
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col gap-1 mr-2">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                moveField(field.id, 'up');
+                              }}
+                              className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-900 transition-colors"
+                              title="Yukarı Taşı"
+                            >
+                              <ChevronRight size={14} className="-rotate-90" />
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                moveField(field.id, 'down');
+                              }}
+                              className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-900 transition-colors"
+                              title="Aşağı Taşı"
+                            >
+                              <ChevronRight size={14} className="rotate-90" />
+                            </button>
+                          </div>
+                          <button 
+                            onClick={() => setSelectedFieldId(field.id)}
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${selectedFieldId === field.id ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                          >
+                            Düzenle
+                          </button>
+                        </div>
                       </div>
                     ))}
                     {debugFields.filter(f => f.page === debugPage).length === 0 && (
@@ -1113,7 +1285,11 @@ export default function App() {
               </button>
 
               <button 
-                onClick={() => setView('debug')}
+                onClick={() => {
+                  setShowPasswordModal(true);
+                  setPasswordInput('');
+                  setPasswordError(false);
+                }}
                 className="w-full p-6 bg-white border-2 border-gray-100 text-gray-800 rounded-3xl shadow-sm active:scale-95 transition-all flex items-center gap-5 group"
               >
                 <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
@@ -1193,6 +1369,13 @@ export default function App() {
                                   onChange={(v: boolean) => updateField(field.id, v)} 
                                 />
                               </div>
+                            ) : field.type === 'select' ? (
+                              <Select 
+                                label={field.label + (field.required ? ' *' : '')} 
+                                value={formData[field.id]} 
+                                options={field.options}
+                                onChange={(v: string) => updateField(field.id, v)} 
+                              />
                             ) : (
                               <Input 
                                 label={field.label + (field.required ? ' *' : '')} 
@@ -1263,12 +1446,6 @@ export default function App() {
           )}
           {/* Version Info Footer - Visible on all pages */}
           <div className="mt-auto pt-8 pb-6 text-center">
-            <button 
-              onClick={() => setView('debug')}
-              className="mt-4 text-[10px] font-bold text-gray-300 hover:text-red-400 uppercase tracking-[0.2em] transition-colors"
-            >
-              Geliştirici Modu (Koordinat Bulucu)
-            </button>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Versiyon 2.1.0</p>
           </div>
         </div>
