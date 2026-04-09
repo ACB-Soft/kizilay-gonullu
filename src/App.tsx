@@ -32,6 +32,11 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
+// Import assets
+import sayfa1 from './assets/sayfa_1.png';
+import sayfa2 from './assets/sayfa_2.png';
+import kizilayLogo from './assets/kizilay_logo.svg';
+
 // --- Types ---
 interface FormData {
   [key: string]: any;
@@ -317,7 +322,7 @@ export default function App() {
       font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     }
 
-    const pageImages = ['/sayfa_1.png', '/sayfa_2.png'];
+    const pageImages = [sayfa1, sayfa2];
     let pagesAdded = 0;
     let lastError = '';
     
@@ -501,7 +506,7 @@ export default function App() {
               <div className="flex flex-col items-center gap-2">
                 <div className="w-32 h-32 flex items-center justify-center">
                   <img 
-                    src="kizilay_logo.svg" 
+                    src={kizilayLogo} 
                     alt="Türk Kızılay Logo" 
                     className="w-full h-full object-contain"
                   />
@@ -658,7 +663,7 @@ export default function App() {
             </div>
             <div className="w-14 h-14 flex items-center justify-center">
               <img 
-                src="kizilay_logo.svg" 
+                src={kizilayLogo} 
                 alt="Türk Kızılay Logo" 
                 className="w-full h-full object-contain"
               />
