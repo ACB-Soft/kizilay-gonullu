@@ -43,8 +43,8 @@ const getAssetPath = (path: string) => {
   return `${cleanBase}${cleanPath}`;
 };
 
-const sayfa1 = getAssetPath('sayfa_1.png');
-const sayfa2 = getAssetPath('sayfa_2.png');
+const sayfa1 = getAssetPath('form_sayfa_1.png');
+const sayfa2 = getAssetPath('form_sayfa_2.png');
 
 // --- Types ---
 interface FormData {
@@ -390,7 +390,7 @@ export default function App() {
             });
           }
 
-          if (field.type === 'text' || field.type === 'number' || field.type === 'date') {
+          if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
             const text = trToEn(String(value));
             let currentFontSize = 6; // Reduced from 7
             const padding = 1.5;
