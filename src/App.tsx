@@ -147,6 +147,7 @@ export default function App() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [fontData, setFontData] = useState<ArrayBuffer | null>(null);
+  const [fontBoldData, setFontBoldData] = useState<ArrayBuffer | null>(null);
 
   const PT_TO_MM = 0.352778;
   const MM_TO_PT = 2.83465;
@@ -160,35 +161,47 @@ export default function App() {
     };
   };
 
-  // Load Turkish compatible font
+  // Load Turkish compatible fonts
   useEffect(() => {
-    const loadFont = async () => {
-      // Multiple CDN sources for Roboto Regular to ensure reliability and bypass CORS issues
-      const fontUrls = [
+    const loadFonts = async () => {
+      // Multiple CDN sources for Roboto Regular and Bold to ensure reliability
+      const regularUrls = [
         'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.ttf',
-        'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Regular.ttf',
-        'https://cdnjs.cloudflare.com/ajax/libs/roboto-fontface/0.10.0/fonts/roboto/Roboto-Regular.ttf'
+        'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Regular.ttf'
+      ];
+      
+      const boldUrls = [
+        'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4.ttf',
+        'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Bold.ttf'
       ];
 
-      for (const url of fontUrls) {
+      // Load Regular
+      for (const url of regularUrls) {
         try {
           const response = await fetch(url);
           if (response.ok) {
             const data = await response.arrayBuffer();
             setFontData(data);
-            console.log(`Font successfully loaded from: ${url}`);
-            return;
+            console.log(`Regular font loaded: ${url}`);
+            break;
           }
-        } catch (error) {
-          // Silent fail for individual URLs, we try the next one
-        }
+        } catch (e) {}
       }
-      
-      // If all attempts fail, we log a warning instead of a scary error
-      // The application will fallback to Helvetica and ASCII conversion automatically
-      console.warn('Custom font could not be loaded from any source. Turkish characters will be converted to ASCII for PDF compatibility.');
+
+      // Load Bold
+      for (const url of boldUrls) {
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            const data = await response.arrayBuffer();
+            setFontBoldData(data);
+            console.log(`Bold font loaded: ${url}`);
+            break;
+          }
+        } catch (e) {}
+      }
     };
-    loadFont();
+    loadFonts();
   }, []);
 
   const [debugMode, setDebugMode] = useState(false);
@@ -299,13 +312,21 @@ export default function App() {
   const fieldsInCurrentSection = stepGroups[currentSectionIndex]?.fields || [];
 
   const updateField = (id: string, value: any) => {
-    const processedValue = typeof value === 'string' ? value.toLocaleUpperCase('tr-TR') : value;
+    let processedValue = value;
+    if (typeof value === 'string') {
+      if (id === '2.1-eposta') {
+        processedValue = value.toLocaleLowerCase('tr-TR');
+      } else {
+        processedValue = value.toLocaleUpperCase('tr-TR');
+      }
+    }
     setFormData(prev => ({ ...prev, [id]: processedValue }));
   };
 
   const trToEn = (str: string) => {
     if (!str) return '';
-    if (fontData) return String(str); // Don't convert if we have the custom font
+    // If we have any custom font, we can support Turkish characters
+    if (fontData || fontBoldData) return String(str); 
     return String(str)
       .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
       .replace(/Ü/g, 'U').replace(/ü/g, 'u')
@@ -329,12 +350,14 @@ export default function App() {
     
     const pdfDoc = await PDFDocument.create();
     
-    // Use custom font if loaded, otherwise fallback to Helvetica
+    // Use custom bold font if loaded, otherwise regular, otherwise fallback to Helvetica
     let font;
-    if (fontData) {
+    if (fontBoldData) {
+      font = await pdfDoc.embedFont(fontBoldData);
+    } else if (fontData) {
       font = await pdfDoc.embedFont(fontData);
     } else {
-      font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     }
 
     const pageImages = [formImages.form_sayfa1, formImages.form_sayfa2];
