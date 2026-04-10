@@ -34,8 +34,6 @@ import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // Import assets
 import kizilayLogo from './assets/kizilay_logo.svg';
-import sayfa1 from './assets/images/form_sayfa1.jpg';
-import sayfa2 from './assets/images/form_sayfa2.jpg';
 import * as formImages from './constants/formImages';
 
 // Helper for robust asset paths (especially for GitHub Pages)
@@ -45,9 +43,6 @@ const getAssetPath = (path: string) => {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${cleanBase}${cleanPath}`;
 };
-
-const sayfa1Url = sayfa1;
-const sayfa2Url = sayfa2;
 
 // --- Types ---
 interface FormData {
@@ -688,7 +683,7 @@ export default function App() {
               <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none aspect-[595/842]">
                 <img 
                   ref={debugImageRef}
-                  src={debugPage === 1 ? sayfa1 : sayfa2} 
+                  src={debugPage === 1 ? formImages.form_sayfa1 : formImages.form_sayfa2} 
                   alt="Debug" 
                   className="w-full h-full object-fill block pointer-events-none opacity-60"
                   onLoad={() => {
