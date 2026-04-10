@@ -148,6 +148,7 @@ export default function App() {
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [fontData, setFontData] = useState<ArrayBuffer | null>(null);
   const [fontBoldData, setFontBoldData] = useState<ArrayBuffer | null>(null);
+  const [fontLoadingStatus, setFontLoadingStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
   const PT_TO_MM = 0.352778;
   const MM_TO_PT = 2.83465;
@@ -164,16 +165,23 @@ export default function App() {
   // Load Turkish compatible fonts
   useEffect(() => {
     const loadFonts = async () => {
+      setFontLoadingStatus('loading');
       // Using Inter font which has excellent Turkish support and is very reliable
+      // Adding multiple sources to ensure it loads
       const regularUrls = [
         'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Regular.ttf',
+        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Regular.ttf',
         'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Regular.ttf'
       ];
       
       const boldUrls = [
         'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Bold.ttf',
+        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Bold.ttf',
         'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Bold.ttf'
       ];
+
+      let regularLoaded = false;
+      let boldLoaded = false;
 
       // Load Regular
       for (const url of regularUrls) {
@@ -183,6 +191,7 @@ export default function App() {
             const data = await response.arrayBuffer();
             setFontData(data);
             console.log(`Regular font loaded successfully: ${url}`);
+            regularLoaded = true;
             break;
           }
         } catch (e) {
@@ -198,11 +207,18 @@ export default function App() {
             const data = await response.arrayBuffer();
             setFontBoldData(data);
             console.log(`Bold font loaded successfully: ${url}`);
+            boldLoaded = true;
             break;
           }
         } catch (e) {
           console.error(`Failed to load bold font from ${url}:`, e);
         }
+      }
+
+      if (regularLoaded || boldLoaded) {
+        setFontLoadingStatus('success');
+      } else {
+        setFontLoadingStatus('error');
       }
     };
     loadFonts();
@@ -329,9 +345,12 @@ export default function App() {
 
   const trToEn = (str: string) => {
     if (!str) return '';
-    // If we have any custom font, we can support Turkish characters
-    // We return the original string to let the font handle the glyphs
-    if (fontData || fontBoldData) return String(str); 
+    
+    // If we have any custom font, we should ideally support Turkish characters.
+    // We only return the original string if we are SURE a custom font will be used.
+    if (fontLoadingStatus === 'success') {
+      return String(str);
+    }
     
     // Fallback conversion only if no custom font is available
     return String(str)
@@ -363,11 +382,16 @@ export default function App() {
     
     // Use custom bold font if loaded, otherwise regular, otherwise fallback to Helvetica
     let font;
-    if (fontBoldData) {
-      font = await pdfDoc.embedFont(fontBoldData);
-    } else if (fontData) {
-      font = await pdfDoc.embedFont(fontData);
-    } else {
+    try {
+      if (fontBoldData) {
+        font = await pdfDoc.embedFont(new Uint8Array(fontBoldData));
+      } else if (fontData) {
+        font = await pdfDoc.embedFont(new Uint8Array(fontData));
+      } else {
+        font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      }
+    } catch (e) {
+      console.error('Font embedding error:', e);
       font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     }
 
@@ -609,20 +633,26 @@ export default function App() {
       {/* Header */}
       {view !== 'home' && (
         <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center py-2">
-          <div className="w-full max-w-7xl px-6 flex items-center">
-            <button 
-              onClick={() => {
-                if (view === 'form' && currentSectionIndex > 0) {
-                  setCurrentSectionIndex(prev => prev - 1);
-                } else {
-                  setView('home');
-                }
-              }}
-              className="p-1.5 -ml-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 flex items-center gap-1"
-            >
-              <ChevronLeft size={24} />
-              <span className="text-sm font-bold uppercase hidden sm:inline">Geri</span>
-            </button>
+          <div className="w-full max-w-7xl px-6 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  if (view === 'form' && currentSectionIndex > 0) {
+                    setCurrentSectionIndex(prev => prev - 1);
+                  } else {
+                    setView('home');
+                  }
+                }}
+                className="p-1.5 -ml-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 flex items-center gap-1"
+              >
+                <ChevronLeft size={24} />
+                <span className="text-sm font-bold uppercase hidden sm:inline">Geri</span>
+              </button>
+            </div>
+            <div className="flex items-center gap-4">
+              {fontLoadingStatus === 'loading' && <RefreshCw size={14} className="animate-spin text-gray-400" />}
+              <span className="text-sm font-black text-red-600 tracking-widest uppercase">TÜRK KIZILAY</span>
+            </div>
           </div>
         </header>
       )}
