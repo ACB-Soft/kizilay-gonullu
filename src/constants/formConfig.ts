@@ -678,7 +678,7 @@ export const FORM_CONFIG: FieldConfig[] = [
   },
   {
     "id": "2.1-eposta",
-    "label": "E-posta",
+    "label": "eposta",
     "type": "text",
     "x": 115,
     "y": 570,

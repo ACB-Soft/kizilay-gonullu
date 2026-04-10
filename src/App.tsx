@@ -77,13 +77,13 @@ const StepIndicator = ({ currentStep, steps }: { currentStep: number; steps: str
 
 const Input = ({ label, value, onChange, type = "text", placeholder = "" }: any) => (
   <div className="flex flex-col gap-1.5 w-full">
-    <label className="text-xs font-bold text-gray-600 uppercase tracking-tight">{label}</label>
+    <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
     <input 
       type={type}
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm uppercase"
+      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm"
     />
   </div>
 );
@@ -100,12 +100,12 @@ const Checkbox = ({ label, checked, onChange }: any) => (
 
 const Select = ({ label, value, onChange, options = [] }: any) => (
   <div className="flex flex-col gap-1.5 w-full">
-    <label className="text-xs font-bold text-gray-600 uppercase tracking-tight">{label}</label>
+    <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
     <div className="relative">
       <select 
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm uppercase appearance-none cursor-pointer"
+        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm appearance-none cursor-pointer"
       >
         <option value="">SEÇİNİZ</option>
         {options.map((opt: string) => (
@@ -164,14 +164,14 @@ export default function App() {
   // Load Turkish compatible fonts
   useEffect(() => {
     const loadFonts = async () => {
-      // Multiple CDN sources for Roboto Regular and Bold to ensure reliability
+      // Using Inter font which has excellent Turkish support and is very reliable
       const regularUrls = [
-        'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.ttf',
+        'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Regular.ttf',
         'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Regular.ttf'
       ];
       
       const boldUrls = [
-        'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4.ttf',
+        'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Bold.ttf',
         'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Bold.ttf'
       ];
 
@@ -182,10 +182,12 @@ export default function App() {
           if (response.ok) {
             const data = await response.arrayBuffer();
             setFontData(data);
-            console.log(`Regular font loaded: ${url}`);
+            console.log(`Regular font loaded successfully: ${url}`);
             break;
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error(`Failed to load regular font from ${url}:`, e);
+        }
       }
 
       // Load Bold
@@ -195,10 +197,12 @@ export default function App() {
           if (response.ok) {
             const data = await response.arrayBuffer();
             setFontBoldData(data);
-            console.log(`Bold font loaded: ${url}`);
+            console.log(`Bold font loaded successfully: ${url}`);
             break;
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error(`Failed to load bold font from ${url}:`, e);
+        }
       }
     };
     loadFonts();
@@ -326,7 +330,10 @@ export default function App() {
   const trToEn = (str: string) => {
     if (!str) return '';
     // If we have any custom font, we can support Turkish characters
+    // We return the original string to let the font handle the glyphs
     if (fontData || fontBoldData) return String(str); 
+    
+    // Fallback conversion only if no custom font is available
     return String(str)
       .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
       .replace(/Ü/g, 'U').replace(/ü/g, 'u')
@@ -346,9 +353,13 @@ export default function App() {
     //    dosyayı yanlış konumda aramasından (404) kaynaklanır.
     
     const { PDFDocument, rgb, StandardFonts } = (window as any).PDFLib;
+    const fontkit = (window as any).fontkit;
     if (!PDFDocument) throw new Error('PDFLib not loaded');
     
     const pdfDoc = await PDFDocument.create();
+    if (fontkit) {
+      pdfDoc.registerFontkit(fontkit);
+    }
     
     // Use custom bold font if loaded, otherwise regular, otherwise fallback to Helvetica
     let font;
