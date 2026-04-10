@@ -63,15 +63,17 @@ const StepIndicator = ({ currentStep, steps }: { currentStep: number; steps: str
         <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
           ADIM {currentStep + 1} / {steps.length}
         </span>
-        <span className="text-xs font-bold text-red-600 uppercase tracking-wider text-right max-w-[60%] truncate">
-          {steps[currentStep]}
-        </span>
       </div>
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
         <div 
           className="h-full bg-red-600 transition-all duration-500 rounded-full" 
           style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
         />
+      </div>
+      <div className="w-full">
+        <span className="text-xs font-bold text-red-600 uppercase tracking-wider block leading-relaxed">
+          {steps[currentStep]}
+        </span>
       </div>
     </div>
   );
@@ -340,18 +342,31 @@ export default function App() {
     }
 
     const pageImages = [sayfa1Url, sayfa2Url];
+    const fallbackImages = [
+      getAssetPath('form_sayfa1.png'),
+      getAssetPath('form_sayfa2.png')
+    ];
+    
     let pagesAdded = 0;
     let lastError = '';
     
     for (let i = 0; i < pageImages.length; i++) {
-      const imgUrl = pageImages[i];
+      let imgUrl = pageImages[i];
       try {
-        const response = await fetch(imgUrl, { cache: 'no-cache' });
+        let response = await fetch(imgUrl, { cache: 'no-cache' });
+        
+        // Fallback logic: if primary JPG fails, try public PNG
         if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error(`${imgUrl} dosyası sunucuda bulunamadı (404).`);
+          console.warn(`Primary image failed to load: ${imgUrl}. Trying fallback: ${fallbackImages[i]}`);
+          imgUrl = fallbackImages[i];
+          response = await fetch(imgUrl, { cache: 'no-cache' });
+          
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error(`${imgUrl} dosyası sunucuda bulunamadı (404).`);
+            }
+            throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
           }
-          throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
         }
         
         const contentType = response.headers.get('Content-Type');
@@ -589,33 +604,21 @@ export default function App() {
 
       {/* Header */}
       {view !== 'home' && (
-        <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center py-4">
-          <div className="w-full max-w-7xl px-6 flex items-center justify-between">
-            <div className="flex items-center">
-              <button 
-                onClick={() => {
-                  if (view === 'form' && currentSectionIndex > 0) {
-                    setCurrentSectionIndex(prev => prev - 1);
-                  } else {
-                    setView('home');
-                  }
-                }}
-                className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 flex items-center gap-1"
-              >
-                <ChevronLeft size={32} />
-                <span className="text-sm font-bold uppercase hidden sm:inline">Geri</span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-4 text-right">
-              <div className="w-14 h-14 flex items-center justify-center">
-                <img 
-                  src={kizilayLogo} 
-                  alt="Türk Kızılay Logo" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </div>
+        <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center py-2">
+          <div className="w-full max-w-7xl px-6 flex items-center">
+            <button 
+              onClick={() => {
+                if (view === 'form' && currentSectionIndex > 0) {
+                  setCurrentSectionIndex(prev => prev - 1);
+                } else {
+                  setView('home');
+                }
+              }}
+              className="p-1.5 -ml-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 flex items-center gap-1"
+            >
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase hidden sm:inline">Geri</span>
+            </button>
           </div>
         </header>
       )}
@@ -657,18 +660,6 @@ export default function App() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => {
-                      const url = new URL(window.location.href);
-                      url.searchParams.set('view', 'debug');
-                      window.open(url.toString(), '_blank');
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-[10px] font-bold uppercase transition-all"
-                    title="Yeni sekmede açarak yakınlaştırma yapabilirsiniz"
-                  >
-                    <ExternalLink size={14} />
-                    Yeni Sekme
-                  </button>
-                  <button 
                     onClick={() => setView('home')}
                     className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                   >
@@ -677,18 +668,6 @@ export default function App() {
                 </div>
               </div>
 
-                  <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-4 flex items-start gap-3">
-                    <Info className="text-blue-600 mt-0.5 shrink-0" size={18} />
-                    <div className="text-xs text-blue-800 leading-relaxed">
-                      <p className="font-bold mb-1 uppercase tracking-wider">Koordinat Sistemi Notu</p>
-                      <p>PDF standartlarına göre <b>(0,0) noktası sol alt köşedir.</b></p>
-                      <ul className="list-disc ml-4 mt-1 space-y-0.5">
-                        <li>X arttıkça sağa gider.</li>
-                        <li>Y arttıkça <b>yukarı</b> gider.</li>
-                        <li>A4 Boyutu: 595 x 842 birimdir.</li>
-                      </ul>
-                    </div>
-                  </div>
 
               <div className="flex gap-2 mb-4">
                 <button 
