@@ -145,7 +145,6 @@ export default function App() {
     });
     return initial;
   });
-  const [showOnboarding, setShowOnboarding] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -506,67 +505,6 @@ export default function App() {
 
   return (
     <div className="h-[100dvh] bg-white font-sans text-gray-900 flex flex-col overflow-hidden">
-      {/* Onboarding Overlay */}
-      <AnimatePresence>
-        {showOnboarding && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-4 text-center"
-          >
-            <motion.div 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="max-w-sm w-full space-y-4"
-            >
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-32 h-32 flex items-center justify-center">
-                  <img 
-                    src={kizilayLogo} 
-                    alt="Türk Kızılay Logo" 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2 py-2">
-                <div className="grid grid-cols-1 gap-2 text-left">
-                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-2xl">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                      <FileText className="text-red-600" size={20} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-900">Kolay Başvuru</h3>
-                      <p className="text-xs text-gray-500">Adım adım soruları yanıtlayarak başvurunuzu tamamlayın.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-2xl">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                      <CheckCircle2 className="text-red-600" size={20} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-900">Hızlı Sonuç</h3>
-                      <p className="text-xs text-gray-500">Sistem sizin için resmi PDF formlarını otomatik olarak hazırlar.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 space-y-3">
-                <button 
-                  onClick={() => setShowOnboarding(false)}
-                  className="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-100 active:scale-95 transition-all"
-                >
-                  BAŞLAYALIM
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Password Modal */}
       <AnimatePresence>
         {showPasswordModal && (
@@ -650,10 +588,10 @@ export default function App() {
       </AnimatePresence>
 
       {/* Header */}
-      <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center">
-        <div className="w-full max-w-7xl px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            {view !== 'home' && (
+      {view !== 'home' && (
+        <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center py-4">
+          <div className="w-full max-w-7xl px-6 flex items-center justify-between">
+            <div className="flex items-center">
               <button 
                 onClick={() => {
                   if (view === 'form' && currentSectionIndex > 0) {
@@ -667,39 +605,44 @@ export default function App() {
                 <ChevronLeft size={32} />
                 <span className="text-sm font-bold uppercase hidden sm:inline">Geri</span>
               </button>
-            )}
-          </div>
+            </div>
 
-          <div className="flex items-center gap-4 text-right">
-            <div className="w-14 h-14 flex items-center justify-center">
-              <img 
-                src={kizilayLogo} 
-                alt="Türk Kızılay Logo" 
-                className="w-full h-full object-contain"
-              />
+            <div className="flex items-center gap-4 text-right">
+              <div className="w-14 h-14 flex items-center justify-center">
+                <img 
+                  src={kizilayLogo} 
+                  alt="Türk Kızılay Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth flex flex-col items-center bg-gray-50/30">
+      <main className={`flex-1 overflow-y-auto px-4 scroll-smooth flex flex-col items-center bg-gray-50/30 ${view === 'home' ? 'pt-0 pb-6' : 'py-6'}`}>
         <div className="w-full max-w-7xl flex flex-col min-h-full relative">
           
           {/* HELP VIEW */}
           {view === 'help' && (
-            <div className="space-y-8 py-4 flex-1 max-w-xl mx-auto w-full">
-              <div className="space-y-4">
+            <div className="space-y-8 py-4 flex-1 max-w-xl mx-auto w-full flex flex-col">
+              <div className="space-y-4 flex-1">
                 <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-                  <Info className="text-red-600" /> Hakkında
+                  <Info className="text-red-600" /> Uygulama Hakkında
                 </h2>
                 <div className="bg-white p-6 rounded-3xl text-sm text-gray-600 leading-relaxed space-y-6 shadow-sm border border-gray-100">
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-justify">
                     <p>Uygulama, Türk Kızılay'ın insani yardım faaliyetlerini kolaylaştırma vizyonu doğrultusunda, saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir. <strong>Türk Kızılay'ın resmi uygulaması değildir.</strong></p>
                     <p>Uygulamaya girilen veriler anlık olarak işlenerek resmi "FRM.005" ve "FRM.006" formatlarına uygun PDF belgeleri üretilir. Veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra silinir.</p>
                     <p>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</p>
                   </div>
                 </div>
+              </div>
+              
+              {/* Version Info Footer - Only on About page */}
+              <div className="mt-auto pt-8 pb-6 text-center">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Versiyon 2.1.0</p>
               </div>
             </div>
           )}
@@ -1268,15 +1211,13 @@ export default function App() {
 
           {/* HOME VIEW */}
           {view === 'home' && (
-            <div className="space-y-6 py-4 flex-1 max-w-xl mx-auto w-full">
-              <div className="flex justify-end">
-                <button 
-                  onClick={() => setView('help')}
-                  className="w-1/2 p-4 bg-white border border-gray-200 text-gray-800 rounded-2xl shadow-sm active:scale-95 transition-all flex items-center justify-center gap-3 group"
-                >
-                  <HelpCircle size={20} className="text-red-600" />
-                  <span className="text-sm font-black uppercase tracking-wide">Hakkında</span>
-                </button>
+            <div className="space-y-3 pb-12 pt-0 flex-1 max-w-xl mx-auto w-full flex flex-col items-center">
+              <div className="w-48 h-48 mb-2 flex items-center justify-center">
+                <img 
+                  src={kizilayLogo} 
+                  alt="Türk Kızılay Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
 
               <button 
@@ -1331,6 +1272,16 @@ export default function App() {
                   <p className="text-[10px] text-gray-400 font-bold tracking-widest">Geliştirici Modu</p>
                 </div>
               </button>
+
+              <div className="pt-4">
+                <button 
+                  onClick={() => setView('help')}
+                  className="w-full p-4 bg-white border border-gray-200 text-gray-500 rounded-2xl shadow-sm active:scale-95 transition-all flex items-center justify-center gap-3 group"
+                >
+                  <HelpCircle size={18} />
+                  <span className="text-xs font-bold uppercase tracking-widest">Uygulama Hakkında</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -1494,10 +1445,6 @@ export default function App() {
               </div>
             </div>
           )}
-          {/* Version Info Footer - Visible on all pages */}
-          <div className="mt-auto pt-8 pb-6 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Versiyon 2.1.0</p>
-          </div>
         </div>
       </main>
     </div>
