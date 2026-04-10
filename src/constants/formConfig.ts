@@ -675,5 +675,121 @@ export const FORM_CONFIG: FieldConfig[] = [
       "44",
       "45"
     ]
+  },
+  {
+    "id": "2.1-eposta",
+    "label": "E-posta",
+    "type": "text",
+    "x": 115,
+    "y": 570,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        570
+      ],
+      "bottomRight": [
+        265,
+        570
+      ],
+      "topRight": [
+        265,
+        583
+      ],
+      "topLeft": [
+        115,
+        583
+      ]
+    }
+  },
+  {
+    "id": "2.1-ililce",
+    "label": "İl / İlçe",
+    "type": "text",
+    "x": 115,
+    "y": 555,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        555
+      ],
+      "bottomRight": [
+        265,
+        555
+      ],
+      "topRight": [
+        265,
+        568
+      ],
+      "topLeft": [
+        115,
+        568
+      ]
+    }
+  },
+  {
+    "id": "2.1-mahalle",
+    "label": "Mahalle",
+    "type": "text",
+    "x": 395,
+    "y": 599,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        395,
+        599
+      ],
+      "bottomRight": [
+        545,
+        599
+      ],
+      "topRight": [
+        545,
+        612
+      ],
+      "topLeft": [
+        395,
+        612
+      ]
+    }
+  },
+  {
+    "id": "2.1-acikadres",
+    "label": "Açık Adres",
+    "type": "text",
+    "x": 395,
+    "y": 562,
+    "width": 150,
+    "height": 35,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        395,
+        562
+      ],
+      "bottomRight": [
+        545,
+        562
+      ],
+      "topRight": [
+        545,
+        597
+      ],
+      "topLeft": [
+        395,
+        597
+      ]
+    }
   }
 ];

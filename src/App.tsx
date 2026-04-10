@@ -36,6 +36,7 @@ import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 import kizilayLogo from './assets/kizilay_logo.svg';
 import sayfa1 from './assets/images/form_sayfa1.jpg';
 import sayfa2 from './assets/images/form_sayfa2.jpg';
+import * as formImages from './constants/formImages';
 
 // Helper for robust asset paths (especially for GitHub Pages)
 const getAssetPath = (path: string) => {
@@ -341,50 +342,24 @@ export default function App() {
       font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     }
 
-    const pageImages = [sayfa1Url, sayfa2Url];
-    const fallbackImages = [
-      getAssetPath('form_sayfa1.png'),
-      getAssetPath('form_sayfa2.png')
-    ];
+    const pageImages = [formImages.form_sayfa1, formImages.form_sayfa2];
     
     let pagesAdded = 0;
     let lastError = '';
     
     for (let i = 0; i < pageImages.length; i++) {
-      let imgUrl = pageImages[i];
+      const base64Data = pageImages[i];
       try {
-        let response = await fetch(imgUrl, { cache: 'no-cache' });
-        
-        // Fallback logic: if primary JPG fails, try public PNG
-        if (!response.ok) {
-          console.warn(`Primary image failed to load: ${imgUrl}. Trying fallback: ${fallbackImages[i]}`);
-          imgUrl = fallbackImages[i];
-          response = await fetch(imgUrl, { cache: 'no-cache' });
-          
-          if (!response.ok) {
-            if (response.status === 404) {
-              throw new Error(`${imgUrl} dosyası sunucuda bulunamadı (404).`);
-            }
-            throw new Error(`${imgUrl} yüklenemedi (HTTP ${response.status})`);
-          }
-        }
-        
-        const contentType = response.headers.get('Content-Type');
-        if (contentType && !contentType.startsWith('image/') && !contentType.includes('application/octet-stream')) {
-          throw new Error(`${imgUrl} bir görsel değil, sunucu ${contentType} döndürdü. Dosya bozulmuş olabilir.`);
+        // Convert base64 to Uint8Array
+        const base64Content = base64Data.split(',')[1];
+        const binaryString = window.atob(base64Content);
+        const len = binaryString.length;
+        const uint8 = new Uint8Array(len);
+        for (let j = 0; j < len; j++) {
+          uint8[j] = binaryString.charCodeAt(j);
         }
 
-        const imgBytes = await response.arrayBuffer();
-        const uint8 = new Uint8Array(imgBytes);
-        let image;
-        
-        if (uint8[0] === 0xFF && uint8[1] === 0xD8 && uint8[2] === 0xFF) {
-          image = await pdfDoc.embedJpg(imgBytes);
-        } else if (uint8[0] === 0x89 && uint8[1] === 0x50 && uint8[2] === 0x4E && uint8[3] === 0x47) {
-          image = await pdfDoc.embedPng(imgBytes);
-        } else {
-          throw new Error(`${imgUrl} geçerli bir JPEG veya PNG değil.`);
-        }
+        const image = await pdfDoc.embedJpg(uint8);
 
         const page = pdfDoc.addPage([595, 842]);
         page.drawImage(image, { x: 0, y: 0, width: 595, height: 842 });
