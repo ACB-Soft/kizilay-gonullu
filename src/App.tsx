@@ -169,15 +169,15 @@ export default function App() {
       // Using Inter font which has excellent Turkish support and is very reliable
       // Adding multiple sources to ensure it loads
       const regularUrls = [
+        'https://raw.githubusercontent.com/rsms/inter/master/docs/font-files/Inter-Regular.ttf',
         'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Regular.ttf',
-        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Regular.ttf',
-        'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Regular.ttf'
+        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Regular.ttf'
       ];
       
       const boldUrls = [
+        'https://raw.githubusercontent.com/rsms/inter/master/docs/font-files/Inter-Bold.ttf',
         'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Bold.ttf',
-        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Bold.ttf',
-        'https://cdn.jsdelivr.net/npm/roboto-fontface@0.10.0/fonts/roboto/Roboto-Bold.ttf'
+        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Bold.ttf'
       ];
 
       let regularLoaded = false;
@@ -343,12 +343,12 @@ export default function App() {
     setFormData(prev => ({ ...prev, [id]: processedValue }));
   };
 
-  const trToEn = (str: string) => {
+  const trToEn = (str: string, forceOriginal = false) => {
     if (!str) return '';
     
     // If we have any custom font, we should ideally support Turkish characters.
-    // We only return the original string if we are SURE a custom font will be used.
-    if (fontLoadingStatus === 'success') {
+    // We only return the original string if we are SURE a custom font will be used or if forced.
+    if (forceOriginal || fontLoadingStatus === 'success' || fontData || fontBoldData) {
       return String(str);
     }
     
@@ -435,7 +435,7 @@ export default function App() {
           }
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
-            const text = trToEn(String(value));
+            const text = trToEn(String(value), true);
             let currentFontSize = 6; // Reduced from 7
             const padding = 1.5;
             const availableWidth = field.width - (padding * 2);
