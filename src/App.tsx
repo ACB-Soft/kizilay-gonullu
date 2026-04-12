@@ -343,16 +343,15 @@ export default function App() {
     setFormData(prev => ({ ...prev, [id]: processedValue }));
   };
 
-  const trToEn = (str: string, forceOriginal = false) => {
+  const trToEn = (str: string, isCustomFont = false) => {
     if (!str) return '';
     
-    // If we have any custom font, we should ideally support Turkish characters.
-    // We only return the original string if we are SURE a custom font will be used or if forced.
-    if (forceOriginal || fontLoadingStatus === 'success' || fontData || fontBoldData) {
+    // If we are using a custom font, we can support Turkish characters.
+    if (isCustomFont) {
       return String(str);
     }
     
-    // Fallback conversion only if no custom font is available
+    // Fallback conversion for standard fonts (Helvetica, etc.)
     return String(str)
       .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
       .replace(/Ü/g, 'U').replace(/ü/g, 'u')
@@ -382,17 +381,21 @@ export default function App() {
     
     // Use custom bold font if loaded, otherwise regular, otherwise fallback to Helvetica
     let font;
+    let isCustomFont = false;
     try {
       if (fontBoldData) {
         font = await pdfDoc.embedFont(new Uint8Array(fontBoldData));
+        isCustomFont = true;
       } else if (fontData) {
         font = await pdfDoc.embedFont(new Uint8Array(fontData));
+        isCustomFont = true;
       } else {
         font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       }
     } catch (e) {
       console.error('Font embedding error:', e);
       font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      isCustomFont = false;
     }
 
     const pageImages = [formImages.form_sayfa1, formImages.form_sayfa2];
@@ -435,31 +438,48 @@ export default function App() {
           }
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
-            const text = trToEn(String(value), true);
+            const text = trToEn(String(value), isCustomFont);
             let currentFontSize = 6; // Reduced from 7
             const padding = 1.5;
             const availableWidth = field.width - (padding * 2);
             
-            let textWidth = font.widthOfTextAtSize(text, currentFontSize);
-            
-            // Auto-scale font size if text is wider than the field
-            if (textWidth > availableWidth) {
-              currentFontSize = (availableWidth / textWidth) * currentFontSize;
-              // Minimum readable font size
-              currentFontSize = Math.max(4, currentFontSize);
+            try {
+              let textWidth = font.widthOfTextAtSize(text, currentFontSize);
+              
+              // Auto-scale font size if text is wider than the field
+              if (textWidth > availableWidth) {
+                currentFontSize = (availableWidth / textWidth) * currentFontSize;
+                // Minimum readable font size
+                currentFontSize = Math.max(4, currentFontSize);
+              }
+
+              // Vertical offset to center text in the box (PDF Y is baseline)
+              const vOffset = (field.height - currentFontSize) / 2 + 0.5;
+              const pdfY = field.y + vOffset;
+
+              page.drawText(text, {
+                x: field.x + padding,
+                y: pdfY,
+                size: currentFontSize,
+                font: font,
+                color: rgb(0, 0, 0),
+              });
+            } catch (textErr) {
+              console.error(`Error drawing text for field ${field.id}:`, textErr);
+              // Fallback: try drawing with ASCII only if it failed
+              try {
+                const fallbackText = trToEn(String(value), false);
+                page.drawText(fallbackText, {
+                  x: field.x + padding,
+                  y: field.y + (field.height - currentFontSize) / 2 + 0.5,
+                  size: currentFontSize,
+                  font: font,
+                  color: rgb(0, 0, 0),
+                });
+              } catch (innerErr) {
+                console.error('Fatal text drawing error:', innerErr);
+              }
             }
-
-            // Vertical offset to center text in the box (PDF Y is baseline)
-            const vOffset = (field.height - currentFontSize) / 2 + 0.5;
-            const pdfY = field.y + vOffset;
-
-            page.drawText(text, {
-              x: field.x + padding,
-              y: pdfY,
-              size: currentFontSize,
-              font: font,
-              color: rgb(0, 0, 0),
-            });
           } else if (field.type === 'checkbox' && value === true) {
             // Checkbox size is 6x6 in config, so X should be smaller
             const checkboxSize = 6; // Reduced from 10 to fit 6x6 boxes
@@ -633,7 +653,7 @@ export default function App() {
       {/* Header */}
       {view !== 'home' && (
         <header className="flex-none bg-white border-b border-gray-100 shadow-sm z-50 flex justify-center py-2">
-          <div className="w-full max-w-7xl px-6 flex items-center justify-between">
+          <div className="w-full max-w-xl px-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => {
@@ -678,8 +698,18 @@ export default function App() {
               </div>
               
               {/* Version Info Footer - Only on About page */}
-              <div className="mt-auto pt-8 pb-6 text-center">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-2">Versiyon 2.1.0</p>
+              <div className="mt-auto pt-8 pb-6 text-center flex flex-col items-center">
+                <button 
+                  onClick={() => {
+                    setShowPasswordModal(true);
+                    setPasswordInput('');
+                    setPasswordError(false);
+                  }}
+                  className="text-[10px] font-bold text-gray-300 uppercase tracking-widest hover:text-red-500 transition-colors mb-2"
+                >
+                  Geliştirici modu
+                </button>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 2.1.0</p>
               </div>
             </div>
           )}
@@ -1258,7 +1288,7 @@ export default function App() {
 
               <button 
                 onClick={() => setView('frm006')}
-                className="w-full p-6 bg-red-500 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex items-center gap-5 group"
+                className="w-full p-6 bg-red-600 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex items-center gap-5 group"
               >
                 <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
                   <FileText size={28} />
@@ -1266,23 +1296,6 @@ export default function App() {
                 <div className="flex flex-col items-start text-left">
                   <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">FRM.006 Oluştur</h2>
                   <p className="text-xs font-bold opacity-80 tracking-tight">Açık Rıza Formu</p>
-                </div>
-              </button>
-
-              <button 
-                onClick={() => {
-                  setShowPasswordModal(true);
-                  setPasswordInput('');
-                  setPasswordError(false);
-                }}
-                className="w-full p-6 bg-white border-2 border-gray-100 text-gray-800 rounded-3xl shadow-sm active:scale-95 transition-all flex items-center gap-5 group"
-              >
-                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                  <FileText size={28} className="text-gray-400" />
-                </div>
-                <div className="text-left">
-                  <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">Alan Düzenle</h2>
-                  <p className="text-[10px] text-gray-400 font-bold tracking-widest">Geliştirici Modu</p>
                 </div>
               </button>
 
