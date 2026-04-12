@@ -31,6 +31,7 @@ import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 // Import assets
 import kizilayLogo from './assets/kizilay_logo.svg';
 import * as formImages from './constants/formImages';
+import { INTER_BOLD_BASE64 } from './constants/fonts';
 
 // Helper for robust asset paths (especially for GitHub Pages)
 const getAssetPath = (path: string) => {
@@ -140,9 +141,7 @@ export default function App() {
     return initial;
   });
   const [isGenerating, setIsGenerating] = useState(false);
-  const [fontData, setFontData] = useState<ArrayBuffer | null>(null);
-  const [fontBoldData, setFontBoldData] = useState<ArrayBuffer | null>(null);
-  const [fontLoadingStatus, setFontLoadingStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [fontLoadingStatus, setFontLoadingStatus] = useState<'loading' | 'success' | 'error'>('success');
 
   const PT_TO_MM = 0.352778;
   const MM_TO_PT = 2.83465;
@@ -155,68 +154,6 @@ export default function App() {
       topLeft: [Number(x.toFixed(2)), Number((y + height).toFixed(2))] as [number, number]
     };
   };
-
-  // Load Turkish compatible fonts
-  useEffect(() => {
-    const loadFonts = async () => {
-      setFontLoadingStatus('loading');
-      // Using Inter font which has excellent Turkish support and is very reliable
-      // Adding multiple sources to ensure it loads
-      const regularUrls = [
-        'https://raw.githubusercontent.com/rsms/inter/master/docs/font-files/Inter-Regular.ttf',
-        'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Regular.ttf',
-        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Regular.ttf'
-      ];
-      
-      const boldUrls = [
-        'https://raw.githubusercontent.com/rsms/inter/master/docs/font-files/Inter-Bold.ttf',
-        'https://cdn.jsdelivr.net/gh/googlefonts/inter@master/docs/font-files/Inter-Bold.ttf',
-        'https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/Inter%20(web)/Inter-Bold.ttf'
-      ];
-
-      let regularLoaded = false;
-      let boldLoaded = false;
-
-      // Load Regular
-      for (const url of regularUrls) {
-        try {
-          const response = await fetch(url);
-          if (response.ok) {
-            const data = await response.arrayBuffer();
-            setFontData(data);
-            console.log(`Regular font loaded successfully: ${url}`);
-            regularLoaded = true;
-            break;
-          }
-        } catch (e) {
-          console.error(`Failed to load regular font from ${url}:`, e);
-        }
-      }
-
-      // Load Bold
-      for (const url of boldUrls) {
-        try {
-          const response = await fetch(url);
-          if (response.ok) {
-            const data = await response.arrayBuffer();
-            setFontBoldData(data);
-            console.log(`Bold font loaded successfully: ${url}`);
-            boldLoaded = true;
-            break;
-          }
-        } catch (e) {
-          console.error(`Failed to load bold font from ${url}:`, e);
-        }
-      }
-
-      if (regularLoaded || boldLoaded) {
-        setFontLoadingStatus('success');
-      } else {
-        setFontLoadingStatus('error');
-      }
-    };
-    loadFonts();
-  }, []);
 
   const [debugMode, setDebugMode] = useState(false);
   const [debugPage, setDebugPage] = useState(1);
@@ -337,33 +274,7 @@ export default function App() {
     setFormData(prev => ({ ...prev, [id]: processedValue }));
   };
 
-  const trToEn = (str: string, isCustomFont = false) => {
-    if (!str) return '';
-    
-    // If we are using a custom font, we can support Turkish characters.
-    if (isCustomFont) {
-      return String(str);
-    }
-    
-    // Fallback conversion for standard fonts (Helvetica, etc.)
-    return String(str)
-      .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
-      .replace(/Ü/g, 'U').replace(/ü/g, 'u')
-      .replace(/Ş/g, 'S').replace(/ş/g, 's')
-      .replace(/İ/g, 'I').replace(/ı/g, 'i')
-      .replace(/Ö/g, 'O').replace(/ö/g, 'o')
-      .replace(/Ç/g, 'C').replace(/ç/g, 'c')
-      .replace(/[^\x00-\x7F]/g, ''); // Remove any remaining non-ASCII characters to prevent PDFLib crashes
-  };
-
   const getPDFBytes = async () => {
-    // PDF-Lib Ayarları ve Çalışma Mantığı:
-    // 1. Kütüphane index.html içinde CDN üzerinden yüklenir ve window.PDFLib üzerinden erişilir.
-    // 2. Görseller (form_sayfa1.jpg, form_sayfa2.jpg) fetch() ile 'byte' dizisi olarak indirilir.
-    // 3. İndirilen bu veriler pdfDoc.embedPng() metodu ile PDF dökümanına gömülür.
-    // 4. Sorun genellikle kütüphanede değil, fetch() işleminin GitHub Pages gibi ortamlarda 
-    //    dosyayı yanlış konumda aramasından (404) kaynaklanır.
-    
     const { PDFDocument, rgb, StandardFonts } = (window as any).PDFLib;
     const fontkit = (window as any).fontkit;
     if (!PDFDocument) throw new Error('PDFLib not loaded');
@@ -373,23 +284,22 @@ export default function App() {
       pdfDoc.registerFontkit(fontkit);
     }
     
-    // Use custom bold font if loaded, otherwise regular, otherwise fallback to Helvetica
     let font;
-    let isCustomFont = false;
     try {
-      if (fontBoldData) {
-        font = await pdfDoc.embedFont(new Uint8Array(fontBoldData));
-        isCustomFont = true;
-      } else if (fontData) {
-        font = await pdfDoc.embedFont(new Uint8Array(fontData));
-        isCustomFont = true;
+      if (INTER_BOLD_BASE64) {
+        const binaryString = window.atob(INTER_BOLD_BASE64);
+        const len = binaryString.length;
+        const uint8 = new Uint8Array(len);
+        for (let j = 0; j < len; j++) {
+          uint8[j] = binaryString.charCodeAt(j);
+        }
+        font = await pdfDoc.embedFont(uint8);
       } else {
         font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       }
     } catch (e) {
       console.error('Font embedding error:', e);
       font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-      isCustomFont = false;
     }
 
     const pageImages = [formImages.form_sayfa1, formImages.form_sayfa2];
@@ -432,7 +342,7 @@ export default function App() {
           }
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
-            const text = trToEn(String(value), isCustomFont);
+            const text = String(value);
             let currentFontSize = 6; // Reduced from 7
             const padding = 1.5;
             const availableWidth = field.width - (padding * 2);
@@ -460,19 +370,6 @@ export default function App() {
               });
             } catch (textErr) {
               console.error(`Error drawing text for field ${field.id}:`, textErr);
-              // Fallback: try drawing with ASCII only if it failed
-              try {
-                const fallbackText = trToEn(String(value), false);
-                page.drawText(fallbackText, {
-                  x: field.x + padding,
-                  y: field.y + (field.height - currentFontSize) / 2 + 0.5,
-                  size: currentFontSize,
-                  font: font,
-                  color: rgb(0, 0, 0),
-                });
-              } catch (innerErr) {
-                console.error('Fatal text drawing error:', innerErr);
-              }
             }
           } else if (field.type === 'checkbox' && value === true) {
             // Checkbox size is 6x6 in config, so X should be smaller
