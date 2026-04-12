@@ -284,6 +284,24 @@ export default function App() {
       pdfDoc.registerFontkit(fontkit);
     }
     
+    const isCustomFont = !!INTER_BOLD_BASE64;
+    
+    // Internal helper to ensure text is encodable by the current font
+    const encodeForPDF = (str: string) => {
+      if (!str) return '';
+      if (isCustomFont) return String(str);
+      
+      // Fallback for standard fonts (Helvetica) which don't support Turkish characters
+      return String(str)
+        .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
+        .replace(/Ü/g, 'U').replace(/ü/g, 'u')
+        .replace(/Ş/g, 'S').replace(/ş/g, 's')
+        .replace(/İ/g, 'I').replace(/ı/g, 'i')
+        .replace(/Ö/g, 'O').replace(/ö/g, 'o')
+        .replace(/Ç/g, 'C').replace(/ç/g, 'c')
+        .replace(/[^\x00-\x7F]/g, '');
+    };
+    
     let font;
     try {
       if (INTER_BOLD_BASE64) {
@@ -342,7 +360,7 @@ export default function App() {
           }
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
-            const text = String(value);
+            const text = encodeForPDF(String(value));
             let currentFontSize = 6; // Reduced from 7
             const padding = 1.5;
             const availableWidth = field.width - (padding * 2);
