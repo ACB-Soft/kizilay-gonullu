@@ -292,123 +292,6 @@ export const FORM_CONFIG: FieldConfig[] = [
     }
   },
   {
-    "id": "2.1-evtelefonu",
-    "label": "Ev Telefonu",
-    "type": "number",
-    "x": 115,
-    "y": 599,
-    "width": 150,
-    "height": 13,
-    "page": 1,
-    "section": "YENİ",
-    "corners": {
-      "bottomLeft": [
-        115,
-        599
-      ],
-      "bottomRight": [
-        265,
-        599
-      ],
-      "topRight": [
-        265,
-        612
-      ],
-      "topLeft": [
-        115,
-        612
-      ]
-    }
-  },
-  {
-    "id": "2.1-ceptelefonu",
-    "label": "Cep Telefonu",
-    "type": "number",
-    "x": 115,
-    "y": 584,
-    "width": 150,
-    "height": 13,
-    "page": 1,
-    "section": "YENİ",
-    "corners": {
-      "bottomLeft": [
-        115,
-        584
-      ],
-      "bottomRight": [
-        265,
-        584
-      ],
-      "topRight": [
-        265,
-        597
-      ],
-      "topLeft": [
-        115,
-        597
-      ]
-    },
-    "required": true
-  },
-  {
-    "id": "2.2-adisoyadi",
-    "label": "Adı Soyadı",
-    "type": "text",
-    "x": 115,
-    "y": 520,
-    "width": 150,
-    "height": 13,
-    "page": 1,
-    "section": "YENİ",
-    "corners": {
-      "bottomLeft": [
-        115,
-        520
-      ],
-      "bottomRight": [
-        265,
-        520
-      ],
-      "topRight": [
-        265,
-        533
-      ],
-      "topLeft": [
-        115,
-        533
-      ]
-    }
-  },
-  {
-    "id": "2.3-adisoyadi",
-    "label": "Adı Soyadı",
-    "type": "text",
-    "x": 404,
-    "y": 520,
-    "width": 150,
-    "height": 13,
-    "page": 1,
-    "section": "YENİ",
-    "corners": {
-      "bottomLeft": [
-        404,
-        520
-      ],
-      "bottomRight": [
-        554,
-        520
-      ],
-      "topRight": [
-        554,
-        533
-      ],
-      "topLeft": [
-        404,
-        533
-      ]
-    }
-  },
-  {
     "id": "2.0-dogumyeri",
     "label": "Doğum Yeri",
     "type": "text",
@@ -677,6 +560,65 @@ export const FORM_CONFIG: FieldConfig[] = [
     ]
   },
   {
+    "id": "2.1-ceptelefonu",
+    "label": "Cep Telefonu",
+    "type": "number",
+    "x": 115,
+    "y": 584,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        584
+      ],
+      "bottomRight": [
+        265,
+        584
+      ],
+      "topRight": [
+        265,
+        597
+      ],
+      "topLeft": [
+        115,
+        597
+      ]
+    },
+    "required": true
+  },
+  {
+    "id": "2.1-evtelefonu",
+    "label": "Ev Telefonu",
+    "type": "number",
+    "x": 115,
+    "y": 599,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        599
+      ],
+      "bottomRight": [
+        265,
+        599
+      ],
+      "topRight": [
+        265,
+        612
+      ],
+      "topLeft": [
+        115,
+        612
+      ]
+    }
+  },
+  {
     "id": "2.1-eposta",
     "label": "eposta",
     "type": "text",
@@ -789,6 +731,180 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topLeft": [
         395,
         597
+      ]
+    }
+  },
+  {
+    "id": "2.2-adisoyadi",
+    "label": "Adı Soyadı",
+    "type": "text",
+    "x": 115,
+    "y": 520,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        520
+      ],
+      "bottomRight": [
+        265,
+        520
+      ],
+      "topRight": [
+        265,
+        533
+      ],
+      "topLeft": [
+        115,
+        533
+      ]
+    }
+  },
+  {
+    "id": "2.2-tckimlikno",
+    "label": "T.C. Kimlik No.",
+    "type": "number",
+    "x": 115,
+    "y": 505,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        505
+      ],
+      "bottomRight": [
+        265,
+        505
+      ],
+      "topRight": [
+        265,
+        518
+      ],
+      "topLeft": [
+        115,
+        518
+      ]
+    }
+  },
+  {
+    "id": "2.2-telefon",
+    "label": "Telefon",
+    "type": "number",
+    "x": 114.7,
+    "y": 490,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        114.7,
+        490
+      ],
+      "bottomRight": [
+        264.7,
+        490
+      ],
+      "topRight": [
+        264.7,
+        503
+      ],
+      "topLeft": [
+        114.7,
+        503
+      ]
+    }
+  },
+  {
+    "id": "2.2-ililce",
+    "label": "İl / İlçe",
+    "type": "text",
+    "x": 115,
+    "y": 460,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        460
+      ],
+      "bottomRight": [
+        265,
+        460
+      ],
+      "topRight": [
+        265,
+        473
+      ],
+      "topLeft": [
+        115,
+        473
+      ]
+    }
+  },
+  {
+    "id": "2.2-acikadres",
+    "label": "Açık Adres",
+    "type": "text",
+    "x": 115,
+    "y": 475,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        115,
+        475
+      ],
+      "bottomRight": [
+        265,
+        475
+      ],
+      "topRight": [
+        265,
+        488
+      ],
+      "topLeft": [
+        115,
+        488
+      ]
+    }
+  },
+  {
+    "id": "2.3-adisoyadi",
+    "label": "Adı Soyadı",
+    "type": "text",
+    "x": 404,
+    "y": 520,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        404,
+        520
+      ],
+      "bottomRight": [
+        554,
+        520
+      ],
+      "topRight": [
+        554,
+        533
+      ],
+      "topLeft": [
+        404,
+        533
       ]
     }
   }

@@ -21,12 +21,8 @@ import {
   X,
   Plus,
   Trash2,
-  FileDown,
-  Save,
   Copy,
   RefreshCw,
-  ExternalLink,
-  Grid,
   Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -144,8 +140,6 @@ export default function App() {
     return initial;
   });
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [fontData, setFontData] = useState<ArrayBuffer | null>(null);
   const [fontBoldData, setFontBoldData] = useState<ArrayBuffer | null>(null);
   const [fontLoadingStatus, setFontLoadingStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -524,45 +518,6 @@ export default function App() {
       alert(`Hata: ${error.message || 'PDF oluşturulamadı.'}`);
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const uploadToDrive = async () => {
-    setIsUploading(true);
-    setUploadStatus('idle');
-    try {
-      const pdfBytes = await getPDFBytes();
-      
-      // Convert to base64
-      const base64 = btoa(
-        new Uint8Array(pdfBytes)
-          .reduce((data, byte) => data + String.fromCharCode(byte), '')
-      );
-
-      const fileName = `Kizilay_Formu_${formData.is_tc_no || 'Yeni'}_${format(new Date(), 'yyyyMMdd_HHmm')}.pdf`;
-
-      const response = await fetch('/api/upload-to-drive', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileName,
-          pdfBase64: base64
-        })
-      });
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || 'Yükleme başarısız oldu.');
-      }
-
-      setUploadStatus('success');
-      alert('Form başarıyla Kızılay Drive klasörüne gönderildi!');
-    } catch (error: any) {
-      console.error('Upload Error:', error);
-      setUploadStatus('error');
-      alert(`Gönderim Hatası: ${error.message}`);
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -1342,15 +1297,6 @@ export default function App() {
               </div>
 
               <div className="w-full space-y-4">
-                <button 
-                  onClick={uploadToDrive}
-                  disabled={isUploading}
-                  className={`w-full py-5 rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all ${uploadStatus === 'success' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white shadow-blue-100'}`}
-                >
-                  {isUploading ? <RefreshCw className="animate-spin" size={24} /> : <FileDown size={24} />}
-                  {uploadStatus === 'success' ? 'GÖNDERİLDİ!' : "KIZILAY'A GÖNDER"}
-                </button>
-
                 <button 
                   onClick={generatePDF}
                   disabled={isGenerating}
