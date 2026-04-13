@@ -274,10 +274,20 @@ export default function App() {
     const visibleFields = debugFields.filter(f => !f.hidden);
     const groups: { id: string; label: string; fields: FieldConfig[] }[] = [];
     
+    // Get the count of other people
+    const haneSayisi = parseInt(formData['3.0-haneoturansayisi'] || '0');
+
     // Get unique prefixes in order of appearance
     const prefixes: string[] = [];
     visibleFields.forEach(f => {
       const p = getPrefix(f.id);
+      
+      // Filter out 3.x steps if they are beyond the haneSayisi
+      if (p.startsWith('3.')) {
+        const stepNum = parseInt(p.split('.')[1]);
+        if (stepNum > haneSayisi) return;
+      }
+
       if (!prefixes.includes(p)) prefixes.push(p);
     });
 
@@ -291,6 +301,8 @@ export default function App() {
       else if (p === '2.1') label = "İletişim - Adres Bilgileri";
       else if (p === '2.2') label = "Vasi/Veli/Kayyım Bilgileri";
       else if (p === '2.3') label = "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri";
+      else if (p === '3.0') label = "Hanede Yaşayan Diğer Kişi Sayısı";
+      else if (p.startsWith('3.')) label = `Hanede Yaşayan Diğer Kişi Bilgileri (${p.split('.')[1]})`;
 
       groups.push({
         id: p,
@@ -300,7 +312,7 @@ export default function App() {
     });
     
     return groups;
-  }, [debugFields]);
+  }, [debugFields, formData['3.0-haneoturansayisi']]);
 
   const sections = stepGroups.map(g => g.label);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
