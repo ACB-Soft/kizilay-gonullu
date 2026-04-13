@@ -89,13 +89,15 @@ const Input = ({ label, value, onChange, type = "text", placeholder = "" }: any)
 
 const Checkbox = ({ label, options = [], value = [], onChange, maxSelections }: any) => {
   const selectedValues = Array.isArray(value) ? value : (value ? [value] : []);
+  const isSingle = maxSelections === 1;
   
   const handleToggle = (option: string) => {
     let newValues;
     if (selectedValues.includes(option)) {
+      if (isSingle) return; // Keep selection if single choice
       newValues = selectedValues.filter(v => v !== option);
     } else {
-      if (maxSelections === 1) {
+      if (isSingle) {
         newValues = [option];
       } else if (!maxSelections || selectedValues.length < maxSelections) {
         newValues = [...selectedValues, option];
@@ -124,14 +126,25 @@ const Checkbox = ({ label, options = [], value = [], onChange, maxSelections }: 
       <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
       <div className="grid grid-cols-1 gap-3">
         {options.map((opt: string) => (
-          <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+          <label 
+            key={opt} 
+            onClick={() => handleToggle(opt)}
+            className={`flex items-center gap-3 cursor-pointer transition-all ${
+              isSingle 
+                ? `p-4 bg-white border-2 rounded-2xl ${selectedValues.includes(opt) ? 'border-red-600 bg-red-50/30' : 'border-gray-100 hover:border-gray-200'}`
+                : 'group'
+            }`}
+          >
             <div 
-              onClick={() => handleToggle(opt)}
-              className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${selectedValues.includes(opt) ? 'bg-red-600 border-red-600' : 'border-gray-300 group-hover:border-red-400'}`}
+              className={`w-6 h-6 border-2 flex items-center justify-center transition-all ${
+                isSingle ? 'rounded-full' : 'rounded-md'
+              } ${selectedValues.includes(opt) ? 'bg-red-600 border-red-600' : 'border-gray-300 group-hover:border-red-400'}`}
             >
-              {selectedValues.includes(opt) && <Check size={14} className="text-white" />}
+              {selectedValues.includes(opt) && (
+                isSingle ? <div className="w-2 h-2 bg-white rounded-full" /> : <Check size={14} className="text-white" />
+              )}
             </div>
-            <span className="text-sm text-gray-700 font-medium">{opt}</span>
+            <span className={`text-sm font-medium ${isSingle && selectedValues.includes(opt) ? 'text-red-700' : 'text-gray-700'}`}>{opt}</span>
           </label>
         ))}
       </div>
