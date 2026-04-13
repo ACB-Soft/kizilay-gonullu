@@ -87,15 +87,57 @@ const Input = ({ label, value, onChange, type = "text", placeholder = "" }: any)
   </div>
 );
 
-const Checkbox = ({ label, checked, onChange }: any) => (
-  <label className="flex items-center gap-3 cursor-pointer group">
-    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${checked ? 'bg-red-600 border-red-600' : 'border-gray-300 group-hover:border-red-400'}`}>
-      {checked && <Check size={14} className="text-white" />}
+const Checkbox = ({ label, options = [], value = [], onChange, maxSelections }: any) => {
+  const selectedValues = Array.isArray(value) ? value : (value ? [value] : []);
+  
+  const handleToggle = (option: string) => {
+    let newValues;
+    if (selectedValues.includes(option)) {
+      newValues = selectedValues.filter(v => v !== option);
+    } else {
+      if (maxSelections === 1) {
+        newValues = [option];
+      } else if (!maxSelections || selectedValues.length < maxSelections) {
+        newValues = [...selectedValues, option];
+      } else {
+        return; // Limit reached
+      }
+    }
+    onChange(newValues);
+  };
+
+  if (options.length === 0) {
+    const checked = value === true;
+    return (
+      <label className="flex items-center gap-3 cursor-pointer group">
+        <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${checked ? 'bg-red-600 border-red-600' : 'border-gray-300 group-hover:border-red-400'}`}>
+          {checked && <Check size={14} className="text-white" />}
+        </div>
+        <span className="text-sm text-gray-700 font-medium">{label}</span>
+        <input type="checkbox" className="hidden" checked={checked || false} onChange={(e) => onChange(e.target.checked)} />
+      </label>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2 w-full">
+      <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
+      <div className="grid grid-cols-1 gap-3">
+        {options.map((opt: string) => (
+          <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+            <div 
+              onClick={() => handleToggle(opt)}
+              className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${selectedValues.includes(opt) ? 'bg-red-600 border-red-600' : 'border-gray-300 group-hover:border-red-400'}`}
+            >
+              {selectedValues.includes(opt) && <Check size={14} className="text-white" />}
+            </div>
+            <span className="text-sm text-gray-700 font-medium">{opt}</span>
+          </label>
+        ))}
+      </div>
     </div>
-    <span className="text-sm text-gray-700 font-medium">{label}</span>
-    <input type="checkbox" className="hidden" checked={checked || false} onChange={(e) => onChange(e.target.checked)} />
-  </label>
-);
+  );
+};
 
 const Select = ({ label, value, onChange, options = [] }: any) => (
   <div className="flex flex-col gap-1.5 w-full">
@@ -353,6 +395,39 @@ export default function App() {
               borderColor: rgb(1, 0, 0),
               borderWidth: 0.5,
             });
+          }
+
+          // Handle Checkbox with multiple options (Option Mappings)
+          if (field.type === 'checkbox' && field.options && field.optionMappings) {
+            const selectedOptions = Array.isArray(value) ? value : (value ? [value] : []);
+            selectedOptions.forEach(opt => {
+              const mapping = field.optionMappings?.[opt];
+              if (mapping) {
+                if (debugMode) {
+                  page.drawRectangle({
+                    x: mapping.x,
+                    y: mapping.y,
+                    width: mapping.width,
+                    height: mapping.height,
+                    borderColor: rgb(0, 0, 1),
+                    borderWidth: 0.5,
+                  });
+                }
+
+                const checkboxSize = 6;
+                const xOffset = (mapping.width - (font.widthOfTextAtSize('X', checkboxSize))) / 2;
+                const yOffset = (mapping.height - checkboxSize) / 2 + 1;
+
+                page.drawText('X', {
+                  x: mapping.x + xOffset,
+                  y: mapping.y + yOffset,
+                  size: checkboxSize,
+                  font: font,
+                  color: rgb(0, 0, 0),
+                });
+              }
+            });
+            return;
           }
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
@@ -657,110 +732,196 @@ export default function App() {
                   {debugFields.filter(f => f.page === debugPage).map(field => {
                     const isSelected = selectedFieldId === field.id;
                     return (
-                      <motion.div
-                        key={field.id}
-                        drag
-                        dragMomentum={false}
-                        onDragStart={() => setSelectedFieldId(field.id)}
-                        onDragEnd={(e, info) => {
-                          if (!debugImageRef.current) return;
-                          const rect = debugImageRef.current.getBoundingClientRect();
-                          
-                          // Calculate deltas in PDF points
-                          const deltaX = (info.offset.x / rect.width) * 595;
-                          const deltaY = (info.offset.y / rect.height) * 842;
-                          
-                          let newPdfX = Number((field.x + deltaX).toFixed(2));
-                          let newPdfY = Number((field.y - deltaY).toFixed(2));
+                      <React.Fragment key={field.id}>
+                        <motion.div
+                          drag
+                          dragMomentum={false}
+                          onDragStart={() => setSelectedFieldId(field.id)}
+                          onDragEnd={(e, info) => {
+                            if (!debugImageRef.current) return;
+                            const rect = debugImageRef.current.getBoundingClientRect();
+                            
+                            // Calculate deltas in PDF points
+                            const deltaX = (info.offset.x / rect.width) * 595;
+                            const deltaY = (info.offset.y / rect.height) * 842;
+                            
+                            let newPdfX = Number((field.x + deltaX).toFixed(2));
+                            let newPdfY = Number((field.y - deltaY).toFixed(2));
 
-                          // Bounds check
-                          newPdfX = Math.max(0, Math.min(595 - field.width, newPdfX));
-                          newPdfY = Math.max(0, Math.min(842 - field.height, newPdfY));
+                            // Bounds check
+                            newPdfX = Math.max(0, Math.min(595 - field.width, newPdfX));
+                            newPdfY = Math.max(0, Math.min(842 - field.height, newPdfY));
 
-                          setDebugFields(prev => prev.map(f => 
-                            f.id === field.id ? { 
-                              ...f, 
-                              x: newPdfX, 
-                              y: newPdfY,
-                              corners: calculateCorners(newPdfX, newPdfY, f.width, f.height)
-                            } : f
-                          ));
-                        }}
-                        style={{
-                          position: 'absolute',
-                          left: `${(field.x / 595) * 100}%`,
-                          bottom: `${(field.y / 842) * 100}%`,
-                          width: `${(field.width / 595) * 100}%`,
-                          height: `${(field.height / 842) * 100}%`,
-                          border: isSelected ? '2px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.4)',
-                          backgroundColor: isSelected ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
-                          cursor: 'move',
-                          zIndex: isSelected ? 50 : 10,
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          justifyContent: 'flex-start',
-                        }}
-                      >
-                        {isSelected && (
-                          <>
-                            {/* Resize Handle Right (Width) */}
+                            setDebugFields(prev => prev.map(f => 
+                              f.id === field.id ? { 
+                                ...f, 
+                                x: newPdfX, 
+                                y: newPdfY,
+                                corners: calculateCorners(newPdfX, newPdfY, f.width, f.height)
+                              } : f
+                            ));
+                          }}
+                          style={{
+                            position: 'absolute',
+                            left: `${(field.x / 595) * 100}%`,
+                            bottom: `${(field.y / 842) * 100}%`,
+                            width: `${(field.width / 595) * 100}%`,
+                            height: `${(field.height / 842) * 100}%`,
+                            border: isSelected ? '2px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.4)',
+                            backgroundColor: isSelected ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                            cursor: 'move',
+                            zIndex: isSelected ? 50 : 10,
+                            display: (field.type === 'checkbox' && field.options && field.options.length > 0) ? 'none' : 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'flex-start',
+                          }}
+                        >
+                          {isSelected && (
+                            <>
+                              {/* Resize Handle Right (Width) */}
+                              <motion.div
+                                drag="x"
+                                dragMomentum={false}
+                                onDrag={(e, info) => {
+                                  e.stopPropagation();
+                                  if (!debugImageRef.current) return;
+                                  const rect = debugImageRef.current.getBoundingClientRect();
+                                  const deltaW = (info.delta.x / rect.width) * 595;
+                                  setDebugFields(prev => prev.map(f => {
+                                    if (f.id === field.id) {
+                                      const newWidth = Math.max(0.1, Number((f.width + deltaW).toFixed(2)));
+                                      return { 
+                                        ...f, 
+                                        width: newWidth,
+                                        corners: calculateCorners(f.x, f.y, newWidth, f.height)
+                                      };
+                                    }
+                                    return f;
+                                  }));
+                                }}
+                                className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize bg-red-500/50 hover:bg-red-500 transition-colors"
+                              />
+                              {/* Resize Handle Top (Height) */}
+                              <motion.div
+                                drag="y"
+                                dragMomentum={false}
+                                onDrag={(e, info) => {
+                                  e.stopPropagation();
+                                  if (!debugImageRef.current) return;
+                                  const rect = debugImageRef.current.getBoundingClientRect();
+                                  // PDF Y is bottom-up, so dragging UP (negative delta.y) increases height
+                                  const deltaH = (-info.delta.y / rect.height) * 842;
+                                  setDebugFields(prev => prev.map(f => {
+                                    if (f.id === field.id) {
+                                      const newHeight = Math.max(0.1, Number((f.height + deltaH).toFixed(2)));
+                                      return { 
+                                        ...f, 
+                                        height: newHeight,
+                                        corners: calculateCorners(f.x, f.y, f.width, newHeight)
+                                      };
+                                    }
+                                    return f;
+                                  }));
+                                }}
+                                className="absolute top-0 left-0 right-0 h-2 cursor-ns-resize bg-red-500/50 hover:bg-red-500 transition-colors"
+                              />
+                            </>
+                          )}
+                        </motion.div>
+
+                        {/* Render Option Mapping Boxes */}
+                        {field.optionMappings && Object.entries(field.optionMappings).map(([opt, mappingValue]) => {
+                          const mapping = mappingValue as { x: number, y: number, width: number, height: number };
+                          return (
                             <motion.div
-                              drag="x"
+                              key={`${field.id}-${opt}`}
+                              drag
                               dragMomentum={false}
-                              onDrag={(e, info) => {
-                                e.stopPropagation();
+                              onDragStart={() => setSelectedFieldId(field.id)}
+                              onDragEnd={(e, info) => {
                                 if (!debugImageRef.current) return;
                                 const rect = debugImageRef.current.getBoundingClientRect();
-                                const deltaW = (info.delta.x / rect.width) * 595;
+                                const deltaX = (info.offset.x / rect.width) * 595;
+                                const deltaY = (info.offset.y / rect.height) * 842;
+                                
                                 setDebugFields(prev => prev.map(f => {
-                                  if (f.id === field.id) {
-                                    const newWidth = Math.max(0.1, Number((f.width + deltaW).toFixed(2)));
-                                    return { 
-                                      ...f, 
-                                      width: newWidth,
-                                      corners: calculateCorners(f.x, f.y, newWidth, f.height)
-                                    };
-                                  }
-                                  return f;
+                                  if (f.id !== field.id) return f;
+                                  const newMappings = { ...(f.optionMappings || {}) } as any;
+                                  newMappings[opt] = {
+                                    ...mapping,
+                                    x: Number((mapping.x + deltaX).toFixed(2)),
+                                    y: Number((mapping.y - deltaY).toFixed(2))
+                                  };
+                                  return { ...f, optionMappings: newMappings };
                                 }));
                               }}
-                              className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize bg-red-500/50 hover:bg-red-500 transition-colors"
-                            />
-                            {/* Resize Handle Top (Height) */}
-                            <motion.div
-                              drag="y"
-                              dragMomentum={false}
-                              onDrag={(e, info) => {
-                                e.stopPropagation();
-                                if (!debugImageRef.current) return;
-                                const rect = debugImageRef.current.getBoundingClientRect();
-                                // PDF Y is bottom-up, so dragging UP (negative delta.y) increases height
-                                const deltaH = (-info.delta.y / rect.height) * 842;
-                                setDebugFields(prev => prev.map(f => {
-                                  if (f.id === field.id) {
-                                    const newHeight = Math.max(0.1, Number((f.height + deltaH).toFixed(2)));
-                                    return { 
-                                      ...f, 
-                                      height: newHeight,
-                                      corners: calculateCorners(f.x, f.y, f.width, newHeight)
-                                    };
-                                  }
-                                  return f;
-                                }));
+                              style={{
+                                position: 'absolute',
+                                left: `${(mapping.x / 595) * 100}%`,
+                                bottom: `${(mapping.y / 842) * 100}%`,
+                                width: `${(mapping.width / 595) * 100}%`,
+                                height: `${(mapping.height / 842) * 100}%`,
+                                border: isSelected ? '2px solid #3b82f6' : '1px solid rgba(59, 130, 246, 0.4)',
+                                backgroundColor: isSelected ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                                cursor: 'move',
+                                zIndex: isSelected ? 49 : 9,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                               }}
-                              className="absolute top-0 left-0 right-0 h-2 cursor-ns-resize bg-red-500/50 hover:bg-red-500 transition-colors"
-                            />
-                          </>
-                        )}
-                      </motion.div>
+                            >
+                              <span className="text-[6px] font-bold text-blue-500 truncate px-0.5">{opt}</span>
+                              {isSelected && (
+                                <>
+                                  <motion.div
+                                    drag="x"
+                                    dragMomentum={false}
+                                    onDrag={(e, info) => {
+                                      e.stopPropagation();
+                                      if (!debugImageRef.current) return;
+                                      const rect = debugImageRef.current.getBoundingClientRect();
+                                      const deltaW = (info.delta.x / rect.width) * 595;
+                                      setDebugFields(prev => prev.map(f => {
+                                        if (f.id !== field.id) return f;
+                                        const newMappings = { ...(f.optionMappings || {}) } as any;
+                                        newMappings[opt] = { ...mapping, width: Math.max(1, mapping.width + deltaW) };
+                                        return { ...f, optionMappings: newMappings };
+                                      }));
+                                    }}
+                                    className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize bg-blue-500/50"
+                                  />
+                                  <motion.div
+                                    drag="y"
+                                    dragMomentum={false}
+                                    onDrag={(e, info) => {
+                                      e.stopPropagation();
+                                      if (!debugImageRef.current) return;
+                                      const rect = debugImageRef.current.getBoundingClientRect();
+                                      const deltaH = (-info.delta.y / rect.height) * 842;
+                                      setDebugFields(prev => prev.map(f => {
+                                        if (f.id !== field.id) return f;
+                                        const newMappings = { ...(f.optionMappings || {}) } as any;
+                                        newMappings[opt] = { ...mapping, height: Math.max(1, mapping.height + deltaH) };
+                                        return { ...f, optionMappings: newMappings };
+                                      }));
+                                    }}
+                                    className="absolute top-0 left-0 right-0 h-1 cursor-ns-resize bg-blue-500/50"
+                                  />
+                                </>
+                              )}
+                            </motion.div>
+                          );
+                        })}
+                      </React.Fragment>
                     );
                   })}
                 </div>
               </div>
 
               {selectedFieldId && (
-                <div className="mt-6 bg-gray-900 text-white p-6 rounded-3xl font-mono text-[11px] shadow-2xl border border-gray-800 animate-in fade-in slide-in-from-top-4 duration-300">
-                  <div className="flex justify-between items-start mb-5">
+                <>
+                  <div className="mt-6 bg-gray-900 text-white p-6 rounded-3xl font-mono text-[11px] shadow-2xl border border-gray-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="flex justify-between items-start mb-5">
                     <div className="flex flex-col flex-1 mr-4">
                       <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Alan Kimliği (ID)</span>
                       <input 
@@ -805,6 +966,22 @@ export default function App() {
                         <option value="checkbox" className="bg-gray-900">Onay Kutusu</option>
                       </select>
                     </div>
+                    {debugFields.find(f => f.id === selectedFieldId)?.type === 'checkbox' && (
+                      <div className="flex flex-col mr-4">
+                        <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Seçim Limiti</span>
+                        <input 
+                          type="number"
+                          min="1"
+                          value={debugFields.find(f => f.id === selectedFieldId)?.maxSelections || ''}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || undefined;
+                            setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, maxSelections: val } : f));
+                          }}
+                          placeholder="Sınırsız"
+                          className="bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all w-20"
+                        />
+                      </div>
+                    )}
                         <div className="flex flex-col mr-4">
                           <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Gizli</span>
                           <button 
@@ -851,7 +1028,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {debugFields.find(f => f.id === selectedFieldId)?.type === 'select' && (
+                  {(debugFields.find(f => f.id === selectedFieldId)?.type === 'select' || debugFields.find(f => f.id === selectedFieldId)?.type === 'checkbox') && (
                     <div className="mb-6 space-y-2">
                       <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Seçenekler (Virgülle ayırın)</span>
                       <input 
@@ -867,7 +1044,8 @@ export default function App() {
                     </div>
                   )}
                   
-                  <div className="grid grid-cols-2 gap-6">
+                  {debugFields.find(f => f.id === selectedFieldId)?.type !== 'checkbox' && (
+                    <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <label className="text-[10px] text-gray-400 uppercase font-black tracking-widest">X (Sol Kenardan)</label>
@@ -976,6 +1154,143 @@ export default function App() {
                         />
                       </div>
                     </div>
+                  </div>
+                )}
+                
+                {/* Option Mappings UI */}
+                    {debugFields.find(f => f.id === selectedFieldId)?.options && (
+                      <div className="col-span-2 space-y-4 bg-white/5 p-5 rounded-[24px] border border-white/10 mt-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-1.5 h-4 bg-red-500 rounded-full"></div>
+                          <label className="text-[10px] text-white uppercase font-black tracking-widest block">Seçeneğe Bağlı Koordinatlar</label>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {debugFields.find(f => f.id === selectedFieldId)?.options?.map(option => {
+                            const field = debugFields.find(f => f.id === selectedFieldId)!;
+                            const mapping = field.optionMappings?.[option] || { x: 0, y: 0, width: 8, height: 8 };
+                            
+                            return (
+                              <div key={option} className="p-4 bg-black/20 rounded-2xl border border-white/5 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[11px] font-black text-red-500 uppercase tracking-wider">{option}</span>
+                                  <button 
+                                    onClick={() => {
+                                      setDebugFields(prev => prev.map(f => {
+                                        if (f.id !== selectedFieldId) return f;
+                                        const newMappings = { ...(f.optionMappings || {}) };
+                                        if (newMappings[option]) {
+                                          delete newMappings[option];
+                                        } else {
+                                          newMappings[option] = { x: f.x, y: f.y, width: 8, height: 8 };
+                                        }
+                                        return { ...f, optionMappings: newMappings };
+                                      }));
+                                    }}
+                                    className={`text-[9px] font-bold px-3 py-1 rounded-lg uppercase tracking-tighter transition-all ${field.optionMappings?.[option] ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-gray-500 border border-white/10'}`}
+                                  >
+                                    {field.optionMappings?.[option] ? 'Aktif' : 'Aktif Et'}
+                                  </button>
+                                </div>
+
+                                {field.optionMappings?.[option] && (
+                                  <div className="grid grid-cols-4 gap-2">
+                                    <div className="space-y-1">
+                                      <label className="text-[8px] text-gray-500 uppercase font-bold">X</label>
+                                      <input 
+                                        type="number"
+                                        step="0.1"
+                                        value={mapping.x}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          setDebugFields(prev => prev.map(f => {
+                                            if (f.id !== selectedFieldId) return f;
+                                            return {
+                                              ...f,
+                                              optionMappings: {
+                                                ...f.optionMappings,
+                                                [option]: { ...mapping, x: val }
+                                              }
+                                            };
+                                          }));
+                                        }}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white font-bold text-[10px] focus:outline-none focus:border-red-500"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-[8px] text-gray-500 uppercase font-bold">Y</label>
+                                      <input 
+                                        type="number"
+                                        step="0.1"
+                                        value={mapping.y}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          setDebugFields(prev => prev.map(f => {
+                                            if (f.id !== selectedFieldId) return f;
+                                            return {
+                                              ...f,
+                                              optionMappings: {
+                                                ...f.optionMappings,
+                                                [option]: { ...mapping, y: val }
+                                              }
+                                            };
+                                          }));
+                                        }}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white font-bold text-[10px] focus:outline-none focus:border-red-500"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-[8px] text-gray-500 uppercase font-bold">G</label>
+                                      <input 
+                                        type="number"
+                                        step="0.1"
+                                        value={mapping.width}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          setDebugFields(prev => prev.map(f => {
+                                            if (f.id !== selectedFieldId) return f;
+                                            return {
+                                              ...f,
+                                              optionMappings: {
+                                                ...f.optionMappings,
+                                                [option]: { ...mapping, width: val }
+                                              }
+                                            };
+                                          }));
+                                        }}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white font-bold text-[10px] focus:outline-none focus:border-red-500"
+                                      />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <label className="text-[8px] text-gray-500 uppercase font-bold">Y</label>
+                                      <input 
+                                        type="number"
+                                        step="0.1"
+                                        value={mapping.height}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          setDebugFields(prev => prev.map(f => {
+                                            if (f.id !== selectedFieldId) return f;
+                                            return {
+                                              ...f,
+                                              optionMappings: {
+                                                ...f.optionMappings,
+                                                [option]: { ...mapping, height: val }
+                                              }
+                                            };
+                                          }));
+                                        }}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white font-bold text-[10px] focus:outline-none focus:border-red-500"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="col-span-2 space-y-3 bg-white/5 p-4 rounded-2xl border border-white/10">
                       <label className="text-[10px] text-red-500 uppercase font-black tracking-widest block mb-2">Köşe Koordinatları (PDF Puanı)</label>
@@ -1010,7 +1325,7 @@ export default function App() {
                     </div>
                   </div>
                   <p className="mt-5 text-[10px] text-gray-500 italic text-center border-t border-white/5 pt-4">İpucu: Aynı satırdaki kutuların Y değerlerini eşitleyerek mükemmel hizalama sağlayabilirsiniz.</p>
-                </div>
+                </>
               )}
 
               <div className="space-y-3 pt-2">
@@ -1070,7 +1385,8 @@ export default function App() {
                           <span className="text-[9px] text-gray-400">
                             {field.type === 'text' ? 'Metin' : 
                              field.type === 'number' ? 'Sayı' : 
-                             field.type === 'date' ? 'Tarih' : 'Onay Kutusu'}
+                             field.type === 'date' ? 'Tarih' : 
+                             field.type === 'select' ? 'Çoktan Seçmeli' : 'Onay Kutusu'}
                             {field.hidden && <span className="ml-2 text-red-500 font-bold">(GİZLİ)</span>}
                             {field.required && <span className="ml-2 text-blue-500 font-bold">(ZORUNLU)</span>}
                           </span>
@@ -1246,14 +1562,16 @@ export default function App() {
                         {fieldsInCurrentSection.map(field => (
                           <div key={field.id}>
                             {field.type === 'checkbox' ? (
-                              <div className="pt-6">
+                              <div className="pt-2">
                                 <Checkbox 
                                   label={field.label + (field.required ? ' *' : '')} 
-                                  checked={formData[field.id]} 
-                                  onChange={(v: boolean) => updateField(field.id, v)} 
+                                  value={formData[field.id]} 
+                                  options={field.options}
+                                  maxSelections={field.maxSelections}
+                                  onChange={(v: any) => updateField(field.id, v)} 
                                 />
                               </div>
-                            ) : field.type === 'select' ? (
+                            ) : (field.type === 'select') ? (
                               <Select 
                                 label={field.label + (field.required ? ' *' : '')} 
                                 value={formData[field.id]} 

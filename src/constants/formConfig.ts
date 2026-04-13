@@ -2,6 +2,7 @@ export interface FieldConfig {
   id: string;
   label: string;
   type: 'text' | 'checkbox' | 'number' | 'date' | 'select';
+  maxSelections?: number;
   x: number;
   y: number;
   width: number;
@@ -12,6 +13,14 @@ export interface FieldConfig {
   required?: boolean;
   defaultValue?: any;
   options?: string[];
+  optionMappings?: {
+    [option: string]: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+  };
   corners: {
     bottomLeft: [number, number];
     bottomRight: [number, number];
@@ -907,5 +916,532 @@ export const FORM_CONFIG: FieldConfig[] = [
         533
       ]
     }
+  },
+  {
+    "id": "2.3-tckimlikno",
+    "label": "T.C. Kimlik No.",
+    "type": "number",
+    "x": 404,
+    "y": 505,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        404,
+        505
+      ],
+      "bottomRight": [
+        554,
+        505
+      ],
+      "topRight": [
+        554,
+        518
+      ],
+      "topLeft": [
+        404,
+        518
+      ]
+    }
+  },
+  {
+    "id": "2.3-telefon",
+    "label": "Telefon",
+    "type": "number",
+    "x": 404,
+    "y": 490,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        404,
+        490
+      ],
+      "bottomRight": [
+        554,
+        490
+      ],
+      "topRight": [
+        554,
+        503
+      ],
+      "topLeft": [
+        404,
+        503
+      ]
+    }
+  },
+  {
+    "id": "2.3-acikadres",
+    "label": "Açık Adres",
+    "type": "text",
+    "x": 404,
+    "y": 475,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        404,
+        475
+      ],
+      "bottomRight": [
+        554,
+        475
+      ],
+      "topRight": [
+        554,
+        488
+      ],
+      "topLeft": [
+        404,
+        488
+      ]
+    }
+  },
+  {
+    "id": "2.3-ililce",
+    "label": "İl / İlçe",
+    "type": "text",
+    "x": 404,
+    "y": 460,
+    "width": 150,
+    "height": 13,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        404,
+        460
+      ],
+      "bottomRight": [
+        554,
+        460
+      ],
+      "topRight": [
+        554,
+        473
+      ],
+      "topLeft": [
+        404,
+        473
+      ]
+    }
+  },
+  {
+    "id": "3.1-adisoyadı",
+    "label": "Adı Soyadı",
+    "type": "text",
+    "x": 27,
+    "y": 368,
+    "width": 90,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        27,
+        368
+      ],
+      "bottomRight": [
+        117,
+        368
+      ],
+      "topRight": [
+        117,
+        384
+      ],
+      "topLeft": [
+        27,
+        384
+      ]
+    }
+  },
+  {
+    "id": "3.1-tckimlikno",
+    "label": "T.C. Kimlik No.",
+    "type": "number",
+    "x": 128,
+    "y": 368,
+    "width": 70,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        128,
+        368
+      ],
+      "bottomRight": [
+        198,
+        368
+      ],
+      "topRight": [
+        198,
+        384
+      ],
+      "topLeft": [
+        128,
+        384
+      ]
+    }
+  },
+  {
+    "id": "3.1-basvurunayakinlik",
+    "label": "Başvuruna Yakınlık",
+    "type": "text",
+    "x": 203,
+    "y": 368,
+    "width": 45,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        203,
+        368
+      ],
+      "bottomRight": [
+        248,
+        368
+      ],
+      "topRight": [
+        248,
+        384
+      ],
+      "topLeft": [
+        203,
+        384
+      ]
+    }
+  },
+  {
+    "id": "3.1-dogumtarihi",
+    "label": "Doğum Tarihi",
+    "type": "date",
+    "x": 289,
+    "y": 368,
+    "width": 34,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        289,
+        368
+      ],
+      "bottomRight": [
+        323,
+        368
+      ],
+      "topRight": [
+        323,
+        384
+      ],
+      "topLeft": [
+        289,
+        384
+      ]
+    }
+  },
+  {
+    "id": "3.1-medenihali",
+    "label": "Medeni Hali",
+    "type": "select",
+    "x": 324,
+    "y": 368,
+    "width": 34.2,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        324,
+        368
+      ],
+      "bottomRight": [
+        358.2,
+        368
+      ],
+      "topRight": [
+        358.2,
+        384
+      ],
+      "topLeft": [
+        324,
+        384
+      ]
+    },
+    "options": [
+      "EVLİ",
+      "BEKAR",
+      "BOŞANMIŞ",
+      "VEFAT"
+    ]
+  },
+  {
+    "id": "3.1-egitimdurumu",
+    "label": "Eğitim Durumu",
+    "type": "select",
+    "x": 360,
+    "y": 368,
+    "width": 50,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        360,
+        368
+      ],
+      "bottomRight": [
+        410,
+        368
+      ],
+      "topRight": [
+        410,
+        384
+      ],
+      "topLeft": [
+        360,
+        384
+      ]
+    },
+    "options": [
+      "İLKÖĞRETİM",
+      "LİSE",
+      "ÖNLİSANS",
+      "LİSANS"
+    ]
+  },
+  {
+    "id": "3.1-meslegi",
+    "label": "Mesleği",
+    "type": "text",
+    "x": 422,
+    "y": 368,
+    "width": 30,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        422,
+        368
+      ],
+      "bottomRight": [
+        452,
+        368
+      ],
+      "topRight": [
+        452,
+        384
+      ],
+      "topLeft": [
+        422,
+        384
+      ]
+    }
+  },
+  {
+    "id": "3.1-cinsiyet",
+    "label": "Cinsiyet",
+    "type": "checkbox",
+    "maxSelections": 1,
+    "x": 114,
+    "y": 401,
+    "width": 100,
+    "height": 20,
+    "page": 1,
+    "section": "YENİ",
+    "optionMappings": {
+      "KADIN": {
+        "x": 256,
+        "y": 377,
+        "width": 10,
+        "height": 7
+      },
+      "ERKEK": {
+        "x": 256,
+        "y": 368,
+        "width": 10,
+        "height": 7
+      }
+    },
+    "corners": {
+      "bottomLeft": [
+        114,
+        401
+      ],
+      "bottomRight": [
+        214,
+        401
+      ],
+      "topRight": [
+        214,
+        421
+      ],
+      "topLeft": [
+        114,
+        421
+      ]
+    },
+    "options": [
+      "KADIN",
+      "ERKEK"
+    ]
+  },
+  {
+    "id": "3.1-calismadurumu",
+    "label": "Çalışma Durumu",
+    "type": "checkbox",
+    "maxSelections": 1,
+    "x": 298,
+    "y": 400,
+    "width": 100,
+    "height": 20,
+    "page": 1,
+    "section": "YENİ",
+    "optionMappings": {
+      "ÇALIŞIYOR": {
+        "x": 460,
+        "y": 377,
+        "width": 10,
+        "height": 7
+      },
+      "ÇALIŞMIYOR": {
+        "x": 460,
+        "y": 368,
+        "width": 10,
+        "height": 7
+      }
+    },
+    "corners": {
+      "bottomLeft": [
+        298,
+        400
+      ],
+      "bottomRight": [
+        398,
+        400
+      ],
+      "topRight": [
+        398,
+        420
+      ],
+      "topLeft": [
+        298,
+        420
+      ]
+    },
+    "options": [
+      "ÇALIŞIYOR",
+      "ÇALIŞMIYOR"
+    ]
+  },
+  {
+    "id": "3.1-aylikgeliri",
+    "label": "Aylık Geliri",
+    "type": "number",
+    "x": 506,
+    "y": 368,
+    "width": 30,
+    "height": 16,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        506,
+        368
+      ],
+      "bottomRight": [
+        536,
+        368
+      ],
+      "topRight": [
+        536,
+        384
+      ],
+      "topLeft": [
+        506,
+        384
+      ]
+    }
+  },
+  {
+    "id": "3.1-bedengiyim",
+    "label": "Beden Giyim",
+    "type": "select",
+    "x": 565,
+    "y": 378,
+    "width": 20,
+    "height": 8,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        565,
+        378
+      ],
+      "bottomRight": [
+        585,
+        378
+      ],
+      "topRight": [
+        585,
+        386
+      ],
+      "topLeft": [
+        565,
+        386
+      ]
+    }
+  },
+  {
+    "id": "3.1-bedenayakkabi",
+    "label": "Ayakkabı",
+    "type": "select",
+    "x": 565,
+    "y": 370.2,
+    "width": 20,
+    "height": 8,
+    "page": 1,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        565,
+        370.2
+      ],
+      "bottomRight": [
+        585,
+        370.2
+      ],
+      "topRight": [
+        585,
+        378.2
+      ],
+      "topLeft": [
+        565,
+        378.2
+      ]
+    },
+    "options": [
+      "35",
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ]
   }
-];
+]
