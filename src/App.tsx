@@ -26,6 +26,8 @@ import {
   Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // Import assets
@@ -275,14 +277,8 @@ export default function App() {
   };
 
   const getPDFBytes = async () => {
-    const { PDFDocument, rgb, StandardFonts } = (window as any).PDFLib;
-    const fontkit = (window as any).fontkit;
-    if (!PDFDocument) throw new Error('PDFLib not loaded');
-    
     const pdfDoc = await PDFDocument.create();
-    if (fontkit) {
-      pdfDoc.registerFontkit(fontkit);
-    }
+    pdfDoc.registerFontkit(fontkit);
     
     const isCustomFont = !!INTER_BOLD_BASE64;
     
