@@ -316,6 +316,8 @@ export default function App() {
       else if (p === '2.3') label = "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri";
       else if (p === '3.0') label = "Hanede Yaşayan Diğer Kişi Sayısı";
       else if (p.startsWith('3.')) label = `Hanede Yaşayan Diğer Kişi Bilgileri (${p.split('.')[1]})`;
+      else if (p === '4.1') label = "Sağlık Bilgileri";
+      else if (p === '5.1') label = "Sosyal Güvence";
 
       groups.push({
         id: p,
@@ -726,25 +728,13 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="flex gap-2 mb-4">
-                <button 
-                  onClick={() => setDebugPage(1)}
-                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all uppercase tracking-wider ${debugPage === 1 ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-white border border-gray-200 text-gray-600'}`}
-                >
-                  Sayfa 1
-                </button>
-                <button 
-                  onClick={() => setDebugPage(2)}
-                  className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all uppercase tracking-wider ${debugPage === 2 ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-white border border-gray-200 text-gray-600'}`}
-                >
-                  Sayfa 2
-                </button>
-              </div>
+              {/* Page Navigation Removed as all fields are on Page 1 */}
+
 
               <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none aspect-[595/842]">
                 <img 
                   ref={debugImageRef}
-                  src={debugPage === 1 ? formImages.form_sayfa1 : formImages.form_sayfa2} 
+                  src={formImages.form_sayfa1} 
                   alt="Debug" 
                   className="w-full h-full object-fill block pointer-events-none opacity-60"
                   onLoad={() => {
