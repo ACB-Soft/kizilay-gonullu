@@ -847,6 +847,177 @@ export const FORM_CONFIG: FieldConfig[] = [
       }
     ];
   }).flat(),
+  ...[1, 2, 3, 4, 5].map(i => {
+    const yOffset = (i - 1) * 19;
+    return [
+      {
+        "id": `4.${i}-Hastaadisoyadi`,
+        "label": "Hasta Adı Soyadı",
+        "type": "text",
+        "x": 28,
+        "y": 131 - yOffset,
+        "width": 115,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [28, 131 - yOffset],
+          "bottomRight": [143, 131 - yOffset],
+          "topRight": [143, 147 - yOffset],
+          "topLeft": [28, 147 - yOffset]
+        }
+      },
+      {
+        "id": `4.${i}-hastalik`,
+        "label": "Hastalık Teşhisi",
+        "type": "text",
+        "x": 150,
+        "y": 131 - yOffset,
+        "width": 55,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [150, 131 - yOffset],
+          "bottomRight": [205, 131 - yOffset],
+          "topRight": [205, 147 - yOffset],
+          "topLeft": [150, 147 - yOffset]
+        }
+      },
+      {
+        "id": `4.${i}-engellilikturu`,
+        "label": "Engellilik Türü",
+        "type": "checkbox",
+        "x": 210,
+        "y": 131 - yOffset,
+        "width": 60,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [210, 131 - yOffset],
+          "bottomRight": [270, 131 - yOffset],
+          "topRight": [270, 147 - yOffset],
+          "topLeft": [210, 147 - yOffset]
+        },
+        "options": ["RUHSAL", "ZİHİNSEL", "FİZİKSEL"],
+        "maxSelections": 1,
+        "optionMappings": {
+          "RUHSAL": { "x": 213, "y": 140 - yOffset, "width": 4, "height": 6 },
+          "FİZİKSEL": { "x": 213, "y": 131.5 - yOffset, "width": 4, "height": 6 },
+          "ZİHİNSEL": { "x": 242, "y": 140 - yOffset, "width": 4, "height": 6 }
+        }
+      },
+      {
+        "id": `4.${i}-hastaysadurumu`,
+        "label": "Hastaysa Durumu",
+        "type": "checkbox",
+        "x": 275,
+        "y": 131 - yOffset,
+        "width": 60,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [275, 131 - yOffset],
+          "bottomRight": [335, 131 - yOffset],
+          "topRight": [335, 147 - yOffset],
+          "topLeft": [275, 147 - yOffset]
+        },
+        "maxSelections": 1,
+        "options": ["GEÇİCİ", "SÜREKLİ"],
+        "optionMappings": {
+          "GEÇİCİ": { "x": 278, "y": 140 - yOffset, "width": 14, "height": 6 },
+          "SÜREKLİ": { "x": 278, "y": 132 - yOffset, "width": 14, "height": 6 }
+        }
+      },
+      {
+        "id": `4.${i}-engelderecesi`,
+        "label": "Engelliyse Derecesi (%)",
+        "type": "number",
+        "x": 340,
+        "y": 131 - yOffset,
+        "width": 20,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [340, 131 - yOffset],
+          "bottomRight": [360, 131 - yOffset],
+          "topRight": [360, 147 - yOffset],
+          "topLeft": [340, 147 - yOffset]
+        }
+      },
+      {
+        "id": `4.${i}-kullanilanilac`,
+        "label": "Kullanılan İlaç",
+        "type": "text",
+        "x": 377,
+        "y": 131 - yOffset,
+        "width": 45,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [377, 131 - yOffset],
+          "bottomRight": [422, 131 - yOffset],
+          "topRight": [422, 147 - yOffset],
+          "topLeft": [377, 147 - yOffset]
+        }
+      },
+      {
+        "id": `4.${i}-kullanilancihaz`,
+        "label": "Kullanılan Cihaz",
+        "type": "text",
+        "x": 429,
+        "y": 131 - yOffset,
+        "width": 45,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [429, 131 - yOffset],
+          "bottomRight": [474, 131 - yOffset],
+          "topRight": [474, 147 - yOffset],
+          "topLeft": [429, 147 - yOffset]
+        }
+      },
+      {
+        "id": `4.${i}-kullanilanmalzeme`,
+        "label": "Kullanılan Malzeme",
+        "type": "text",
+        "x": 482,
+        "y": 131 - yOffset,
+        "width": 45,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [482, 131 - yOffset],
+          "bottomRight": [527, 131 - yOffset],
+          "topRight": [527, 147 - yOffset],
+          "topLeft": [482, 147 - yOffset]
+        }
+      },
+      {
+        "id": `4.${i}-aciklama`,
+        "label": "Açıklama",
+        "type": "text",
+        "x": 534,
+        "y": 131 - yOffset,
+        "width": 48,
+        "height": 16,
+        "page": 1,
+        "section": "Hastalık ve Engellilik Durumu",
+        "corners": {
+          "bottomLeft": [534, 131 - yOffset],
+          "bottomRight": [582, 131 - yOffset],
+          "topRight": [582, 147 - yOffset],
+          "topLeft": [534, 147 - yOffset]
+        }
+      }
+    ];
+  }).flat(),
   {
     "id": "5.1-sosyalguvence",
     "label": "Sosyal Güvence",
