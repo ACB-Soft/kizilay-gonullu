@@ -28,6 +28,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
+import * as XLSX from 'xlsx';
 import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // Import assets
@@ -74,11 +75,12 @@ const StepIndicator = ({ currentStep, steps }: { currentStep: number; steps: str
   );
 };
 
-const Input = ({ label, value, onChange, type = "text", placeholder = "" }: any) => (
+const Input = ({ label, value, onChange, type = "text", placeholder = "", inputMode }: any) => (
   <div className="flex flex-col gap-1.5 w-full">
     <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
     <input 
       type={type}
+      inputMode={inputMode}
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
@@ -289,6 +291,10 @@ export default function App() {
     
     // Get the count of other people
     const haneSayisi = parseInt(formData['3.0-haneoturansayisi'] || '0');
+    
+    // Get the count of health conditions
+    const hastalikAdediVal = formData['4.0-hastalikadedi'] || 'YOK';
+    const hastalikAdedi = hastalikAdediVal === 'YOK' ? 0 : parseInt(hastalikAdediVal);
 
     // Get unique prefixes in order of appearance
     const prefixes: string[] = [];
@@ -299,6 +305,16 @@ export default function App() {
       if (p.startsWith('3.')) {
         const stepNum = parseInt(p.split('.')[1]);
         if (stepNum > haneSayisi) return;
+      }
+
+      // Filter out 4.x steps if they are beyond the hastalikAdedi
+      if (p.startsWith('4.')) {
+        const stepNum = parseInt(p.split('.')[1]);
+        if (stepNum === 0) {
+          // Keep 4.0
+        } else if (stepNum > hastalikAdedi) {
+          return;
+        }
       }
 
       if (!prefixes.includes(p)) prefixes.push(p);
@@ -316,7 +332,8 @@ export default function App() {
       else if (p === '2.3') label = "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri";
       else if (p === '3.0') label = "Hanede Yaşayan Diğer Kişi Sayısı";
       else if (p.startsWith('3.')) label = `Hanede Yaşayan Diğer Kişi Bilgileri (${p.split('.')[1]})`;
-      else if (p === '4.1') label = "Sağlık Bilgileri";
+      else if (p === '4.0') label = "Hastalık ve Engellilik Durumu Sayısı";
+      else if (p.startsWith('4.')) label = `Hastalık ve Engellilik Durumu (${p.split('.')[1]})`;
       else if (p === '5.1') label = "Sosyal Güvence";
 
       groups.push({
@@ -327,7 +344,7 @@ export default function App() {
     });
     
     return groups;
-  }, [debugFields, formData['3.0-haneoturansayisi']]);
+  }, [debugFields, formData['3.0-haneoturansayisi'], formData['4.0-hastalikadedi']]);
 
   const sections = stepGroups.map(g => g.label);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -458,7 +475,12 @@ export default function App() {
           }
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
-            const text = encodeForPDF(String(value));
+            let displayValue = String(value);
+            if (field.type === 'date' && displayValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              const [y, m, d] = displayValue.split('-');
+              displayValue = `${d}.${m}.${y}`;
+            }
+            const text = encodeForPDF(displayValue);
             let currentFontSize = 6; // Reduced from 7
             const padding = 1.5;
             const availableWidth = field.width - (padding * 2);
@@ -514,6 +536,24 @@ export default function App() {
     }
 
     return await pdfDoc.save();
+  };
+
+  const generateExcel = () => {
+    // Get all fields that were actually part of the visible step groups
+    const visibleFields = stepGroups.flatMap(group => group.fields);
+    
+    const data = visibleFields.map(field => ({
+      id: field.id,
+      label: field.label,
+      'seçilen değer': formData[field.id] || ''
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Form Verileri");
+    
+    const fileName = `FRM.005_${formData['2.0-tckimlikno'] || 'Yeni'}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
   };
 
   const generatePDF = async () => {
@@ -728,13 +768,26 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Page Navigation Removed as all fields are on Page 1 */}
+              <div className="flex gap-2 mb-4">
+                <button 
+                  onClick={() => setDebugPage(1)}
+                  className={`flex-1 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${debugPage === 1 ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                >
+                  SAYFA 1
+                </button>
+                <button 
+                  onClick={() => setDebugPage(2)}
+                  className={`flex-1 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${debugPage === 2 ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                >
+                  SAYFA 2
+                </button>
+              </div>
 
 
               <div className="relative border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl bg-white select-none aspect-[595/842]">
                 <img 
                   ref={debugImageRef}
-                  src={formImages.form_sayfa1} 
+                  src={debugPage === 1 ? formImages.form_sayfa1 : formImages.form_sayfa2} 
                   alt="Debug" 
                   className="w-full h-full object-fill block pointer-events-none opacity-60"
                   onLoad={() => {
@@ -998,6 +1051,20 @@ export default function App() {
                         />
                       </div>
                     )}
+                        <div className="flex flex-col mr-4">
+                          <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Sayfa</span>
+                          <select 
+                            value={debugFields.find(f => f.id === selectedFieldId)?.page || 1}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value);
+                              setDebugFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, page: val } : f));
+                            }}
+                            className="bg-white/5 border border-white/10 rounded-xl p-3 text-white font-bold text-sm focus:outline-none focus:border-red-500 transition-all appearance-none cursor-pointer"
+                          >
+                            <option value={1} className="bg-gray-900">1</option>
+                            <option value={2} className="bg-gray-900">2</option>
+                          </select>
+                        </div>
                         <div className="flex flex-col mr-4">
                           <span className="text-red-500 font-black uppercase tracking-wider text-[10px] mb-1">Gizli</span>
                           <button 
@@ -1548,6 +1615,14 @@ export default function App() {
                   {isGenerating ? <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" /> : <Download size={24} />}
                   PDF OLARAK İNDİR
                 </button>
+
+                <button 
+                  onClick={generateExcel}
+                  className="w-full py-5 bg-green-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-green-200 flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+                >
+                  <FileText size={24} />
+                  EXCEL OLARAK İNDİR
+                </button>
                 
                 <button 
                   onClick={() => setView('home')}
@@ -1598,8 +1673,16 @@ export default function App() {
                               <Input 
                                 label={field.label + (field.required ? ' *' : '')} 
                                 value={formData[field.id]} 
-                                type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
-                                onChange={(v: string) => updateField(field.id, v)} 
+                                type={field.id.includes('tckimlikno') ? 'text' : (field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text')}
+                                inputMode={field.id.includes('tckimlikno') ? 'numeric' : undefined}
+                                onChange={(v: string) => {
+                                  if (field.id.includes('tckimlikno')) {
+                                    const numericValue = v.replace(/\D/g, '');
+                                    updateField(field.id, numericValue.slice(0, 11));
+                                  } else {
+                                    updateField(field.id, v);
+                                  }
+                                }} 
                               />
                             )}
                           </div>

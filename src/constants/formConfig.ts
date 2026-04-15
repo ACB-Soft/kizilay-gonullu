@@ -847,6 +847,24 @@ export const FORM_CONFIG: FieldConfig[] = [
       }
     ];
   }).flat(),
+  {
+    "id": "4.0-hastalikadedi",
+    "label": "Hastalık ve Engellilik Durumu Sayısı",
+    "type": "select",
+    "x": 11.5,
+    "y": 155,
+    "width": 10,
+    "height": 10,
+    "page": 1,
+    "section": "Hastalık ve Engellilik Durumu",
+    "options": ["YOK", "1", "2", "3", "4", "5"],
+    "corners": {
+      "bottomLeft": [11.5, 155],
+      "bottomRight": [21.5, 155],
+      "topRight": [21.5, 165],
+      "topLeft": [11.5, 165]
+    }
+  },
   ...[1, 2, 3, 4, 5].map(i => {
     const yOffset = (i - 1) * 19;
     return [
