@@ -523,7 +523,7 @@ export default function App() {
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `Kizilay_Formu_${formData.is_tc_no || 'Yeni'}.pdf`;
+      link.download = `FRM.005_${formData['2.0-tckimlikno'] || 'Yeni'}.pdf`;
       link.click();
       setView('result');
     } catch (error: any) {
