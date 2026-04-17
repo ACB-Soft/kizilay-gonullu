@@ -1708,7 +1708,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Eşya Durumu",
     "corners": {
       "bottomLeft": [
         100,
@@ -1812,7 +1812,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Eşya Durumu",
     "corners": {
       "bottomLeft": [
         100,
@@ -1916,7 +1916,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 130.1,
     "height": 30.2,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Eşya Durumu",
     "corners": {
       "bottomLeft": [
         441,

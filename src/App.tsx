@@ -299,7 +299,7 @@ export default function App() {
     // Get unique prefixes in order of appearance
     const prefixes: string[] = [];
     visibleFields.forEach(f => {
-      const p = getPrefix(f.id);
+      let p = getPrefix(f.id);
       
       // Filter out 3.x steps if they are beyond the haneSayisi
       if (p.startsWith('3.')) {
@@ -317,11 +317,20 @@ export default function App() {
         }
       }
 
+      // Group 8 and 9 together into a single summary step
+      if (p.startsWith('8.') || p.startsWith('9.')) {
+        p = '8-9';
+      }
+
       if (!prefixes.includes(p)) prefixes.push(p);
     });
 
     prefixes.forEach(p => {
-      const fields = visibleFields.filter(f => getPrefix(f.id) === p);
+      const fields = visibleFields.filter(f => {
+        const fp = getPrefix(f.id);
+        if (p === '8-9') return fp.startsWith('8.') || fp.startsWith('9.');
+        return fp === p;
+      });
       
       // Map prefix to specific labels
       let label = fields[0].section;
@@ -339,8 +348,7 @@ export default function App() {
       else if (p === '6.2') label = "Hane Gider Durumu";
       else if (p === '6.3') label = "Hane Borç Durumu";
       else if (p.startsWith('7.')) label = "Hane Konut Durumu";
-      else if (p.startsWith('8.')) label = "Hanede Bulunan Eşyalar";
-      else if (p.startsWith('9.')) label = "İhtiyaç Olduğu Tespit Edilen Eşyalar";
+      else if (p === '8-9') label = "Hane Eşya Durumu";
 
       groups.push({
         id: p,
