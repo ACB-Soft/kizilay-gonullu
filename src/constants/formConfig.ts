@@ -65,7 +65,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [265, 737.29],
       "topLeft": [115, 737.29]
     },
-    "required": true
+    "required": false
   },
   {
     "id": "2.0-tckimlikno",
@@ -83,7 +83,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [265, 722],
       "topLeft": [115, 722]
     },
-    "required": true
+    "required": false
   },
   {
     "id": "2.0-babaadi",
@@ -153,7 +153,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [522, 723],
       "topLeft": [372, 723]
     },
-    "required": true
+    "required": false
   },
   {
     "id": "2.0-calismiyorsanedeni",
@@ -346,7 +346,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [265, 597],
       "topLeft": [115, 597]
     },
-    "required": true
+    "required": false
   },
   {
     "id": "2.1-evtelefonu",
@@ -1698,5 +1698,242 @@ export const FORM_CONFIG: FieldConfig[] = [
       }
     },
     "maxSelections": 1
+  },
+  {
+    "id": "8.1-hanedebulunanesyalar",
+    "label": "Hanede Bulunan Eşyalar",
+    "type": "checkbox",
+    "x": 100,
+    "y": 400,
+    "width": 100,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        100,
+        400
+      ],
+      "bottomRight": [
+        200,
+        400
+      ],
+      "topRight": [
+        200,
+        420
+      ],
+      "topLeft": [
+        100,
+        420
+      ]
+    },
+    "maxSelections": 10,
+    "options": [
+      "BUZDOLABI",
+      "ÇAMAŞIR MAKİNESİ",
+      "BULAŞIK MAKİNESİ",
+      "FIRIN",
+      "ELEKTRİKLİ SÜPÜRGE",
+      "TELEVİZYON",
+      "BİLGİSAYAR",
+      "YATAK",
+      "KOLTUK-KANEPE",
+      "HALI-KİLİM"
+    ],
+    "optionMappings": {
+      "BUZDOLABI": {
+        "x": 304,
+        "y": 717,
+        "width": 16,
+        "height": 6
+      },
+      "ÇAMAŞIR MAKİNESİ": {
+        "x": 304,
+        "y": 709,
+        "width": 16,
+        "height": 6
+      },
+      "BULAŞIK MAKİNESİ": {
+        "x": 304,
+        "y": 701,
+        "width": 16,
+        "height": 6
+      },
+      "FIRIN": {
+        "x": 304,
+        "y": 693,
+        "width": 16,
+        "height": 6
+      },
+      "ELEKTRİKLİ SÜPÜRGE": {
+        "x": 304,
+        "y": 685,
+        "width": 16,
+        "height": 6
+      },
+      "TELEVİZYON": {
+        "x": 304,
+        "y": 677,
+        "width": 16,
+        "height": 6
+      },
+      "BİLGİSAYAR": {
+        "x": 304,
+        "y": 669,
+        "width": 16,
+        "height": 6
+      },
+      "YATAK": {
+        "x": 304,
+        "y": 661,
+        "width": 16,
+        "height": 6
+      },
+      "KOLTUK-KANEPE": {
+        "x": 304,
+        "y": 653,
+        "width": 16,
+        "height": 6
+      },
+      "HALI-KİLİM": {
+        "x": 304,
+        "y": 645,
+        "width": 16,
+        "height": 6
+      }
+    }
+  },
+  {
+    "id": "9.1-ihtiyacesyalar",
+    "label": "İhtiyaç Olduğu Tespit Edilen Eşyalar",
+    "type": "checkbox",
+    "x": 100,
+    "y": 400,
+    "width": 100,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        100,
+        400
+      ],
+      "bottomRight": [
+        200,
+        400
+      ],
+      "topRight": [
+        200,
+        420
+      ],
+      "topLeft": [
+        100,
+        420
+      ]
+    },
+    "maxSelections": 10,
+    "options": [
+      "BUZDOLABI",
+      "ÇAMAŞIR MAKİNESİ",
+      "BULAŞIK MAKİNESİ",
+      "FIRIN",
+      "ELEKTRİKLİ SÜPÜRGE",
+      "TELEVİZYON",
+      "BİLGİSAYAR",
+      "YATAK",
+      "KOLTUK-KANEPE",
+      "HALI-KİLİM"
+    ],
+    "optionMappings": {
+      "BUZDOLABI": {
+        "x": 420,
+        "y": 717,
+        "width": 16,
+        "height": 6
+      },
+      "ÇAMAŞIR MAKİNESİ": {
+        "x": 420,
+        "y": 709,
+        "width": 16,
+        "height": 6
+      },
+      "BULAŞIK MAKİNESİ": {
+        "x": 420,
+        "y": 701,
+        "width": 16,
+        "height": 6
+      },
+      "FIRIN": {
+        "x": 420,
+        "y": 693,
+        "width": 16,
+        "height": 6
+      },
+      "ELEKTRİKLİ SÜPÜRGE": {
+        "x": 420,
+        "y": 685,
+        "width": 16,
+        "height": 6
+      },
+      "TELEVİZYON": {
+        "x": 506,
+        "y": 717,
+        "width": 16,
+        "height": 6
+      },
+      "BİLGİSAYAR": {
+        "x": 506,
+        "y": 709,
+        "width": 16,
+        "height": 6
+      },
+      "YATAK": {
+        "x": 506,
+        "y": 701,
+        "width": 16,
+        "height": 6
+      },
+      "KOLTUK-KANEPE": {
+        "x": 506,
+        "y": 693,
+        "width": 16,
+        "height": 6
+      },
+      "HALI-KİLİM": {
+        "x": 506,
+        "y": 685,
+        "width": 16,
+        "height": 6
+      }
+    }
+  },
+  {
+    "id": "9.1-aciklama",
+    "label": "Açıklama",
+    "type": "text",
+    "x": 441,
+    "y": 635,
+    "width": 130.1,
+    "height": 30.2,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        441,
+        635
+      ],
+      "bottomRight": [
+        571.1,
+        635
+      ],
+      "topRight": [
+        571.1,
+        665.2
+      ],
+      "topLeft": [
+        441,
+        665.2
+      ]
+    }
   }
 ] as any[];
