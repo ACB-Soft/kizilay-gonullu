@@ -338,6 +338,9 @@ export default function App() {
       else if (p === '6.1') label = "Hane Gelir Durumu";
       else if (p === '6.2') label = "Hane Gider Durumu";
       else if (p === '6.3') label = "Hane Borç Durumu";
+      else if (p.startsWith('7.')) label = "Hane Konut Durumu";
+      else if (p.startsWith('8.')) label = "Hanede Bulunan Eşyalar";
+      else if (p.startsWith('9.')) label = "İhtiyaç Olduğu Tespit Edilen Eşyalar";
 
       groups.push({
         id: p,

@@ -1574,5 +1574,129 @@ export const FORM_CONFIG: FieldConfig[] = [
         637
       ]
     }
+  },
+  {
+    "id": "7.1-konutturu",
+    "label": "Konut Türü",
+    "type": "checkbox",
+    "x": 100,
+    "y": 400,
+    "width": 100,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        100,
+        400
+      ],
+      "bottomRight": [
+        200,
+        400
+      ],
+      "topRight": [
+        200,
+        420
+      ],
+      "topLeft": [
+        100,
+        420
+      ]
+    },
+    "maxSelections": 1,
+    "options": [
+      "APARTMAN",
+      "MÜSTAKİL",
+      "GECEKONDU",
+      "DİĞER (çadır-baraka-evsiz...)"
+    ],
+    "optionMappings": {
+      "APARTMAN": {
+        "x": 305,
+        "y": 794,
+        "width": 16,
+        "height": 6
+      },
+      "MÜSTAKİL": {
+        "x": 305,
+        "y": 783,
+        "width": 16,
+        "height": 6
+      },
+      "GECEKONDU": {
+        "x": 305,
+        "y": 771,
+        "width": 16,
+        "height": 6
+      },
+      "DİĞER (çadır-baraka-evsiz...)": {
+        "x": 305,
+        "y": 760,
+        "width": 16,
+        "height": 6
+      }
+    }
+  },
+  {
+    "id": "7.1-konutkimeait",
+    "label": "Konut Kime Ait",
+    "type": "checkbox",
+    "x": 100,
+    "y": 400,
+    "width": 100,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        100,
+        400
+      ],
+      "bottomRight": [
+        200,
+        400
+      ],
+      "topRight": [
+        200,
+        420
+      ],
+      "topLeft": [
+        100,
+        420
+      ]
+    },
+    "options": [
+      "KİRACI",
+      "EV SAHİBİ",
+      "KİRA ÖDEMEDEN OTURUYOR",
+      "DİĞER(çadır-baraka-evsiz...)"
+    ],
+    "optionMappings": {
+      "KİRACI": {
+        "x": 434,
+        "y": 794,
+        "width": 16,
+        "height": 6
+      },
+      "EV SAHİBİ": {
+        "x": 434,
+        "y": 783,
+        "width": 16,
+        "height": 6
+      },
+      "KİRA ÖDEMEDEN OTURUYOR": {
+        "x": 434,
+        "y": 771,
+        "width": 16,
+        "height": 6
+      },
+      "DİĞER(çadır-baraka-evsiz...)": {
+        "x": 434,
+        "y": 760,
+        "width": 16,
+        "height": 6
+      }
+    },
+    "maxSelections": 1
   }
 ] as any[];
