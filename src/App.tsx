@@ -335,6 +335,9 @@ export default function App() {
       else if (p === '4.0') label = "Hastalık ve Engellilik Durumu Sayısı";
       else if (p.startsWith('4.')) label = `Hastalık ve Engellilik Durumu (${p.split('.')[1]})`;
       else if (p === '5.1') label = "Sosyal Güvence";
+      else if (p === '6.1') label = "Hane Gelir Durumu";
+      else if (p === '6.2') label = "Hane Gider Durumu";
+      else if (p === '6.3') label = "Hane Borç Durumu";
 
       groups.push({
         id: p,

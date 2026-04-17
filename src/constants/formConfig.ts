@@ -1062,5 +1062,517 @@ export const FORM_CONFIG: FieldConfig[] = [
       "YEŞİL KART": { "x": 328, "y": 21, "width": 8, "height": 8 },
       "DİĞER": { "x": 393.2, "y": 21, "width": 8, "height": 8 }
     }
+  },
+  {
+    "id": "6.1-maas",
+    "label": "Maaş (Aylık)",
+    "type": "number",
+    "x": 62,
+    "y": 793,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        62,
+        793
+      ],
+      "bottomRight": [
+        132,
+        793
+      ],
+      "topRight": [
+        132,
+        805
+      ],
+      "topLeft": [
+        62,
+        805
+      ]
+    }
+  },
+  {
+    "id": "6.1-kirageliri",
+    "label": "Kira Geliri (Aylık)",
+    "type": "number",
+    "x": 62,
+    "y": 780,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        62,
+        780
+      ],
+      "bottomRight": [
+        132,
+        780
+      ],
+      "topRight": [
+        132,
+        792
+      ],
+      "topLeft": [
+        62,
+        792
+      ]
+    }
+  },
+  {
+    "id": "6.1-duzensizgelir",
+    "label": "Düzensiz Gelir (Aylık)",
+    "type": "number",
+    "x": 62,
+    "y": 767,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        62,
+        767
+      ],
+      "bottomRight": [
+        132,
+        767
+      ],
+      "topRight": [
+        132,
+        779
+      ],
+      "topLeft": [
+        62,
+        779
+      ]
+    }
+  },
+  {
+    "id": "6.1-kamuyardimi",
+    "label": "Kamu Yardımı (Aylık)",
+    "type": "number",
+    "x": 62,
+    "y": 754,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        62,
+        754
+      ],
+      "bottomRight": [
+        132,
+        754
+      ],
+      "topRight": [
+        132,
+        766
+      ],
+      "topLeft": [
+        62,
+        766
+      ]
+    }
+  },
+  {
+    "id": "6.1-stkyardimi",
+    "label": "STK Yardımı (Aylık)",
+    "type": "number",
+    "x": 62,
+    "y": 740,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        62,
+        740
+      ],
+      "bottomRight": [
+        132,
+        740
+      ],
+      "topRight": [
+        132,
+        752
+      ],
+      "topLeft": [
+        62,
+        752
+      ]
+    }
+  },
+  {
+    "id": "6.1-digergelirler",
+    "label": "Diğer Gelirler (Aylık)",
+    "type": "number",
+    "x": 62,
+    "y": 720,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        62,
+        720
+      ],
+      "bottomRight": [
+        132,
+        720
+      ],
+      "topRight": [
+        132,
+        732
+      ],
+      "topLeft": [
+        62,
+        732
+      ]
+    }
+  },
+  {
+    "id": "6.1-ayliktoplamgelir",
+    "label": "Toplam Gelir (Aylık)",
+    "type": "number",
+    "x": 62,
+    "y": 702,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        62,
+        702
+      ],
+      "bottomRight": [
+        132,
+        702
+      ],
+      "topRight": [
+        132,
+        714
+      ],
+      "topLeft": [
+        62,
+        714
+      ]
+    }
+  },
+  {
+    "id": "6.2-saglikgiderleri",
+    "label": "Sağlık Giderleri (Aylık)",
+    "type": "number",
+    "x": 190,
+    "y": 793,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        190,
+        793
+      ],
+      "bottomRight": [
+        260,
+        793
+      ],
+      "topRight": [
+        260,
+        805
+      ],
+      "topLeft": [
+        190,
+        805
+      ]
+    }
+  },
+  {
+    "id": "6.2-kiragideri",
+    "label": "Kira Gideri (Aylık)",
+    "type": "number",
+    "x": 190,
+    "y": 780,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        190,
+        780
+      ],
+      "bottomRight": [
+        260,
+        780
+      ],
+      "topRight": [
+        260,
+        792
+      ],
+      "topLeft": [
+        190,
+        792
+      ]
+    }
+  },
+  {
+    "id": "6.2-mutfakgiderleri",
+    "label": "Mutfak Giderleri (Aylık)",
+    "type": "number",
+    "x": 190,
+    "y": 767,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        190,
+        767
+      ],
+      "bottomRight": [
+        260,
+        767
+      ],
+      "topRight": [
+        260,
+        779
+      ],
+      "topLeft": [
+        190,
+        779
+      ]
+    }
+  },
+  {
+    "id": "6.2-egitimgiderleri",
+    "label": "Eğitim Giderleri (Aylık)",
+    "type": "number",
+    "x": 190,
+    "y": 754,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        190,
+        754
+      ],
+      "bottomRight": [
+        260,
+        754
+      ],
+      "topRight": [
+        260,
+        766
+      ],
+      "topLeft": [
+        190,
+        766
+      ]
+    }
+  },
+  {
+    "id": "6.2-faturagiderleri",
+    "label": "Fatura Giderleri (Aylık)",
+    "type": "number",
+    "x": 218,
+    "y": 734,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        218,
+        734
+      ],
+      "bottomRight": [
+        288,
+        734
+      ],
+      "topRight": [
+        288,
+        746
+      ],
+      "topLeft": [
+        218,
+        746
+      ]
+    }
+  },
+  {
+    "id": "6.2-digergiderler",
+    "label": "Diğer Giderler (Aylık)",
+    "type": "number",
+    "x": 190,
+    "y": 719,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        190,
+        719
+      ],
+      "bottomRight": [
+        260,
+        719
+      ],
+      "topRight": [
+        260,
+        731
+      ],
+      "topLeft": [
+        190,
+        731
+      ]
+    }
+  },
+  {
+    "id": "6.2-ayliktoplamgider",
+    "label": "Aylık Toplam Gider",
+    "type": "number",
+    "x": 190,
+    "y": 701,
+    "width": 70,
+    "height": 12,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        190,
+        701
+      ],
+      "bottomRight": [
+        260,
+        701
+      ],
+      "topRight": [
+        260,
+        713
+      ],
+      "topLeft": [
+        190,
+        713
+      ]
+    }
+  },
+  {
+    "id": "6.3-borcdurumu",
+    "label": "Borç Durumu (TL)",
+    "type": "checkbox",
+    "x": 100,
+    "y": 400,
+    "width": 100,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        100,
+        400
+      ],
+      "bottomRight": [
+        200,
+        400
+      ],
+      "topRight": [
+        200,
+        420
+      ],
+      "topLeft": [
+        100,
+        420
+      ]
+    },
+    "options": [
+      "BORÇ VAR",
+      "BORÇ YOK"
+    ],
+    "optionMappings": {
+      "BORÇ VAR": {
+        "x": 25,
+        "y": 666,
+        "width": 16,
+        "height": 8
+      },
+      "BORÇ YOK": {
+        "x": 145,
+        "y": 666,
+        "width": 16,
+        "height": 8
+      }
+    },
+    "maxSelections": 1
+  },
+  {
+    "id": "6.3-bankaborcu",
+    "label": "Banka Borcu (varsa)",
+    "type": "number",
+    "x": 77,
+    "y": 637,
+    "width": 43,
+    "height": 10,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        77,
+        637
+      ],
+      "bottomRight": [
+        120,
+        637
+      ],
+      "topRight": [
+        120,
+        647
+      ],
+      "topLeft": [
+        77,
+        647
+      ]
+    }
+  },
+  {
+    "id": "6.3-eldenborcu",
+    "label": "Elden Borcu (varsa)",
+    "type": "number",
+    "x": 77,
+    "y": 627,
+    "width": 43,
+    "height": 10,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        77,
+        627
+      ],
+      "bottomRight": [
+        120,
+        627
+      ],
+      "topRight": [
+        120,
+        637
+      ],
+      "topLeft": [
+        77,
+        637
+      ]
+    }
   }
 ] as any[];
