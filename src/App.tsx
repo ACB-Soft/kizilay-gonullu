@@ -176,7 +176,8 @@ const Select = ({ label, value, onChange, options = [] }: any) => (
 );
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug' | 'frm006'>('home');
+  const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug' | 'frm006' | 'selection'>('home');
+  const [formMode, setFormMode] = useState<'all' | 'mandatory'>('all');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
@@ -286,7 +287,7 @@ export default function App() {
   
   // Group fields by their ID prefix (e.g., "2.0", "2.1")
   const stepGroups = useMemo(() => {
-    const visibleFields = debugFields.filter(f => !f.hidden);
+    const visibleFields = debugFields.filter(f => !f.hidden && (formMode === 'all' || f.required));
     const groups: { id: string; label: string; fields: FieldConfig[] }[] = [];
     
     // Get the count of other people
@@ -349,6 +350,8 @@ export default function App() {
       else if (p === '6.3') label = "Hane Borç Durumu";
       else if (p.startsWith('7.')) label = "Hane Konut Durumu";
       else if (p === '8-9') label = "Hane Eşya Durumu";
+      else if (p.startsWith('10.')) label = "Diğer Kurum Yardımlarından Yararlanma Durumu";
+      else if (p.startsWith('11.')) label = "Görüşme Yapan Kişi Bilgileri";
 
       groups.push({
         id: p,
@@ -358,7 +361,7 @@ export default function App() {
     });
     
     return groups;
-  }, [debugFields, formData['3.0-haneoturansayisi'], formData['4.0-hastalikadedi']]);
+  }, [debugFields, formData['3.0-haneoturansayisi'], formData['4.0-hastalikadedi'], formMode]);
 
   const sections = stepGroups.map(g => g.label);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -495,31 +498,65 @@ export default function App() {
               displayValue = `${d}.${m}.${y}`;
             }
             const text = encodeForPDF(displayValue);
-            let currentFontSize = 6; // Reduced from 7
+            const baseFontSize = 6;
             const padding = 1.5;
             const availableWidth = field.width - (padding * 2);
             
             try {
-              let textWidth = font.widthOfTextAtSize(text, currentFontSize);
-              
-              // Auto-scale font size if text is wider than the field
-              if (textWidth > availableWidth) {
-                currentFontSize = (availableWidth / textWidth) * currentFontSize;
-                // Minimum readable font size
-                currentFontSize = Math.max(4, currentFontSize);
+              // Word wrap logic
+              const words = text.split(' ');
+              const lines: string[] = [];
+              let currentLine = '';
+
+              for (const word of words) {
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                const testWidth = font.widthOfTextAtSize(testLine, baseFontSize);
+                if (testWidth <= availableWidth) {
+                  currentLine = testLine;
+                } else {
+                  if (currentLine) lines.push(currentLine);
+                  currentLine = word;
+                }
               }
+              if (currentLine) lines.push(currentLine);
 
-              // Vertical offset to center text in the box (PDF Y is baseline)
-              const vOffset = (field.height - currentFontSize) / 2 + 0.5;
-              const pdfY = field.y + vOffset;
+              const lineHeight = baseFontSize * 1.1;
+              const fitsMultiLine = field.height >= lineHeight * 1.5;
 
-              page.drawText(text, {
-                x: field.x + padding,
-                y: pdfY,
-                size: currentFontSize,
-                font: font,
-                color: rgb(0, 0, 0),
-              });
+              if (!fitsMultiLine || lines.length <= 1) {
+                // Existing scaling logic for single line or small boxes
+                let textWidth = font.widthOfTextAtSize(text, baseFontSize);
+                let scaledFontSize = baseFontSize;
+                if (textWidth > availableWidth) {
+                  scaledFontSize = (availableWidth / textWidth) * baseFontSize;
+                  scaledFontSize = Math.max(4, scaledFontSize);
+                }
+                const vOffset = (field.height - scaledFontSize) / 2 + 0.5;
+                page.drawText(text, {
+                  x: field.x + padding,
+                  y: field.y + vOffset,
+                  size: scaledFontSize,
+                  font: font,
+                  color: rgb(0, 0, 0),
+                });
+              } else {
+                // Multi-line drawing (Left Aligned)
+                // Start from the top of the field with a small offset
+                let currentY = field.y + field.height - baseFontSize - 0.5; 
+                
+                lines.forEach((line) => {
+                  if (currentY >= field.y) {
+                    page.drawText(line, {
+                      x: field.x + padding,
+                      y: currentY,
+                      size: baseFontSize,
+                      font: font,
+                      color: rgb(0, 0, 0),
+                    });
+                    currentY -= lineHeight;
+                  }
+                });
+              }
             } catch (textErr) {
               console.error(`Error drawing text for field ${field.id}:`, textErr);
             }
@@ -715,7 +752,7 @@ export default function App() {
                     <p>Uygulama, Türk Kızılay'ın insani yardım faaliyetlerini kolaylaştırmak ve saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir.</p>
                     <p><strong>Türk Kızılay'ın resmi uygulaması değildir.</strong></p>
                     <p>Uygulamaya girilen veriler anlık olarak işlenerek resmi "FRM.005" ve "FRM.006" formatlarına uygun PDF belgeleri üretilir. Veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra silinir.</p>
-                    <p>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</p>
+                    <p><strong>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</strong></p>
                   </div>
                 </div>
               </div>
@@ -1552,7 +1589,7 @@ export default function App() {
                   });
                   setFormData(initial);
                   setCurrentSectionIndex(0);
-                  setView('form');
+                  setView('selection');
                 }}
                 className="w-full p-6 bg-red-600 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex items-center gap-5 group"
               >
@@ -1565,26 +1602,62 @@ export default function App() {
                 </div>
               </button>
 
-              <button 
-                onClick={() => setView('frm006')}
-                className="w-full p-6 bg-red-600 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex items-center gap-5 group"
-              >
-                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                  <FileText size={28} />
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <h2 className="text-lg md:text-xl font-black uppercase tracking-wide">FRM.006 Oluştur</h2>
-                  <p className="text-xs font-bold opacity-80 tracking-tight">Açık Rıza Formu</p>
-                </div>
-              </button>
+              <div className="flex-1" />
 
-              <div className="pt-4">
+              <button 
+                onClick={() => setView('help')}
+                className="w-full mt-4 p-4 bg-gray-50 hover:bg-red-50 border border-gray-100 hover:border-red-100 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 group mb-4 active:scale-95"
+              >
+                <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <HelpCircle size={22} className="text-gray-400 group-hover:text-red-500 transition-colors" />
+                </div>
+                <span className="text-sm font-black text-gray-500 group-hover:text-red-600 uppercase tracking-widest transition-colors">Uygulama Hakkında</span>
+              </button>
+            </div>
+          )}
+
+          {/* SELECTION VIEW */}
+          {view === 'selection' && (
+            <div className="space-y-4 py-8 flex-1 max-w-md mx-auto w-full flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-500">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">FORM TÜRÜNÜ SEÇİN</h2>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3">
                 <button 
-                  onClick={() => setView('help')}
-                  className="w-full p-4 bg-white border border-gray-200 text-gray-500 rounded-2xl shadow-sm active:scale-95 transition-all flex items-center justify-center gap-3 group"
+                  onClick={() => {
+                    setFormMode('mandatory');
+                    setView('form');
+                  }}
+                  className="p-5 bg-white border-2 border-gray-100 rounded-3xl hover:border-red-500 hover:shadow-xl transition-all flex items-center text-left space-x-4 group"
                 >
-                  <HelpCircle size={18} />
-                  <span className="text-xs font-bold uppercase tracking-widest">Uygulama Hakkında</span>
+                  <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                    <CheckCircle2 className="text-red-600" size={24} />
+                  </div>
+                  <div className="space-y-0.5">
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">ZORUNLU ALANLAR</h3>
+                    <p className="text-[10px] font-bold text-gray-400 leading-tight">
+                      Sadece temel ve zorunlu bilgileri içeren hızlı form
+                    </p>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => {
+                    setFormMode('all');
+                    setView('form');
+                  }}
+                  className="p-5 bg-white border-2 border-gray-100 rounded-3xl hover:border-gray-900 hover:shadow-xl transition-all flex items-center text-left space-x-4 group"
+                >
+                  <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                    <Menu className="text-gray-900" size={24} />
+                  </div>
+                  <div className="space-y-0.5">
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">TÜM ALANLAR</h3>
+                    <p className="text-[10px] font-bold text-gray-400 leading-tight">
+                      Eşya, konut ve gelir detaylarını içeren kapsamlı form
+                    </p>
+                  </div>
                 </button>
               </div>
             </div>

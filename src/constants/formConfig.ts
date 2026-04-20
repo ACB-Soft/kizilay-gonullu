@@ -65,7 +65,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [265, 737.29],
       "topLeft": [115, 737.29]
     },
-    "required": false
+    "required": true
   },
   {
     "id": "2.0-tckimlikno",
@@ -83,7 +83,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [265, 722],
       "topLeft": [115, 722]
     },
-    "required": false
+    "required": true
   },
   {
     "id": "2.0-babaadi",
@@ -153,7 +153,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [522, 723],
       "topLeft": [372, 723]
     },
-    "required": false
+    "required": true
   },
   {
     "id": "2.0-calismiyorsanedeni",
@@ -346,7 +346,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [265, 597],
       "topLeft": [115, 597]
     },
-    "required": false
+    "required": true
   },
   {
     "id": "2.1-evtelefonu",
@@ -1934,6 +1934,54 @@ export const FORM_CONFIG: FieldConfig[] = [
         441,
         665.2
       ]
+    }
+  },
+  {
+    "id": "10.0-yardimlardanyararlanmadurumu",
+    "label": "Yardımlardan Yararlanma Durumu",
+    "type": "checkbox",
+    "x": 131,
+    "y": 579,
+    "width": 100,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        131,
+        579
+      ],
+      "bottomRight": [
+        231,
+        579
+      ],
+      "topRight": [
+        231,
+        599
+      ],
+      "topLeft": [
+        131,
+        599
+      ]
+    },
+    "maxSelections": 1,
+    "options": [
+      "YARARLANIYOR",
+      "YARARLANMIYOR"
+    ],
+    "optionMappings": {
+      "YARARLANIYOR": {
+        "x": 308,
+        "y": 582,
+        "width": 15,
+        "height": 9
+      },
+      "YARARLANMIYOR": {
+        "x": 451,
+        "y": 582,
+        "width": 15,
+        "height": 9
+      }
     }
   }
 ] as any[];
