@@ -1983,5 +1983,324 @@ export const FORM_CONFIG: FieldConfig[] = [
         "height": 9
       }
     }
+  },
+  {
+    "id": "10.1-yardimalinandernekadi",
+    "label": "Yardım Alınan Kurum/Kuruluş Adı",
+    "type": "text",
+    "x": 189,
+    "y": 561,
+    "width": 100,
+    "height": 13,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        189,
+        561
+      ],
+      "bottomRight": [
+        289,
+        561
+      ],
+      "topRight": [
+        289,
+        574
+      ],
+      "topLeft": [
+        189,
+        574
+      ]
+    }
+  },
+  {
+    "id": "10.1-yardimturu",
+    "label": "Yardım Türü",
+    "type": "text",
+    "x": 78,
+    "y": 546,
+    "width": 100,
+    "height": 13,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        78,
+        546
+      ],
+      "bottomRight": [
+        178,
+        546
+      ],
+      "topRight": [
+        178,
+        559
+      ],
+      "topLeft": [
+        78,
+        559
+      ]
+    }
+  },
+  {
+    "id": "10.1-yardimmiktari",
+    "label": "Yardım Miktarı",
+    "type": "text",
+    "x": 88,
+    "y": 531,
+    "width": 100,
+    "height": 13,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        88,
+        531
+      ],
+      "bottomRight": [
+        188,
+        531
+      ],
+      "topRight": [
+        188,
+        544
+      ],
+      "topLeft": [
+        88,
+        544
+      ]
+    }
+  },
+  {
+    "id": "10.1-yardimdanyararlanmasuresi",
+    "label": "Yardımdan Yararlanma Süresi ve Aralığı",
+    "type": "text",
+    "x": 191,
+    "y": 515,
+    "width": 100,
+    "height": 13,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        191,
+        515
+      ],
+      "bottomRight": [
+        291,
+        515
+      ],
+      "topRight": [
+        291,
+        528
+      ],
+      "topLeft": [
+        191,
+        528
+      ]
+    }
+  },
+  {
+    "id": "10.1-yardimkesildiysenedeni",
+    "label": "Yardım Kesildiyse Nedeni",
+    "type": "text",
+    "x": 127,
+    "y": 500,
+    "width": 160,
+    "height": 13,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        127,
+        500
+      ],
+      "bottomRight": [
+        287,
+        500
+      ],
+      "topRight": [
+        287,
+        513
+      ],
+      "topLeft": [
+        127,
+        513
+      ]
+    }
+  },
+  {
+    "id": "11.1-adisoyadi",
+    "label": "Adı Soyadı",
+    "type": "text",
+    "x": 83,
+    "y": 427,
+    "width": 150,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        83,
+        427
+      ],
+      "bottomRight": [
+        233,
+        427
+      ],
+      "topRight": [
+        233,
+        447
+      ],
+      "topLeft": [
+        83,
+        447
+      ]
+    }
+  },
+  {
+    "id": "11.1-gorevi",
+    "label": "Görevi",
+    "type": "text",
+    "x": 83,
+    "y": 404,
+    "width": 150,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        83,
+        404
+      ],
+      "bottomRight": [
+        233,
+        404
+      ],
+      "topRight": [
+        233,
+        424
+      ],
+      "topLeft": [
+        83,
+        424
+      ]
+    }
+  },
+  {
+    "id": "11.1-gorevyeri",
+    "label": "Görev Yeri",
+    "type": "text",
+    "x": 83,
+    "y": 382,
+    "width": 150,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        83,
+        382
+      ],
+      "bottomRight": [
+        233,
+        382
+      ],
+      "topRight": [
+        233,
+        402
+      ],
+      "topLeft": [
+        83,
+        402
+      ]
+    }
+  },
+  {
+    "id": "11.1-tarih",
+    "label": "Tarih",
+    "type": "text",
+    "x": 83,
+    "y": 360,
+    "width": 150,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        83,
+        360
+      ],
+      "bottomRight": [
+        233,
+        360
+      ],
+      "topRight": [
+        233,
+        380
+      ],
+      "topLeft": [
+        83,
+        380
+      ]
+    }
+  },
+  {
+    "id": "11.1-gorusmeyeri",
+    "label": "Görüşme Yeri",
+    "type": "text",
+    "x": 83,
+    "y": 338,
+    "width": 150,
+    "height": 20,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        83,
+        338
+      ],
+      "bottomRight": [
+        233,
+        338
+      ],
+      "topRight": [
+        233,
+        358
+      ],
+      "topLeft": [
+        83,
+        358
+      ]
+    }
+  },
+  {
+    "id": "11.1-imza",
+    "label": "İmza",
+    "type": "text",
+    "x": 150,
+    "y": 304,
+    "width": 140,
+    "height": 32,
+    "page": 2,
+    "section": "YENİ",
+    "corners": {
+      "bottomLeft": [
+        150,
+        304
+      ],
+      "bottomRight": [
+        290,
+        304
+      ],
+      "topRight": [
+        290,
+        336
+      ],
+      "topLeft": [
+        150,
+        336
+      ]
+    }
   }
 ] as any[];

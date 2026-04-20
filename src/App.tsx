@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import * as XLSX from 'xlsx';
+import SignatureCanvas from 'react-signature-canvas';
 import { FORM_CONFIG, FieldConfig } from './constants/formConfig';
 
 // Import assets
@@ -174,6 +175,68 @@ const Select = ({ label, value, onChange, options = [] }: any) => (
     </div>
   </div>
 );
+
+const SignaturePad = ({ label, value, onChange }: any) => {
+  const sigCanvas = useRef<SignatureCanvas>(null);
+
+  const clear = () => {
+    sigCanvas.current?.clear();
+    onChange('');
+  };
+
+  const save = () => {
+    if (sigCanvas.current?.isEmpty()) return;
+    const dataURL = sigCanvas.current?.getTrimmedCanvas().toDataURL('image/png');
+    if (dataURL) {
+      onChange(dataURL);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
+      <div className="relative bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-4 overflow-hidden">
+        {value ? (
+          <div className="relative flex flex-col items-center">
+            <img src={value} alt="İmza" className="max-h-32 object-contain bg-white rounded-lg shadow-sm mb-3" />
+            <button 
+              onClick={clear}
+              className="px-4 py-2 bg-red-50 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-colors"
+            >
+              YENİDEN İMZA AT
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <div className="w-full h-48 bg-white rounded-xl shadow-inner mb-4 relative touch-none border border-gray-100">
+              <SignatureCanvas 
+                ref={sigCanvas}
+                penColor="black"
+                canvasProps={{ 
+                  className: "signature-canvas w-full h-full",
+                  style: { width: '100%', height: '100%' }
+                }}
+                onEnd={save}
+              />
+              <div className="absolute top-2 right-2 pointer-events-none opacity-20 flex flex-col items-end">
+                <span className="text-[8px] font-black uppercase">Buraya İmza Atın</span>
+                <div className="w-8 h-8 rounded-full border-2 border-gray-400 border-dashed animate-pulse flex items-center justify-center mt-1">
+                  <Plus size={12} className="text-gray-400" />
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={clear}
+              className="px-4 py-2 bg-gray-200 text-gray-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-300 transition-colors"
+            >
+              TEMİZLE
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function App() {
   const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug' | 'frm006' | 'selection'>('home');
@@ -443,9 +506,9 @@ export default function App() {
         pagesAdded++;
 
         const fieldsOnThisPage = debugFields.filter(f => f.page === i + 1);
-        fieldsOnThisPage.forEach(field => {
+        for (const field of fieldsOnThisPage) {
           const value = formData[field.id];
-          if (value === undefined || value === '') return;
+          if (value === undefined || value === '') continue;
 
           if (debugMode) {
             page.drawRectangle({
@@ -488,10 +551,45 @@ export default function App() {
                 });
               }
             });
-            return;
+            continue;
           }
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
+            // Special handling for signature
+            if (field.id === '11.1-imza' && String(value).startsWith('data:image')) {
+              try {
+                const base64Content = (value as string).split(',')[1];
+                const binaryString = window.atob(base64Content);
+                const len = binaryString.length;
+                const uint8 = new Uint8Array(len);
+                for (let j = 0; j < len; j++) uint8[j] = binaryString.charCodeAt(j);
+                
+                const signatureImage = await pdfDoc.embedPng(uint8);
+                
+                const dims = signatureImage.scale(1);
+                const targetWidth = field.width;
+                const targetHeight = field.height;
+                
+                let renderWidth = targetWidth;
+                let renderHeight = (dims.height * targetWidth) / dims.width;
+                
+                if (renderHeight > targetHeight) {
+                  renderHeight = targetHeight;
+                  renderWidth = (dims.width * targetHeight) / dims.height;
+                }
+
+                page.drawImage(signatureImage, {
+                  x: field.x + (targetWidth - renderWidth) / 2,
+                  y: field.y + (targetHeight - renderHeight) / 2,
+                  width: renderWidth,
+                  height: renderHeight,
+                });
+              } catch (sigErr) {
+                console.error('Error embedding signature:', sigErr);
+              }
+              continue;
+            }
+            
             let displayValue = String(value);
             if (field.type === 'date' && displayValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
               const [y, m, d] = displayValue.split('-');
@@ -575,7 +673,7 @@ export default function App() {
               color: rgb(0, 0, 0),
             });
           }
-        });
+        }
       } catch (err: any) {
         console.error(`Page ${i+1} error:`, err);
         lastError = err.message;
@@ -1739,7 +1837,13 @@ export default function App() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {fieldsInCurrentSection.map(field => (
                           <div key={field.id}>
-                            {field.type === 'checkbox' ? (
+                            {field.id === '11.1-imza' ? (
+                              <SignaturePad 
+                                label={field.label + (field.required ? ' *' : '')} 
+                                value={formData[field.id]} 
+                                onChange={(v: string) => updateField(field.id, v)} 
+                              />
+                            ) : field.type === 'checkbox' ? (
                               <div className="pt-2">
                                 <Checkbox 
                                   label={field.label + (field.required ? ' *' : '')} 
