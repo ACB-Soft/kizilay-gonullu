@@ -41,12 +41,35 @@ export const FORM_CONFIG: FieldConfig[] = [
     "page": 1,
     "section": "BAŞVURU BİLGİLERİ",
     "hidden": true,
-    "defaultValue": true,
+    "defaultValue": ["DİĞER"],
     "corners": {
-      "bottomLeft": [407.3, 759.3],
-      "bottomRight": [415.3, 759.3],
-      "topRight": [415.3, 767.3],
-      "topLeft": [407.3, 767.3]
+      "bottomLeft": [
+        407.3,
+        759.3
+      ],
+      "bottomRight": [
+        415.3,
+        759.3
+      ],
+      "topRight": [
+        415.3,
+        767.3
+      ],
+      "topLeft": [
+        407.3,
+        767.3
+      ]
+    },
+    "options": [
+      "DİĞER"
+    ],
+    "optionMappings": {
+      "DİĞER": {
+        "x": 407.3,
+        "y": 759.3,
+        "width": 8,
+        "height": 8
+      }
     }
   },
   {
