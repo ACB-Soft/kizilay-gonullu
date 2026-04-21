@@ -980,8 +980,8 @@ export default function App() {
                   <div className="space-y-4 text-justify">
                     <p>Uygulama, Türk Kızılay'ın insani yardım faaliyetlerini kolaylaştırmak ve saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir.</p>
                     <p><strong>Türk Kızılay'ın resmi uygulaması değildir.</strong></p>
-                    <p>Uygulamaya girilen veriler anlık olarak işlenerek resmi "FRM.005" ve "FRM.006" formatlarına uygun PDF belgeleri üretilir. Veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra silinir.</p>
-                    <p><strong>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</strong></p>
+                    <p>Uygulamaya girilen veriler işlenerek resmi "FRM.005" formatına uygun PDF belgeleri üretilir. Veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra önbellekten silinir. Belgenizi indirip kaydetmeyi unutmayınız.</p>
+                    <p>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</p>
                   </div>
                 </div>
               </div>
