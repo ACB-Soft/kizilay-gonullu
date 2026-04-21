@@ -313,11 +313,6 @@ const SignaturePad = ({ label, value, onChange }: any) => {
                     style: { width: '100%', height: '100%' }
                   }}
                 />
-                <div className="absolute top-3 left-4 pointer-events-none">
-                  <div className="px-3 py-1 bg-gray-50 rounded-full text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] border border-gray-100">
-                    Buraya İmza Atın
-                  </div>
-                </div>
               </div>
               
               <div className="flex gap-4 w-full">
