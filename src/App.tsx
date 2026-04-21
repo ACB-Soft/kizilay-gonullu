@@ -981,7 +981,7 @@ export default function App() {
                     <p>Uygulama, Türk Kızılay'ın insani yardım faaliyetlerini kolaylaştırmak ve saha ekiplerinin sosyal inceleme süreçlerini hızlandırmak amacıyla geliştirilmiştir.</p>
                     <p><strong>Türk Kızılay'ın resmi uygulaması değildir.</strong></p>
                     <p>Uygulamaya girilen veriler işlenerek resmi "FRM.005" formatına uygun PDF belgeleri üretilir. Veriler tarayıcı oturumunuzda tutulur, PDF oluşturulduktan sonra önbellekten silinir. Belgenizi indirip kaydetmeyi unutmayınız.</p>
-                    <p>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</p>
+                    <p><strong>Mimar ve Mühendisler Grubu Derneği (MMG) Bursa Şubesi'nin teknik destek ve vizyonuyla hayata geçirilmiştir.</strong></p>
                   </div>
                 </div>
               </div>
@@ -2038,6 +2038,19 @@ export default function App() {
                           alert('Lütfen zorunlu alanları doldurunuz.');
                           return;
                         }
+
+                        // Validate TC Identity Numbers in current section
+                        const invalidTC = fieldsInCurrentSection.some(f => 
+                          f.id.includes('tckimlikno') && 
+                          formData[f.id] && 
+                          formData[f.id].length !== 11
+                        );
+                        
+                        if (invalidTC) {
+                          alert('T.C. Kimlik No 11 haneli olmalıdır.');
+                          return;
+                        }
+
                         setCurrentSectionIndex(prev => prev + 1);
                       }}
                       className="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-100"
@@ -2055,6 +2068,20 @@ export default function App() {
                           alert(`Lütfen zorunlu alanları doldurunuz: ${missingFields.map(f => f.label).join(', ')}`);
                           return;
                         }
+
+                        // Final TC Validation for all visible fields
+                        const allVisibleFields = debugFields.filter(f => !f.hidden);
+                        const invalidTCFields = allVisibleFields.filter(f => 
+                          f.id.includes('tckimlikno') && 
+                          formData[f.id] && 
+                          formData[f.id].length !== 11
+                        );
+
+                        if (invalidTCFields.length > 0) {
+                          alert(`Aşağıdaki alanlar 11 haneli olmalıdır: ${invalidTCFields.map(f => f.label).join(', ')}`);
+                          return;
+                        }
+
                         setView('result');
                       }}
                       className="flex-1 py-4 bg-green-600 text-white rounded-2xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-lg"
