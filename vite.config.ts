@@ -10,6 +10,14 @@ export default defineConfig(({mode}) => {
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
+    optimizeDeps: {
+      include: ['react-signature-canvas'],
+    },
+    build: {
+      commonjsOptions: {
+        include: [/react-signature-canvas/, /node_modules/],
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
