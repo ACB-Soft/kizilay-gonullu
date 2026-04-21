@@ -11,10 +11,11 @@ export default defineConfig(({mode}) => {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
     optimizeDeps: {
-      include: ['react-signature-canvas'],
+      include: ['react-signature-canvas', 'pdf-lib', '@pdf-lib/fontkit'],
     },
     build: {
       commonjsOptions: {
+        transformMixedEsModules: true,
         include: [/react-signature-canvas/, /node_modules/],
       },
     },

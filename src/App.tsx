@@ -176,65 +176,162 @@ const Select = ({ label, value, onChange, options = [] }: any) => (
   </div>
 );
 
+// --- Base64 to Uint8Array Utility (Robust against Latin1 errors) ---
+const decodeBase64 = (base64: string) => {
+  if (!base64) return new Uint8Array(0);
+  try {
+    // Try standard atob first, it works for most cases
+    const binaryString = window.atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  } catch (e) {
+    // Fallback to manual decoding for strings with non-Latin1 characters
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    const lookup = new Uint8Array(256);
+    for (let i = 0; i < chars.length; i++) lookup[chars.charCodeAt(i)] = i;
+    
+    const cleanBase64 = base64.replace(/=+$/, '').replace(/[\r\n]/g, '');
+    const len = cleanBase64.length;
+    const bufferLength = Math.floor(len * 0.75);
+    const bytes = new Uint8Array(bufferLength);
+    
+    let p = 0;
+    for (let i = 0; i < len; i += 4) {
+      const encoded1 = lookup[cleanBase64.charCodeAt(i)] || 0;
+      const encoded2 = lookup[cleanBase64.charCodeAt(i + 1)] || 0;
+      const encoded3 = lookup[cleanBase64.charCodeAt(i + 2)] || 0;
+      const encoded4 = lookup[cleanBase64.charCodeAt(i + 3)] || 0;
+
+      bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+      if (p < bufferLength) bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+      if (p < bufferLength) bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
+    }
+    return bytes;
+  }
+};
+
 const SignaturePad = ({ label, value, onChange }: any) => {
   const sigCanvas = useRef<SignatureCanvas>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(!!value);
+
+  // PDF Form signature field dimensions are 140x32
+  // Let's use the same ratio (4.375:1) for the UI component
+  const canvasWidth = 400; // Optimal width for display
+  const canvasHeight = (32 / 140) * canvasWidth; // ~91.4px
 
   const clear = () => {
     sigCanvas.current?.clear();
+    setIsConfirmed(false);
     onChange('');
   };
 
-  const save = () => {
-    if (sigCanvas.current?.isEmpty()) return;
-    const dataURL = sigCanvas.current?.getTrimmedCanvas().toDataURL('image/png');
-    if (dataURL) {
-      onChange(dataURL);
+  const handleConfirm = async () => {
+    if (sigCanvas.current?.isEmpty()) {
+      alert('Lütfen önce imza atın.');
+      return;
+    }
+    
+    setIsProcessing(true);
+    
+    // Simulate processing time as requested by user ("resim işleniyor uyarısı")
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    try {
+      const canvas = sigCanvas.current?.getCanvas();
+      if (canvas) {
+        // Get high quality PNG
+        const dataURL = canvas.toDataURL('image/png');
+        onChange(dataURL);
+        setIsConfirmed(true);
+      }
+    } catch (error) {
+      console.error('Signature processing error:', error);
+      alert('İmza işlenirken bir hata oluştu.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
-      <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
-      <div className="relative bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-4 overflow-hidden">
-        {value ? (
-          <div className="relative flex flex-col items-center">
-            <img src={value} alt="İmza" className="max-h-32 object-contain bg-white rounded-lg shadow-sm mb-3" />
-            <div className="flex gap-2">
-              <button 
-                onClick={clear}
-                className="px-4 py-2 bg-red-50 text-red-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-colors"
-              >
-                YENİDEN İMZA AT
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center">
-            <div className="w-full h-48 bg-white rounded-xl shadow-inner mb-4 relative touch-none border border-gray-100">
-              <SignatureCanvas 
-                ref={sigCanvas}
-                penColor="black"
-                canvasProps={{ 
-                  className: "signature-canvas w-full h-full",
-                  style: { width: '100%', height: '100%' }
-                }}
-                onEnd={save}
-              />
-              <div className="absolute top-2 right-2 pointer-events-none opacity-20 flex flex-col items-end">
-                <span className="text-[8px] font-black uppercase">Buraya İmza Atın</span>
-                <div className="w-8 h-8 rounded-full border-2 border-gray-400 border-dashed animate-pulse flex items-center justify-center mt-1">
-                  <Plus size={12} className="text-gray-400" />
+    <div className="flex flex-col gap-2 w-full pt-2">
+      <div className="flex items-center justify-between px-1">
+        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{label}</label>
+        {isConfirmed && (
+          <span className="flex items-center gap-1.5 text-[10px] font-black text-green-600 uppercase animate-in fade-in slide-in-from-right-2">
+            <CheckCircle2 size={12} strokeWidth={3} /> ONAYLANDI
+          </span>
+        )}
+      </div>
+
+      <div className="relative group">
+        <div className={`relative bg-gray-50 border-2 rounded-[28px] p-5 overflow-hidden transition-all duration-500 ${isConfirmed ? 'border-green-200 bg-green-50/20 shadow-inner' : 'border-dashed border-gray-200 group-focus-within:border-red-400'}`}>
+          {isProcessing && (
+            <div className="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-red-600/10 border-t-red-600 rounded-full animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-ping" />
                 </div>
               </div>
+              <p className="mt-4 text-[11px] font-black text-red-600 uppercase tracking-[0.2em] animate-pulse">İmza İşleniyor...</p>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Lütfen bekleyin</p>
             </div>
-            <button 
-              onClick={clear}
-              className="px-4 py-2 bg-gray-200 text-gray-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-300 transition-colors"
-            >
-              TEMİZLE
-            </button>
-          </div>
-        )}
+          )}
+
+          {isConfirmed ? (
+            <div className="relative flex flex-col items-center py-4 animate-in zoom-in-95 duration-500">
+              <div className="relative p-2 bg-white rounded-2xl shadow-xl border border-green-100 mb-6 w-full max-w-[400px] overflow-hidden" 
+                   style={{ aspectRatio: '140 / 32' }}>
+                <img src={value} alt="İmza" className="w-full h-full object-contain" />
+                <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                   <Check size={16} strokeWidth={4} />
+                </div>
+              </div>
+              <button 
+                onClick={clear}
+                className="group flex items-center gap-3 px-6 py-2.5 bg-white border border-gray-200 text-gray-500 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-all active:scale-95"
+              >
+                <RefreshCw size={14} className="group-hover:rotate-180 transition-transform duration-700" />
+                İMZAYI SIFIRLA
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center">
+              <div 
+                className="w-full max-w-[400px] mx-auto bg-white rounded-3xl shadow-inner mb-6 relative touch-none border border-gray-100 overflow-hidden group-hover:border-red-100 transition-colors"
+                style={{ aspectRatio: '140 / 32' }}
+              >
+                <SignatureCanvas 
+                  ref={sigCanvas}
+                  penColor="#000"
+                  canvasProps={{ 
+                    className: "signature-canvas w-full h-full",
+                    style: { width: '100%', height: '100%' }
+                  }}
+                />
+              </div>
+              
+              <div className="flex gap-4 w-full">
+                <button 
+                  onClick={clear}
+                  className="flex-1 py-4 bg-gray-100 text-gray-400 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-gray-200 hover:text-gray-600 transition-all active:scale-95"
+                >
+                  TEMİZLE
+                </button>
+                <button 
+                  onClick={handleConfirm}
+                  className="flex-[2.5] py-4 bg-red-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] hover:bg-red-700 transition-all shadow-xl shadow-red-200 active:scale-95 flex items-center justify-center gap-3"
+                >
+                  <Zap size={16} fill="currentColor" /> İMZAYI ONAYLA
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -259,7 +356,15 @@ export default function App() {
   const [formData, setFormData] = useState<FormData>(() => {
     const initial: FormData = {};
     FORM_CONFIG.forEach(field => {
-      if (field.defaultValue !== undefined) {
+      // Auto-fill fields with defaultValue
+      if (field.defaultValue === 'today') {
+        const today = new Date().toISOString().split('T')[0];
+        initial[field.id] = today;
+      } else if (field.id === '11.1-tarih') {
+        // Fallback for explicitly requested field if not already handled by today
+        const today = new Date().toISOString().split('T')[0];
+        initial[field.id] = today;
+      } else if (field.defaultValue !== undefined) {
         initial[field.id] = field.defaultValue;
       }
     });
@@ -435,7 +540,10 @@ export default function App() {
   const updateField = (id: string, value: any) => {
     let processedValue = value;
     if (typeof value === 'string') {
-      if (id === '2.1-eposta') {
+      // PRO TIP: Do not uppercase technical data like base64 signatures
+      if (id === '11.1-imza') {
+        processedValue = value;
+      } else if (id === '2.1-eposta') {
         processedValue = value.toLocaleLowerCase('tr-TR');
       } else {
         processedValue = value.toLocaleUpperCase('tr-TR');
@@ -492,14 +600,9 @@ export default function App() {
     for (let i = 0; i < pageImages.length; i++) {
       const base64Data = pageImages[i];
       try {
-        // Convert base64 to Uint8Array
+        // Convert base64 to Uint8Array using our robust utility
         const base64Content = base64Data.split(',')[1];
-        const binaryString = window.atob(base64Content);
-        const len = binaryString.length;
-        const uint8 = new Uint8Array(len);
-        for (let j = 0; j < len; j++) {
-          uint8[j] = binaryString.charCodeAt(j);
-        }
+        const uint8 = decodeBase64(base64Content);
 
         const image = await pdfDoc.embedJpg(uint8);
 
@@ -558,15 +661,13 @@ export default function App() {
 
           if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select') {
             // CRITICAL: Handle Signature Image embedding
-            if (field.id === '11.1-imza' && typeof value === 'string' && value.startsWith('data:image')) {
+            if (field.id === '11.1-imza' && typeof value === 'string' && value.toLowerCase().includes('base64,')) {
               try {
+                // Decode base64 using our robust utility
                 const base64Content = value.split(',')[1];
-                const binaryString = window.atob(base64Content);
-                const len = binaryString.length;
-                const uint8 = new Uint8Array(len);
-                for (let j = 0; j < len; j++) uint8[j] = binaryString.charCodeAt(j);
+                const bytes = decodeBase64(base64Content);
                 
-                const signatureImage = await pdfDoc.embedPng(uint8);
+                const signatureImage = await pdfDoc.embedPng(bytes);
                 
                 const dims = signatureImage.scale(1);
                 const targetWidth = field.width;
@@ -690,20 +791,38 @@ export default function App() {
   };
 
   const generateExcel = () => {
-    // Get all fields that were actually part of the visible step groups
-    const visibleFields = stepGroups.flatMap(group => group.fields);
+    // Determine which fields to use - prioritize debugFields if in debug mode, else FORM_CONFIG
+    const allFields = debugFields.length > 0 ? debugFields : FORM_CONFIG;
     
-    const data = visibleFields.map(field => ({
-      id: field.id,
-      label: field.label,
-      'seçilen değer': formData[field.id] || ''
-    }));
+    const data = allFields.map(field => {
+      let value = formData[field.id] || '';
+      
+      // Format date fields for better visibility in Excel
+      if (field.type === 'date' && typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [y, m, d] = value.split('-');
+        value = `${d}.${m}.${y}`;
+      }
+
+      return {
+        'Alan Kimliği': field.id,
+        'Açıklama': field.label,
+        'Değer': value
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Form Verileri");
     
-    const fileName = `FRM.005_${formData['2.0-tckimlikno'] || 'Yeni'}.xlsx`;
+    // Set column widths for better readability
+    const wscols = [
+      { wch: 20 }, // id
+      { wch: 40 }, // label
+      { wch: 30 }  // value
+    ];
+    worksheet['!cols'] = wscols;
+
+    const fileName = `FRM.005_${formData['2.0-tckimlikno'] || 'Yeni'}_${format(new Date(), 'dd-MM-yyyy')}.xlsx`;
     XLSX.writeFile(workbook, fileName);
   };
 

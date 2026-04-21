@@ -2219,13 +2219,15 @@ export const FORM_CONFIG: FieldConfig[] = [
   {
     "id": "11.1-tarih",
     "label": "Tarih",
-    "type": "text",
+    "type": "date",
     "x": 83,
     "y": 360,
     "width": 150,
     "height": 20,
     "page": 2,
     "section": "YENİ",
+    "hidden": true,
+    "defaultValue": "today",
     "corners": {
       "bottomLeft": [
         83,
