@@ -2278,6 +2278,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "id": "11.1-imza",
     "label": "İmza",
     "type": "text",
+    "required": true,
     "x": 150,
     "y": 304,
     "width": 140,
