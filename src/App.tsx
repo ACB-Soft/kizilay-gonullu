@@ -219,9 +219,9 @@ const SignaturePad = ({ label, value, onChange }: any) => {
   const [isConfirmed, setIsConfirmed] = useState(!!value);
 
   // PDF Form signature field dimensions are 140x32
-  // Let's use the same ratio (4.375:1) for the UI component
+  // Let's use the same ratio (4.375:1) for the UI component, but doubled in height as requested
   const canvasWidth = 400; // Optimal width for display
-  const canvasHeight = (32 / 140) * canvasWidth; // ~91.4px
+  const canvasHeight = (64 / 140) * canvasWidth; // Doubled height ~182.8px
 
   const clear = () => {
     sigCanvas.current?.clear();
@@ -285,7 +285,7 @@ const SignaturePad = ({ label, value, onChange }: any) => {
           {isConfirmed ? (
             <div className="relative flex flex-col items-center py-4 animate-in zoom-in-95 duration-500">
               <div className="relative p-2 bg-white rounded-2xl shadow-xl border border-green-100 mb-6 w-full max-w-[400px] overflow-hidden" 
-                   style={{ aspectRatio: '140 / 32' }}>
+                   style={{ aspectRatio: '140 / 64' }}>
                 <img src={value} alt="İmza" className="w-full h-full object-contain" />
                 <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white">
                    <Check size={16} strokeWidth={4} />
@@ -303,7 +303,7 @@ const SignaturePad = ({ label, value, onChange }: any) => {
             <div className="flex flex-col items-center">
               <div 
                 className="w-full max-w-[400px] mx-auto bg-white rounded-3xl shadow-inner mb-6 relative touch-none border border-gray-100 overflow-hidden group-hover:border-red-100 transition-colors"
-                style={{ aspectRatio: '140 / 32' }}
+                style={{ aspectRatio: '140 / 64' }}
               >
                 <SignatureCanvas 
                   ref={sigCanvas}
