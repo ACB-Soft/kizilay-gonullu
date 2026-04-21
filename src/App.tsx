@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-console.log("App.tsx file executed");
 import { format } from 'date-fns';
 import { 
   Heart, 
@@ -314,6 +313,11 @@ const SignaturePad = ({ label, value, onChange }: any) => {
                     style: { width: '100%', height: '100%' }
                   }}
                 />
+                <div className="absolute top-3 left-4 pointer-events-none">
+                  <div className="px-3 py-1 bg-gray-50 rounded-full text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] border border-gray-100">
+                    Buraya İmza Atın
+                  </div>
+                </div>
               </div>
               
               <div className="flex gap-4 w-full">
@@ -357,15 +361,7 @@ export default function App() {
   const [formData, setFormData] = useState<FormData>(() => {
     const initial: FormData = {};
     FORM_CONFIG.forEach(field => {
-      // Auto-fill fields with defaultValue
-      if (field.defaultValue === 'today') {
-        const today = new Date().toISOString().split('T')[0];
-        initial[field.id] = today;
-      } else if (field.id === '11.1-tarih') {
-        // Fallback for explicitly requested field if not already handled by today
-        const today = new Date().toISOString().split('T')[0];
-        initial[field.id] = today;
-      } else if (field.defaultValue !== undefined) {
+      if (field.defaultValue !== undefined) {
         initial[field.id] = field.defaultValue;
       }
     });
@@ -792,38 +788,20 @@ export default function App() {
   };
 
   const generateExcel = () => {
-    // Determine which fields to use - prioritize debugFields if in debug mode, else FORM_CONFIG
-    const allFields = debugFields.length > 0 ? debugFields : FORM_CONFIG;
+    // Get all fields that were actually part of the visible step groups
+    const visibleFields = stepGroups.flatMap(group => group.fields);
     
-    const data = allFields.map(field => {
-      let value = formData[field.id] || '';
-      
-      // Format date fields for better visibility in Excel
-      if (field.type === 'date' && typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        const [y, m, d] = value.split('-');
-        value = `${d}.${m}.${y}`;
-      }
-
-      return {
-        'Alan Kimliği': field.id,
-        'Açıklama': field.label,
-        'Değer': value
-      };
-    });
+    const data = visibleFields.map(field => ({
+      id: field.id,
+      label: field.label,
+      'seçilen değer': formData[field.id] || ''
+    }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Form Verileri");
     
-    // Set column widths for better readability
-    const wscols = [
-      { wch: 20 }, // id
-      { wch: 40 }, // label
-      { wch: 30 }  // value
-    ];
-    worksheet['!cols'] = wscols;
-
-    const fileName = `FRM.005_${formData['2.0-tckimlikno'] || 'Yeni'}_${format(new Date(), 'dd-MM-yyyy')}.xlsx`;
+    const fileName = `FRM.005_${formData['2.0-tckimlikno'] || 'Yeni'}.xlsx`;
     XLSX.writeFile(workbook, fileName);
   };
 

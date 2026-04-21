@@ -2226,8 +2226,6 @@ export const FORM_CONFIG: FieldConfig[] = [
     "height": 20,
     "page": 2,
     "section": "YENİ",
-    "hidden": true,
-    "defaultValue": "today",
     "corners": {
       "bottomLeft": [
         83,
