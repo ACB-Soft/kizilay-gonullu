@@ -783,10 +783,10 @@ export default function App() {
   };
 
   const generateExcel = () => {
-    // Get all fields that were actually part of the visible step groups
-    const visibleFields = stepGroups.flatMap(group => group.fields);
+    // Show all non-hidden fields in Excel, excluding the signature field
+    const allFields = debugFields.filter(f => !f.hidden && f.id !== '11.1-imza');
     
-    const data = visibleFields.map(field => ({
+    const data = allFields.map(field => ({
       id: field.id,
       label: field.label,
       'seçilen değer': formData[field.id] || ''
