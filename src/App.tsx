@@ -76,7 +76,7 @@ const StepIndicator = ({ currentStep, steps }: { currentStep: number; steps: str
   );
 };
 
-const Input = ({ label, value, onChange, type = "text", placeholder = "", inputMode }: any) => (
+const Input = ({ label, value, onChange, type = "text", placeholder = "", inputMode, readOnly }: any) => (
   <div className="flex flex-col gap-1.5 w-full">
     <label className="text-xs font-bold text-gray-600 tracking-tight">{label}</label>
     <input 
@@ -85,7 +85,8 @@ const Input = ({ label, value, onChange, type = "text", placeholder = "", inputM
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm"
+      readOnly={readOnly}
+      className={`w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm ${readOnly ? 'bg-gray-100 cursor-not-allowed opacity-80' : 'bg-gray-50'}`}
     />
   </div>
 );
@@ -177,6 +178,21 @@ const Select = ({ label, value, onChange, options = [] }: any) => (
 );
 
 // --- Base64 to Uint8Array Utility (Robust against Latin1 errors) ---
+// --- Formatting Utilities ---
+const formatPhoneNumber = (val: string) => {
+  const digits = val.replace(/\D/g, '');
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)} ${digits.slice(6, 10)}`;
+};
+
+const formatCurrency = (val: any) => {
+  if (val === undefined || val === null || val === '') return '';
+  const str = String(val).replace(/\D/g, '');
+  if (!str) return '';
+  return new Intl.NumberFormat('tr-TR').format(parseInt(str));
+};
+
 const decodeBase64 = (base64: string) => {
   if (!base64) return new Uint8Array(0);
   try {
@@ -364,6 +380,35 @@ export default function App() {
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [fontLoadingStatus, setFontLoadingStatus] = useState<'loading' | 'success' | 'error'>('success');
+
+  // Automatic Totals Calculation
+  useEffect(() => {
+    const incomeFields = ['6.1-maas', '6.1-kirageliri', '6.1-duzensizgelir', '6.1-kamuyardimi', '6.1-stkyardimi', '6.1-digergelirler'];
+    const totalIncome = incomeFields.reduce((sum, id) => sum + (parseFloat(formData[id] || '0')), 0);
+    
+    const expenseFields = ['6.2-saglikgiderleri', '6.2-kiragideri', '6.2-mutfakgiderleri', '6.2-egitimgiderleri', '6.2-faturagiderleri', '6.2-digergiderler'];
+    const totalExpense = expenseFields.reduce((sum, id) => sum + (parseFloat(formData[id] || '0')), 0);
+
+    setFormData(prev => {
+      const updates: any = {};
+      if (prev['6.1-ayliktoplamgelir'] !== String(totalIncome)) {
+        updates['6.1-ayliktoplamgelir'] = String(totalIncome);
+      }
+      if (prev['6.2-ayliktoplamgider'] !== String(totalExpense)) {
+        updates['6.2-ayliktoplamgider'] = String(totalExpense);
+      }
+      
+      if (Object.keys(updates).length > 0) {
+        return { ...prev, ...updates };
+      }
+      return prev;
+    });
+  }, [
+    formData['6.1-maas'], formData['6.1-kirageliri'], formData['6.1-duzensizgelir'],
+    formData['6.1-kamuyardimi'], formData['6.1-stkyardimi'], formData['6.1-digergelirler'],
+    formData['6.2-saglikgiderleri'], formData['6.2-kiragideri'], formData['6.2-mutfakgiderleri'],
+    formData['6.2-egitimgiderleri'], formData['6.2-faturagiderleri'], formData['6.2-digergiderler']
+  ]);
 
   const PT_TO_MM = 0.352778;
   const MM_TO_PT = 2.83465;
@@ -602,7 +647,11 @@ export default function App() {
         page.drawImage(image, { x: 0, y: 0, width: 595, height: 842 });
         pagesAdded++;
 
-        const fieldsOnThisPage = debugFields.filter(f => f.page === i + 1);
+        const fieldsOnThisPage = debugFields.filter(f => 
+          f.page === i + 1 && 
+          f.id !== '3.0-haneoturansayisi' && 
+          f.id !== '4.0-hastalikadedi'
+        );
         for (const field of fieldsOnThisPage) {
           const value = formData[field.id];
           if (value === undefined || value === '') continue;
@@ -806,8 +855,12 @@ export default function App() {
   };
 
   const generateExcel = () => {
-    // Show all fields in Excel, excluding the signature field
-    const allFields = debugFields.filter(f => f.id !== '11.1-imza');
+    // Show all fields in Excel, excluding the signature and counter fields
+    const allFields = debugFields.filter(f => 
+      f.id !== '11.1-imza' && 
+      f.id !== '3.0-haneoturansayisi' && 
+      f.id !== '4.0-hastalikadedi'
+    );
     
     const data = allFields.map(field => {
       let displayValue = formData[field.id];
@@ -1992,20 +2045,31 @@ export default function App() {
                                 onChange={(v: string) => updateField(field.id, v)} 
                               />
                             ) : (
-                              <Input 
-                                label={field.label + (field.required ? ' *' : '')} 
-                                value={formData[field.id]} 
-                                type={field.id.includes('tckimlikno') ? 'text' : (field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text')}
-                                inputMode={field.id.includes('tckimlikno') ? 'numeric' : undefined}
-                                onChange={(v: string) => {
-                                  if (field.id.includes('tckimlikno')) {
-                                    const numericValue = v.replace(/\D/g, '');
-                                    updateField(field.id, numericValue.slice(0, 11));
-                                  } else {
-                                    updateField(field.id, v);
-                                  }
-                                }} 
-                              />
+                              (() => {
+                                const isCurrency = field.id.startsWith('6.1') || field.id.startsWith('6.2');
+                                const isTC = field.id.includes('tckimlikno');
+
+                                return (
+                                  <Input 
+                                    label={field.label + (field.required ? ' *' : '')} 
+                                    value={isCurrency ? formatCurrency(formData[field.id]) : formData[field.id]} 
+                                    type={isTC || isCurrency ? 'text' : (field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text')}
+                                    inputMode={isTC || isCurrency ? 'numeric' : undefined}
+                                    readOnly={field.readOnly}
+                                    onChange={(v: string) => {
+                                      if (isTC) {
+                                        const numericValue = v.replace(/\D/g, '');
+                                        updateField(field.id, numericValue.slice(0, 11));
+                                      } else if (isCurrency) {
+                                        const numericValue = v.replace(/\D/g, '');
+                                        updateField(field.id, numericValue);
+                                      } else {
+                                        updateField(field.id, v);
+                                      }
+                                    }} 
+                                  />
+                                );
+                              })()
                             )}
                           </div>
                         ))}
@@ -2051,6 +2115,23 @@ export default function App() {
                           return;
                         }
 
+                        // Validate Totals
+                        const currentPrefix = stepGroups[currentSectionIndex].id;
+                        if (currentPrefix === '6.1') {
+                          const income = parseFloat(formData['6.1-ayliktoplamgelir'] || '0');
+                          if (income <= 0) {
+                            alert('Aylık toplam gelir sıfırdan büyük olmalıdır.');
+                            return;
+                          }
+                        }
+                        if (currentPrefix === '6.2') {
+                          const expense = parseFloat(formData['6.2-ayliktoplamgider'] || '0');
+                          if (expense <= 0) {
+                            alert('Aylık toplam gider sıfırdan büyük olmalıdır.');
+                            return;
+                          }
+                        }
+
                         setCurrentSectionIndex(prev => prev + 1);
                       }}
                       className="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-100"
@@ -2060,18 +2141,51 @@ export default function App() {
                   ) : (
                     <button
                       onClick={() => {
-                        // Final validation
-                        const allRequiredFields = debugFields.filter(f => f.required && !f.hidden);
-                        const missingFields = allRequiredFields.filter(f => !formData[f.id]);
+                        // Final validation - Only check fields that are actually "active" in the current form flow
+                        const haneSayisi = parseInt(formData['3.0-haneoturansayisi'] || '0');
+                        const hastalikAdediVal = formData['4.0-hastalikadedi'] || 'YOK';
+                        const hastalikAdedi = hastalikAdediVal === 'YOK' ? 0 : parseInt(hastalikAdediVal);
+
+                        const activeRequiredFields = debugFields.filter(f => {
+                          if (!f.required || f.hidden) return false;
+                          
+                          const prefix = getPrefix(f.id);
+                          if (prefix.startsWith('3.')) {
+                            const num = parseInt(prefix.split('.')[1]);
+                            return num <= haneSayisi;
+                          }
+                          if (prefix.startsWith('4.')) {
+                            const num = parseInt(prefix.split('.')[1]);
+                            if (num === 0) return true;
+                            return num <= hastalikAdedi;
+                          }
+                          return true;
+                        });
+
+                        const missingFields = activeRequiredFields.filter(f => !formData[f.id]);
                         
                         if (missingFields.length > 0) {
                           alert(`Lütfen zorunlu alanları doldurunuz: ${missingFields.map(f => f.label).join(', ')}`);
                           return;
                         }
 
-                        // Final TC Validation for all visible fields
-                        const allVisibleFields = debugFields.filter(f => !f.hidden);
-                        const invalidTCFields = allVisibleFields.filter(f => 
+                        // Final TC Validation for all active visible fields
+                        const activeVisibleFields = debugFields.filter(f => {
+                          if (f.hidden) return false;
+                          const prefix = getPrefix(f.id);
+                          if (prefix.startsWith('3.')) {
+                            const num = parseInt(prefix.split('.')[1]);
+                            return num <= haneSayisi;
+                          }
+                          if (prefix.startsWith('4.')) {
+                            const num = parseInt(prefix.split('.')[1]);
+                            if (num === 0) return true;
+                            return num <= hastalikAdedi;
+                          }
+                          return true;
+                        });
+
+                        const invalidTCFields = activeVisibleFields.filter(f => 
                           f.id.includes('tckimlikno') && 
                           formData[f.id] && 
                           formData[f.id].length !== 11

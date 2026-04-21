@@ -11,6 +11,7 @@ export interface FieldConfig {
   section: string;
   hidden?: boolean;
   required?: boolean;
+  readOnly?: boolean;
   defaultValue?: any;
   options?: string[];
   optionMappings?: {
@@ -422,7 +423,8 @@ export const FORM_CONFIG: FieldConfig[] = [
       "bottomRight": [265, 555],
       "topRight": [265, 568],
       "topLeft": [115, 568]
-    }
+    },
+    "required": true
   },
   {
     "id": "2.1-mahalle",
@@ -439,7 +441,8 @@ export const FORM_CONFIG: FieldConfig[] = [
       "bottomRight": [545, 599],
       "topRight": [545, 612],
       "topLeft": [395, 612]
-    }
+    },
+    "required": true
   },
   {
     "id": "2.1-acikadres",
@@ -667,7 +670,8 @@ export const FORM_CONFIG: FieldConfig[] = [
           "bottomRight": [117, 368 - yOffset],
           "topRight": [117, 384 - yOffset],
           "topLeft": [27, 384 - yOffset]
-        }
+        },
+        "required": true
       },
       {
         "id": `3.${n}-tckimlikno`,
@@ -684,7 +688,8 @@ export const FORM_CONFIG: FieldConfig[] = [
           "bottomRight": [198, 368 - yOffset],
           "topRight": [198, 384 - yOffset],
           "topLeft": [128, 384 - yOffset]
-        }
+        },
+        "required": true
       },
       {
         "id": `3.${n}-basvurunayakinlik`,
@@ -701,7 +706,8 @@ export const FORM_CONFIG: FieldConfig[] = [
           "bottomRight": [248, 368 - yOffset],
           "topRight": [248, 384 - yOffset],
           "topLeft": [203, 384 - yOffset]
-        }
+        },
+        "required": true
       },
       {
         "id": `3.${n}-dogumtarihi`,
@@ -718,7 +724,8 @@ export const FORM_CONFIG: FieldConfig[] = [
           "bottomRight": [323, 368 - yOffset],
           "topRight": [323, 384 - yOffset],
           "topLeft": [289, 384 - yOffset]
-        }
+        },
+        "required": true
       },
       {
         "id": `3.${n}-medenihali`,
@@ -1299,7 +1306,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         714
       ]
     },
-    "required": true
+    "required": true,
+    "readOnly": true
   },
   {
     "id": "6.2-saglikgiderleri",
@@ -1509,7 +1517,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         713
       ]
     },
-    "required": true
+    "required": true,
+    "readOnly": true
   },
   {
     "id": "6.3-borcdurumu",
