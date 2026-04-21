@@ -753,20 +753,43 @@ export default function App() {
             } catch (textErr) {
               console.error(`Error drawing text for field ${field.id}:`, textErr);
             }
-          } else if (field.type === 'checkbox' && value === true) {
-            // Checkbox size is 6x6 in config, so X should be smaller
-            const checkboxSize = 6; // Reduced from 10 to fit 6x6 boxes
-            // Center X perfectly in the box
-            const xOffset = (field.width - (font.widthOfTextAtSize('X', checkboxSize))) / 2;
-            const yOffset = (field.height - checkboxSize) / 2 + 1;
+          } else if (field.type === 'checkbox') {
+            const selectedOptions = Array.isArray(value) ? value : (value === true ? [field.label] : []);
             
-            page.drawText('X', {
-              x: field.x + xOffset,
-              y: field.y + yOffset,
-              size: checkboxSize,
-              font: font,
-              color: rgb(0, 0, 0),
-            });
+            if (selectedOptions.length > 0) {
+              // If we have specific option mappings, draw X at each mapped location
+              if (field.optionMappings) {
+                Object.entries(field.optionMappings).forEach(([opt, mapping]: [string, any]) => {
+                  if (selectedOptions.includes(opt)) {
+                    const checkboxSize = Math.min(mapping.width, mapping.height, 8);
+                    const xOffset = (mapping.width - (font.widthOfTextAtSize('X', checkboxSize))) / 2;
+                    const yOffset = (mapping.height - checkboxSize) / 2 + (field.page === 1 ? 1 : 0);
+                    
+                    page.drawText('X', {
+                      x: mapping.x + xOffset,
+                      y: mapping.y + yOffset,
+                      size: checkboxSize,
+                      font: font,
+                      color: rgb(0, 0, 0),
+                    });
+                  }
+                });
+              } 
+              // Fallback for single boolean checkboxes
+              else if (value === true) {
+                const checkboxSize = 6;
+                const xOffset = (field.width - (font.widthOfTextAtSize('X', checkboxSize))) / 2;
+                const yOffset = (field.height - checkboxSize) / 2 + 1;
+                
+                page.drawText('X', {
+                  x: field.x + xOffset,
+                  y: field.y + yOffset,
+                  size: checkboxSize,
+                  font: font,
+                  color: rgb(0, 0, 0),
+                });
+              }
+            }
           }
         }
       } catch (err: any) {
@@ -783,14 +806,27 @@ export default function App() {
   };
 
   const generateExcel = () => {
-    // Show all non-hidden fields in Excel, excluding the signature field
-    const allFields = debugFields.filter(f => !f.hidden && f.id !== '11.1-imza');
+    // Show all fields in Excel, excluding the signature field
+    const allFields = debugFields.filter(f => f.id !== '11.1-imza');
     
-    const data = allFields.map(field => ({
-      id: field.id,
-      label: field.label,
-      'seçilen değer': formData[field.id] || ''
-    }));
+    const data = allFields.map(field => {
+      let displayValue = formData[field.id];
+      
+      // Format array values (for checkboxes/multi-selects)
+      if (Array.isArray(displayValue)) {
+        displayValue = displayValue.join(', ');
+      } 
+      // Format boolean values
+      else if (typeof displayValue === 'boolean') {
+        displayValue = displayValue ? 'Evet' : 'Hayır';
+      }
+      
+      return {
+        id: field.id,
+        label: field.label,
+        'seçilen değer': displayValue || ''
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();

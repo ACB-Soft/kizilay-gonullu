@@ -244,7 +244,8 @@ export const FORM_CONFIG: FieldConfig[] = [
       "bottomRight": [288, 664],
       "topRight": [288, 677],
       "topLeft": [228, 677]
-    }
+    },
+    "required": true
   },
   {
     "id": "2.0-medenidurum",
@@ -262,6 +263,7 @@ export const FORM_CONFIG: FieldConfig[] = [
       "topRight": [265, 662],
       "topLeft": [115, 662]
     },
+    "required": true,
     "options": ["EVLİ", "BEKAR", "BOŞANMIŞ", "VEFAT"]
   },
   {
@@ -454,7 +456,8 @@ export const FORM_CONFIG: FieldConfig[] = [
       "bottomRight": [545, 562],
       "topRight": [545, 597],
       "topLeft": [395, 597]
-    }
+    },
+    "required": true
   },
   {
     "id": "2.2-adisoyadi",
@@ -642,7 +645,8 @@ export const FORM_CONFIG: FieldConfig[] = [
       "bottomRight": [21.5, 399],
       "topRight": [21.5, 409],
       "topLeft": [11.5, 409]
-    }
+    },
+    "required": true
   },
   ...Array.from({ length: 10 }, (_, i) => {
     const n = i + 1;
@@ -886,7 +890,8 @@ export const FORM_CONFIG: FieldConfig[] = [
       "bottomRight": [21.5, 155],
       "topRight": [21.5, 165],
       "topLeft": [11.5, 165]
-    }
+    },
+    "required": true
   },
   ...[1, 2, 3, 4, 5].map(i => {
     const yOffset = (i - 1) * 19;
@@ -1113,7 +1118,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         62,
         805
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.1-kirageliri",
@@ -1142,7 +1148,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         62,
         792
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.1-duzensizgelir",
@@ -1171,7 +1178,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         62,
         779
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.1-kamuyardimi",
@@ -1200,7 +1208,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         62,
         766
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.1-stkyardimi",
@@ -1229,7 +1238,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         62,
         752
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.1-digergelirler",
@@ -1258,7 +1268,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         62,
         732
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.1-ayliktoplamgelir",
@@ -1287,7 +1298,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         62,
         714
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.2-saglikgiderleri",
@@ -1316,7 +1328,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         190,
         805
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.2-kiragideri",
@@ -1345,7 +1358,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         190,
         792
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.2-mutfakgiderleri",
@@ -1374,7 +1388,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         190,
         779
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.2-egitimgiderleri",
@@ -1403,7 +1418,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         190,
         766
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.2-faturagiderleri",
@@ -1432,7 +1448,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         218,
         746
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.2-digergiderler",
@@ -1461,7 +1478,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         190,
         731
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.2-ayliktoplamgider",
@@ -1490,7 +1508,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         190,
         713
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "6.3-borcdurumu",
@@ -1626,6 +1645,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         420
       ]
     },
+    "required": true,
     "maxSelections": 1,
     "options": [
       "APARTMAN",
@@ -1688,6 +1708,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         420
       ]
     },
+    "required": true,
     "options": [
       "KİRACI",
       "EV SAHİBİ",
@@ -1987,6 +2008,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         599
       ]
     },
+    "required": true,
     "maxSelections": 1,
     "options": [
       "YARARLANIYOR",
@@ -2179,7 +2201,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         83,
         447
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "11.1-gorevi",
@@ -2208,7 +2231,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         83,
         424
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "11.1-gorevyeri",
@@ -2237,7 +2261,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         83,
         402
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "11.1-tarih",
@@ -2266,7 +2291,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         83,
         380
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "11.1-gorusmeyeri",
@@ -2295,7 +2321,8 @@ export const FORM_CONFIG: FieldConfig[] = [
         83,
         358
       ]
-    }
+    },
+    "required": true
   },
   {
     "id": "11.1-imza",
