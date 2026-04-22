@@ -354,7 +354,7 @@ const SignaturePad = ({ label, value, onChange }: any) => {
 };
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug' | 'frm006' | 'selection'>('home');
+  const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug' | 'frm006'>('home');
   const [formMode, setFormMode] = useState<'all' | 'mandatory'>('all');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -1871,7 +1871,8 @@ export default function App() {
                   });
                   setFormData(initial);
                   setCurrentSectionIndex(0);
-                  setView('selection');
+                  setFormMode('all');
+                  setView('form');
                 }}
                 className="w-full p-6 bg-red-600 text-white rounded-3xl shadow-xl shadow-red-100 active:scale-95 transition-all flex items-center gap-5 group"
               >
@@ -1895,53 +1896,6 @@ export default function App() {
                 </div>
                 <span className="text-sm font-black text-gray-500 group-hover:text-red-600 uppercase tracking-widest transition-colors">Uygulama Hakkında</span>
               </button>
-            </div>
-          )}
-
-          {/* SELECTION VIEW */}
-          {view === 'selection' && (
-            <div className="space-y-4 py-8 flex-1 max-w-md mx-auto w-full flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-500">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">FORM TÜRÜNÜ SEÇİN</h2>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3">
-                <button 
-                  onClick={() => {
-                    setFormMode('mandatory');
-                    setView('form');
-                  }}
-                  className="p-5 bg-white border-2 border-gray-100 rounded-3xl hover:border-red-500 hover:shadow-xl transition-all flex items-center text-left space-x-4 group"
-                >
-                  <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                    <CheckCircle2 className="text-red-600" size={24} />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">ZORUNLU ALANLAR</h3>
-                    <p className="text-[10px] font-bold text-gray-400 leading-tight">
-                      Sadece temel ve zorunlu bilgileri içeren hızlı form
-                    </p>
-                  </div>
-                </button>
-
-                <button 
-                  onClick={() => {
-                    setFormMode('all');
-                    setView('form');
-                  }}
-                  className="p-5 bg-white border-2 border-gray-100 rounded-3xl hover:border-gray-900 hover:shadow-xl transition-all flex items-center text-left space-x-4 group"
-                >
-                  <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                    <Menu className="text-gray-900" size={24} />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">TÜM ALANLAR</h3>
-                    <p className="text-[10px] font-bold text-gray-400 leading-tight">
-                      Eşya, konut ve gelir detaylarını içeren kapsamlı form
-                    </p>
-                  </div>
-                </button>
-              </div>
             </div>
           )}
 
