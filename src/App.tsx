@@ -355,6 +355,8 @@ const SignaturePad = ({ label, value, onChange }: any) => {
 
 export default function App() {
   const [view, setView] = useState<'home' | 'form' | 'result' | 'help' | 'debug' | 'frm006'>('home');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [formMode, setFormMode] = useState<'all' | 'mandatory'>('all');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -852,6 +854,41 @@ export default function App() {
     }
 
     return await pdfDoc.save();
+  };
+
+  const saveToGoogleSheets = async (currentData: FormData) => {
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbzvSeRJfDEfAI0bzpoaWTF0NJS4Pflh3OrusEA6A4aKobeY93Pk3YTpkAYWKgwpNzTV/exec";
+    
+    setSaveStatus('saving');
+    setIsSaving(true);
+    try {
+      const sheetData: any = {};
+      debugFields.forEach(field => {
+        if (field.id === '11.1-imza') return;
+        sheetData[field.id] = {
+          label: field.label,
+          value: currentData[field.id] || ''
+        };
+      });
+
+      await fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sheetData)
+      });
+      
+      setSaveStatus('success');
+      alert('Veriler başarıyla Kızılay sistemine iletildi.');
+    } catch (error) {
+      console.error('Google Sheets hatası:', error);
+      setSaveStatus('error');
+      alert('Veriler gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const generateExcel = () => {
@@ -1786,6 +1823,29 @@ export default function App() {
                   Forma Dön
                 </button>
 
+                {/* Google Sheets URL Config */}
+                <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-3xl space-y-3">
+                  <div className="flex items-center gap-2">
+                    <FileText size={18} className="text-green-600" />
+                    <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Google Sheets API Entegrasyonu</h4>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-gray-500 uppercase ml-1">Apps Script Web Uygulaması URL</label>
+                    <input 
+                      type="text"
+                      placeholder="https://script.google.com/macros/s/.../exec"
+                      defaultValue={localStorage.getItem('GOOGLE_SHEETS_URL') || ''}
+                      onChange={(e) => {
+                        localStorage.setItem('GOOGLE_SHEETS_URL', e.target.value);
+                      }}
+                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs font-mono outline-none focus:border-green-500 transition-all"
+                    />
+                    <p className="text-[8px] text-gray-400 leading-tight px-1">
+                      * Bu URL'ye gönderilen veriler anonim olarak kaydedilir. "Dağıt" kısmından "Herkes" erişimine izin verdiğinizden emin olun.
+                    </p>
+                  </div>
+                </div>
+
                 {/* Field List */}
                 <div className="mt-6 space-y-3">
                   <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Mevcut Alanlar ({debugFields.filter(f => f.page === debugPage).length})</h3>
@@ -1931,25 +1991,46 @@ export default function App() {
 
               <div className="w-full space-y-4">
                 <button 
-                  onClick={generatePDF}
-                  disabled={isGenerating}
-                  className="w-full py-5 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-200 flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+                  onClick={() => saveToGoogleSheets(formData)}
+                  disabled={isSaving || saveStatus === 'success'}
+                  className={`w-full py-5 rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all ${
+                    saveStatus === 'success' 
+                      ? 'bg-gray-100 text-green-600 shadow-none cursor-default' 
+                      : 'bg-gray-900 text-white shadow-gray-200'
+                  }`}
                 >
-                  {isGenerating ? <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" /> : <Download size={24} />}
-                  PDF OLARAK İNDİR
+                  {isSaving ? (
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                  ) : saveStatus === 'success' ? (
+                    <CheckCircle2 size={24} />
+                  ) : (
+                    <Heart size={24} fill="currentColor" />
+                  )}
+                  {saveStatus === 'success' ? 'VERİLER İLETİLDİ' : isSaving ? 'GÖNDERİLİYOR...' : "VERİLERİ KIZILAY'A GÖNDER"}
                 </button>
 
-                <button 
-                  onClick={generateExcel}
-                  className="w-full py-5 bg-green-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-green-200 flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
-                >
-                  <FileText size={24} />
-                  EXCEL OLARAK İNDİR
-                </button>
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={generatePDF}
+                    disabled={isGenerating}
+                    className="py-4 bg-red-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-red-100 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                  >
+                    {isGenerating ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : <Download size={18} />}
+                    PDF İNDİR
+                  </button>
+
+                  <button 
+                    onClick={generateExcel}
+                    className="py-4 bg-green-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-green-100 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                  >
+                    <FileText size={18} />
+                    EXCEL İNDİR
+                  </button>
+                </div>
                 
                 <button 
                   onClick={() => setView('home')}
-                  className="w-full py-5 bg-gray-100 text-gray-600 rounded-2xl font-bold text-lg hover:bg-gray-200 active:scale-[0.98] transition-all"
+                  className="w-full py-4 bg-gray-50 text-gray-400 rounded-2xl font-bold text-sm hover:bg-gray-100 active:scale-[0.98] transition-all uppercase tracking-widest"
                 >
                   ANA EKRANA DÖN
                 </button>
@@ -2150,7 +2231,11 @@ export default function App() {
                           return;
                         }
 
+                        // Remove automatic save from completion handler
+                        // saveToGoogleSheets(formData);
+
                         setView('result');
+                        setSaveStatus('idle'); // Reset status when entering result view
                       }}
                       className="flex-1 py-4 bg-green-600 text-white rounded-2xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-lg"
                     >
