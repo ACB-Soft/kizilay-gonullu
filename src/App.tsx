@@ -493,6 +493,30 @@ export default function App() {
   }, [view, selectedFieldId]);
 
   const getPrefix = (id: string) => id.split('-')[0];
+
+  const getStepLabel = (id: string, defaultSection: string) => {
+    let p = getPrefix(id);
+    if (p.startsWith('8.') || p.startsWith('9.')) p = '8-9';
+
+    if (p === '1.0') return "Başvuru Kanalı";
+    if (p === '2.0') return "İhtiyaç Sahibi Bilgileri";
+    if (p === '2.1') return "İletişim - Adres Bilgileri";
+    if (p === '2.2') return "Vasi/Veli/Kayyım Bilgileri";
+    if (p === '2.3') return "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri";
+    if (p === '3.0') return "Hanede Yaşayan Diğer Kişi Sayısı";
+    if (p.startsWith('3.')) return `Hanede Yaşayan Diğer Kişi Bilgileri (${p.split('.')[1]})`;
+    if (p === '4.0') return "Hastalık ve Engellilik Durumu Sayısı";
+    if (p.startsWith('4.')) return `Hastalık ve Engellilik Durumu (${p.split('.')[1]})`;
+    if (p === '5.1') return "Sosyal Güvence";
+    if (p === '6.1') return "Hane Gelir Durumu";
+    if (p === '6.2') return "Hane Gider Durumu";
+    if (p === '6.3') return "Hane Borç Durumu";
+    if (p.startsWith('7.')) return "Hane Konut Durumu";
+    if (p === '8-9') return "Hane Eşya Durumu";
+    if (p.startsWith('10.')) return "Diğer Kurum Yardımlarından Yararlanma Durumu";
+    if (p.startsWith('11.')) return "Görüşme Yapan Kişi Bilgileri";
+    return defaultSection;
+  };
   
   // Group fields by their ID prefix (e.g., "2.0", "2.1")
   const stepGroups = useMemo(() => {
@@ -542,29 +566,9 @@ export default function App() {
         return fp === p;
       });
       
-      // Map prefix to specific labels
-      let label = fields[0].section;
-      if (p === '1.0') label = "Başvuru Kanalı";
-      else if (p === '2.0') label = "İhtiyaç Sahibi Bilgileri";
-      else if (p === '2.1') label = "İletişim - Adres Bilgileri";
-      else if (p === '2.2') label = "Vasi/Veli/Kayyım Bilgileri";
-      else if (p === '2.3') label = "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri";
-      else if (p === '3.0') label = "Hanede Yaşayan Diğer Kişi Sayısı";
-      else if (p.startsWith('3.')) label = `Hanede Yaşayan Diğer Kişi Bilgileri (${p.split('.')[1]})`;
-      else if (p === '4.0') label = "Hastalık ve Engellilik Durumu Sayısı";
-      else if (p.startsWith('4.')) label = `Hastalık ve Engellilik Durumu (${p.split('.')[1]})`;
-      else if (p === '5.1') label = "Sosyal Güvence";
-      else if (p === '6.1') label = "Hane Gelir Durumu";
-      else if (p === '6.2') label = "Hane Gider Durumu";
-      else if (p === '6.3') label = "Hane Borç Durumu";
-      else if (p.startsWith('7.')) label = "Hane Konut Durumu";
-      else if (p === '8-9') label = "Hane Eşya Durumu";
-      else if (p.startsWith('10.')) label = "Diğer Kurum Yardımlarından Yararlanma Durumu";
-      else if (p.startsWith('11.')) label = "Görüşme Yapan Kişi Bilgileri";
-
       groups.push({
         id: p,
-        label: label,
+        label: getStepLabel(fields[0].id, fields[0].section),
         fields
       });
     });
@@ -875,7 +879,7 @@ export default function App() {
         const idNumber = field.id.split('-')[0];
         
         sheetData[field.id] = {
-          section: field.section || '',
+          section: getStepLabel(field.id, field.section || ''),
           id: idNumber,
           label: field.label,
           value: currentData[field.id] || ''
