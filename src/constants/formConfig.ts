@@ -40,7 +40,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 8,
     "height": 8,
     "page": 1,
-    "section": "BAŞVURU BİLGİLERİ",
+    "section": "Başvuru Kanalı",
     "hidden": true,
     "defaultValue": ["DİĞER"],
     "corners": {
@@ -82,7 +82,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "KİŞİSEL BİLGİLER",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [115, 724.29],
       "bottomRight": [265, 724.29],
@@ -100,7 +100,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [115, 709],
       "bottomRight": [265, 709],
@@ -118,7 +118,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [115, 694],
       "bottomRight": [265, 694],
@@ -135,7 +135,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [115, 679],
       "bottomRight": [265, 679],
@@ -188,7 +188,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 28,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [372, 679],
       "bottomRight": [522, 679],
@@ -205,7 +205,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 28,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [372, 649],
       "bottomRight": [522, 649],
@@ -222,7 +222,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 60,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [138, 664],
       "bottomRight": [198, 664],
@@ -239,7 +239,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 60,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [228, 664],
       "bottomRight": [288, 664],
@@ -257,7 +257,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [115, 649],
       "bottomRight": [265, 649],
@@ -276,7 +276,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 60,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [115, 634],
       "bottomRight": [175, 634],
@@ -294,7 +294,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 60,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [232, 634],
       "bottomRight": [292, 634],
@@ -311,7 +311,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 54,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [372, 634],
       "bottomRight": [426, 634],
@@ -329,7 +329,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 30,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [482, 635],
       "bottomRight": [512, 635],
@@ -347,7 +347,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 30,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İhtiyaç Sahibi Bilgileri",
     "corners": {
       "bottomLeft": [553, 635],
       "bottomRight": [583, 635],
@@ -365,7 +365,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İletişim - Adres Bilgileri",
     "corners": {
       "bottomLeft": [115, 584],
       "bottomRight": [265, 584],
@@ -383,7 +383,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İletişim - Adres Bilgileri",
     "corners": {
       "bottomLeft": [115, 599],
       "bottomRight": [265, 599],
@@ -400,7 +400,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İletişim - Adres Bilgileri",
     "corners": {
       "bottomLeft": [115, 570],
       "bottomRight": [265, 570],
@@ -417,7 +417,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İletişim - Adres Bilgileri",
     "corners": {
       "bottomLeft": [115, 555],
       "bottomRight": [265, 555],
@@ -435,7 +435,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "İletişim - Adres Bilgileri",
     "corners": {
       "bottomLeft": [395, 599],
       "bottomRight": [545, 599],
@@ -453,7 +453,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 35,
     "page": 1,
-    "section": "YENİ",
+    "section": "İletişim - Adres Bilgileri",
     "corners": {
       "bottomLeft": [395, 562],
       "bottomRight": [545, 562],
@@ -471,7 +471,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Vasi/Veli/Kayyım Bilgileri",
     "corners": {
       "bottomLeft": [115, 520],
       "bottomRight": [265, 520],
@@ -488,7 +488,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Vasi/Veli/Kayyım Bilgileri",
     "corners": {
       "bottomLeft": [115, 505],
       "bottomRight": [265, 505],
@@ -505,7 +505,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Vasi/Veli/Kayyım Bilgileri",
     "corners": {
       "bottomLeft": [114.7, 490],
       "bottomRight": [264.7, 490],
@@ -522,7 +522,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Vasi/Veli/Kayyım Bilgileri",
     "corners": {
       "bottomLeft": [115, 460],
       "bottomRight": [265, 460],
@@ -539,7 +539,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Vasi/Veli/Kayyım Bilgileri",
     "corners": {
       "bottomLeft": [115, 475],
       "bottomRight": [265, 475],
@@ -556,7 +556,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri",
     "corners": {
       "bottomLeft": [404, 520],
       "bottomRight": [554, 520],
@@ -573,7 +573,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri",
     "corners": {
       "bottomLeft": [404, 505],
       "bottomRight": [554, 505],
@@ -590,7 +590,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri",
     "corners": {
       "bottomLeft": [404, 490],
       "bottomRight": [554, 490],
@@ -607,7 +607,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri",
     "corners": {
       "bottomLeft": [404, 475],
       "bottomRight": [554, 475],
@@ -624,7 +624,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 13,
     "page": 1,
-    "section": "YENİ",
+    "section": "Ulaşılamadığında İrtibat Kurulacak Kişi Bİlgileri",
     "corners": {
       "bottomLeft": [404, 460],
       "bottomRight": [554, 460],
@@ -641,7 +641,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 10,
     "height": 10,
     "page": 1,
-    "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+    "section": "Hanede Yaşayan Diğer Kişi Sayısı",
     "options": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
     "corners": {
       "bottomLeft": [11.5, 399],
@@ -664,7 +664,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 90,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [27, 368 - yOffset],
           "bottomRight": [117, 368 - yOffset],
@@ -682,7 +682,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 70,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [128, 368 - yOffset],
           "bottomRight": [198, 368 - yOffset],
@@ -700,7 +700,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 45,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [203, 368 - yOffset],
           "bottomRight": [248, 368 - yOffset],
@@ -718,7 +718,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 34,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [289, 368 - yOffset],
           "bottomRight": [323, 368 - yOffset],
@@ -736,7 +736,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 34.2,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [324, 368 - yOffset],
           "bottomRight": [358.2, 368 - yOffset],
@@ -754,7 +754,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 50,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [360, 368 - yOffset],
           "bottomRight": [410, 368 - yOffset],
@@ -772,7 +772,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 30,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [422, 368 - yOffset],
           "bottomRight": [452, 368 - yOffset],
@@ -789,7 +789,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 30,
         "height": 16,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [506, 368 - yOffset],
           "bottomRight": [536, 368 - yOffset],
@@ -807,7 +807,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 100,
         "height": 20,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "optionMappings": {
           "KADIN": { "x": 256, "y": 377 - yOffset, "width": 10, "height": 7 },
           "ERKEK": { "x": 256, "y": 368 - yOffset, "width": 10, "height": 7 }
@@ -830,7 +830,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 100,
         "height": 20,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "optionMappings": {
           "ÇALIŞIYOR": { "x": 460, "y": 377 - yOffset, "width": 10, "height": 7 },
           "ÇALIŞMIYOR": { "x": 460, "y": 368 - yOffset, "width": 10, "height": 7 }
@@ -852,7 +852,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 20,
         "height": 8,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [565, 378 - yOffset],
           "bottomRight": [585, 378 - yOffset],
@@ -870,7 +870,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 20,
         "height": 8,
         "page": 1,
-        "section": "Hanede Yaşayan Diğer Kişi Bilgileri",
+        "section": `Hanede Yaşayan Diğer Kişi Bilgileri (${n})`,
         "corners": {
           "bottomLeft": [565, 370.2 - yOffset],
           "bottomRight": [585, 370.2 - yOffset],
@@ -890,7 +890,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 10,
     "height": 10,
     "page": 1,
-    "section": "Hastalık ve Engellilik Durumu",
+    "section": "Hastalık ve Engellilik Durumu Sayısı",
     "options": ["YOK", "1", "2", "3", "4", "5"],
     "corners": {
       "bottomLeft": [11.5, 155],
@@ -912,7 +912,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 115,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [28, 131 - yOffset],
           "bottomRight": [143, 131 - yOffset],
@@ -929,7 +929,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 55,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [150, 131 - yOffset],
           "bottomRight": [205, 131 - yOffset],
@@ -946,7 +946,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 60,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [210, 131 - yOffset],
           "bottomRight": [270, 131 - yOffset],
@@ -970,7 +970,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 60,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [275, 131 - yOffset],
           "bottomRight": [335, 131 - yOffset],
@@ -993,7 +993,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 20,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [340, 131 - yOffset],
           "bottomRight": [360, 131 - yOffset],
@@ -1010,7 +1010,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 45,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [377, 131 - yOffset],
           "bottomRight": [422, 131 - yOffset],
@@ -1027,7 +1027,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 45,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [429, 131 - yOffset],
           "bottomRight": [474, 131 - yOffset],
@@ -1044,7 +1044,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 45,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [482, 131 - yOffset],
           "bottomRight": [527, 131 - yOffset],
@@ -1061,7 +1061,7 @@ export const FORM_CONFIG: FieldConfig[] = [
         "width": 48,
         "height": 16,
         "page": 1,
-        "section": "Hastalık ve Engellilik Durumu",
+        "section": `Hastalık ve Engellilik Durumu (${i})`,
         "corners": {
           "bottomLeft": [534, 131 - yOffset],
           "bottomRight": [582, 131 - yOffset],
@@ -1080,7 +1080,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 400,
     "height": 20,
     "page": 1,
-    "section": "YENİ",
+    "section": "Sosyal Güvence",
     "corners": {
       "bottomLeft": [31, 21],
       "bottomRight": [431, 21],
@@ -1107,7 +1107,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gelir Durumu",
     "corners": {
       "bottomLeft": [
         62,
@@ -1137,7 +1137,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gelir Durumu",
     "corners": {
       "bottomLeft": [
         62,
@@ -1167,7 +1167,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gelir Durumu",
     "corners": {
       "bottomLeft": [
         62,
@@ -1197,7 +1197,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gelir Durumu",
     "corners": {
       "bottomLeft": [
         62,
@@ -1227,7 +1227,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gelir Durumu",
     "corners": {
       "bottomLeft": [
         62,
@@ -1257,7 +1257,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gelir Durumu",
     "corners": {
       "bottomLeft": [
         62,
@@ -1287,7 +1287,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gelir Durumu",
     "corners": {
       "bottomLeft": [
         62,
@@ -1318,7 +1318,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gider Durumu",
     "corners": {
       "bottomLeft": [
         190,
@@ -1348,7 +1348,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gider Durumu",
     "corners": {
       "bottomLeft": [
         190,
@@ -1378,7 +1378,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gider Durumu",
     "corners": {
       "bottomLeft": [
         190,
@@ -1408,7 +1408,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gider Durumu",
     "corners": {
       "bottomLeft": [
         190,
@@ -1438,7 +1438,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gider Durumu",
     "corners": {
       "bottomLeft": [
         218,
@@ -1468,7 +1468,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gider Durumu",
     "corners": {
       "bottomLeft": [
         190,
@@ -1498,7 +1498,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 70,
     "height": 12,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Gider Durumu",
     "corners": {
       "bottomLeft": [
         190,
@@ -1529,7 +1529,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Borç Durumu",
     "corners": {
       "bottomLeft": [
         100,
@@ -1577,7 +1577,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 43,
     "height": 10,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Borç Durumu",
     "corners": {
       "bottomLeft": [
         77,
@@ -1606,7 +1606,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 43,
     "height": 10,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Borç Durumu",
     "corners": {
       "bottomLeft": [
         77,
@@ -1635,7 +1635,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Konut Durumu",
     "corners": {
       "bottomLeft": [
         100,
@@ -1698,7 +1698,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Hane Konut Durumu",
     "corners": {
       "bottomLeft": [
         100,
@@ -1998,7 +1998,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Diğer Kurum Yardımlarından Yararlanma Durumu",
     "corners": {
       "bottomLeft": [
         131,
@@ -2047,7 +2047,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 13,
     "page": 2,
-    "section": "YENİ",
+    "section": "Diğer Kurum Yardımlarından Yararlanma Durumu",
     "corners": {
       "bottomLeft": [
         189,
@@ -2076,7 +2076,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 13,
     "page": 2,
-    "section": "YENİ",
+    "section": "Diğer Kurum Yardımlarından Yararlanma Durumu",
     "corners": {
       "bottomLeft": [
         78,
@@ -2105,7 +2105,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 13,
     "page": 2,
-    "section": "YENİ",
+    "section": "Diğer Kurum Yardımlarından Yararlanma Durumu",
     "corners": {
       "bottomLeft": [
         88,
@@ -2134,7 +2134,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 100,
     "height": 13,
     "page": 2,
-    "section": "YENİ",
+    "section": "Diğer Kurum Yardımlarından Yararlanma Durumu",
     "corners": {
       "bottomLeft": [
         191,
@@ -2163,7 +2163,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 160,
     "height": 13,
     "page": 2,
-    "section": "YENİ",
+    "section": "Diğer Kurum Yardımlarından Yararlanma Durumu",
     "corners": {
       "bottomLeft": [
         127,
@@ -2192,7 +2192,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Görüşme Yapan Kişi Bilgileri",
     "corners": {
       "bottomLeft": [
         83,
@@ -2222,7 +2222,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Görüşme Yapan Kişi Bilgileri",
     "corners": {
       "bottomLeft": [
         83,
@@ -2252,7 +2252,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Görüşme Yapan Kişi Bilgileri",
     "corners": {
       "bottomLeft": [
         83,
@@ -2282,7 +2282,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Görüşme Yapan Kişi Bilgileri",
     "corners": {
       "bottomLeft": [
         83,
@@ -2312,7 +2312,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 150,
     "height": 20,
     "page": 2,
-    "section": "YENİ",
+    "section": "Görüşme Yapan Kişi Bilgileri",
     "corners": {
       "bottomLeft": [
         83,
@@ -2343,7 +2343,7 @@ export const FORM_CONFIG: FieldConfig[] = [
     "width": 140,
     "height": 32,
     "page": 2,
-    "section": "YENİ",
+    "section": "Görüşme Yapan Kişi Bilgileri",
     "corners": {
       "bottomLeft": [
         150,
