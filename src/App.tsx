@@ -876,7 +876,7 @@ export default function App() {
         
         sheetData[field.id] = {
           section: field.section || '',
-          idNumber: idNumber,
+          id: idNumber,
           label: field.label,
           value: currentData[field.id] || ''
         };
