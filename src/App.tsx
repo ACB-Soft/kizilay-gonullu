@@ -1103,7 +1103,7 @@ export default function App() {
                 >
                   Geliştirici modu
                 </button>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 2.1.0</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Versiyon 2.1.1</p>
               </div>
             </div>
           )}
