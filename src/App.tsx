@@ -863,9 +863,20 @@ export default function App() {
     setIsSaving(true);
     try {
       const sheetData: any = {};
-      debugFields.forEach(field => {
-        if (field.id === '11.1-imza') return;
+      // Filter fields exactly like generateExcel (excluding signature and counters)
+      const filteredFields = debugFields.filter(f => 
+        f.id !== '11.1-imza' && 
+        f.id !== '3.0-haneoturansayisi' && 
+        f.id !== '4.0-hastalikadedi'
+      );
+
+      filteredFields.forEach(field => {
+        // ID'den sadece numarayı al (Örn: "2.0-adisoyadi" -> "2.0")
+        const idNumber = field.id.split('-')[0];
+        
         sheetData[field.id] = {
+          section: field.section || '',
+          idNumber: idNumber,
           label: field.label,
           value: currentData[field.id] || ''
         };
