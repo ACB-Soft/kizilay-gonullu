@@ -2020,24 +2020,14 @@ export default function App() {
                   {saveStatus === 'success' ? 'VERİLER İLETİLDİ' : isSaving ? 'GÖNDERİLİYOR...' : "VERİLERİ KIZILAY'A GÖNDER"}
                 </button>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <button 
-                    onClick={generatePDF}
-                    disabled={isGenerating}
-                    className="py-4 bg-red-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-red-100 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                  >
-                    {isGenerating ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : <Download size={18} />}
-                    PDF İNDİR
-                  </button>
-
-                  <button 
-                    onClick={generateExcel}
-                    className="py-4 bg-green-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-green-100 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                  >
-                    <FileText size={18} />
-                    EXCEL İNDİR
-                  </button>
-                </div>
+                <button 
+                  onClick={generatePDF}
+                  disabled={isGenerating}
+                  className="w-full py-5 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-200 flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+                >
+                  {isGenerating ? <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" /> : <Download size={24} />}
+                  PDF OLARAK İNDİR
+                </button>
                 
                 <button 
                   onClick={() => setView('home')}
