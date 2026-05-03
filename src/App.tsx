@@ -882,7 +882,8 @@ export default function App() {
           section: getStepLabel(field.id, field.section || ''),
           id: idNumber,
           label: field.label,
-          value: currentData[field.id] || ''
+          value: currentData[field.id] || '',
+          required: field.required || false
         };
       });
 
